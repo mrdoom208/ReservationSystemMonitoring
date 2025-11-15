@@ -1,0 +1,182 @@
+.login-button{
+    -fx-background-radius: 50; 
+    -fx-font-weight: bold; 
+    -fx-text-fill: black; 
+    -fx-font-size: 20;
+}
+.login-button:hover {
+    -fx-background-color: rgba(255, 0, 0, 0.5);
+    -fx-text-fill: white;
+   
+}
+
+.login-button-active{
+    -fx-background-radius: 50; 
+    -fx-text-fill: white; 
+    -fx-font-weight: bold; 
+    -fx-font-size: 20; 
+    -fx-background-color: #FF0000;
+}
+.login-button:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+#Submit {
+    -fx-background-radius: 10;
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(to bottom, #FF0000, #FF3333);
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+}
+
+#Submit:hover {
+    -fx-background-color: rgba(255, 0, 0, 0.5);
+    -fx-text-fill: black;
+}
+#Submit:pressed {
+    -fx-background-color: rgba(255, 0, 0, 0.2); 
+}
+
+
+.navigation-btns{
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-border-radius: 20;
+    
+}
+
+.navigation-btns:hover{
+    -fx-background-color: rgba(255, 0, 0, 0.5);
+    -fx-background-radius:20;
+    -fx-font-weight: normal;
+ 
+    
+    
+}
+.navigation-btns-active{
+    -fx-background-color: rgba(255, 0, 0, 1);
+    -fx-text-fill: white;
+    -fx-background-radius:20;
+    -fx-font-weight: bold;
+    
+    
+}
+.Scrollpane{
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
+
+.DashboardPane{
+    -fx-background-color:#1B1B1B;
+    
+    
+}
+.BoldText{
+    -fx-font-size: 30px;
+    -fx-text-fill: white;
+    -fx-fill: blue;
+    -fx-font-weight: bold;
+}
+.Section{
+    -fx-font-size: 24px;
+    -fx-text-fill: white;
+    -fx-font-weight: normal;
+}
+.Active-Statistics{
+    -fx-font-size: 50px;
+    -fx-text-fill: white;
+    -fx-fill: blue;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, transparent, 0, 0, 0, 0);
+    
+}
+    
+
+.PlainText{
+    -fx-text-fill: white;
+    -fx-fill: blue;
+    -fx-font-weight: normal;
+}
+
+.LineGraph-Label{
+    -fx-font-weight:normal;
+    -fx-font-size:20;
+    -fx-text-fill:white;
+}
+
+
+.Statistics-cell{
+     -fx-background-color:#303030;
+     -fx-background-radius:20;
+     -fx-effect: dropshadow(gaussian, transparent, 0, 0, 0, 0);
+}
+/*.Statistics-cell:hover{
+    -fx-effect: dropshadow(gaussian, rgba(255,64,129,0.3), 30, 0.4 , 0, 0);  
+}*/
+.notification-pane{
+    -fx-background-color:#303030;
+    -fx-background-radius:20;
+    -fx-pref-height:100;
+    }
+.close-notif-btn{
+    -fx-background-color:transparent;
+    -fx-border-color:transparent;
+    -fx-text-fill: #FFFFFFB3;
+}
+.notification-title{
+    -fx-text-fill:white;
+    -fx-font-size:15;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+.notification-message{
+    -fx-text-fill:white;
+    -fx-font-size:20;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+
+    
+}
+
+.my-linechart {
+    -fx-background-color: #222;   /* dark background */
+}
+
+.table-cell.available {
+    -fx-background-color: #4CAF50; /* green */
+    -fx-text-fill: white;
+}
+
+.table-cell.occupied {
+    -fx-background-color: #F44336; /* red */
+    -fx-text-fill: white;
+}
+
+.table-cell.reserved {
+    -fx-background-color: #FFC107; /* amber */
+    -fx-text-fill: #212121;
+}
+.DefaultTable{
+    -fx-table-cell-border-color: transparent;
+    -fx-table-cell-border-width: 0;
+    -fx-border-color: transparent;
+    /*-fx-background-color:transparent;*/
+}
+.DefaultTable .table-row-cell {
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+
+.DefaultTable .table-cell {
+    -fx-alignment: CENTER;  /* center horizontally and vertically */
+}
+.DefaultTable .column-header .label {
+    -fx-alignment: CENTER;
+}
+
+
+
