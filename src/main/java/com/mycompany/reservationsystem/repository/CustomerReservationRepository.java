@@ -7,6 +7,7 @@ package com.mycompany.reservationsystem.repository;
 import com.mycompany.reservationsystem.dto.CustomerReservationDTO;
 import com.mycompany.reservationsystem.model.CustomerReservation;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,8 +21,12 @@ import org.springframework.stereotype.Repository;
 public interface CustomerReservationRepository extends JpaRepository<CustomerReservation, Long> {
     long countByStatus(String Status);
 
-    List<CustomerReservation> findTop10ByOrderByDateDescTimeDesc(Pageable pageable);
+    List<CustomerReservation> findTop10ByOrderByDateDescReservationPendingtimeDesc(Pageable pageable);
     List<CustomerReservation> findByStatus(String status);
+    List<CustomerReservation> findByStatusIn(List<String> statuses);
+
+    Optional<CustomerReservation>findByReference(String reference);
+    
    
     
     

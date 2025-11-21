@@ -26,11 +26,15 @@ public class ManageTables {
     
     
     String tableNo;
-    String status;
-    
-    LocalTime time;
     int capacity;
-    String remarks;
+    String status;
+    String location;
+    
+    LocalTime tablestarttime;
+    LocalTime tableendtime;
+    
+    
+    
     
     @OneToMany(mappedBy = "table")
     private List<CustomerReservation> reservations;
@@ -52,12 +56,14 @@ public class ManageTables {
     public int getCapacity(){return capacity;}
     public void setCapacity(int Capacity){this.capacity = Capacity;}
     
-    public LocalTime getTime(){return time;}
-    public void setTime(LocalTime Time){this.time = Time;}
-    
-    
-    public String getRemarks(){return remarks;}
-    public void setRemarks(String Remarks){this.remarks = Remarks;}
+    public LocalTime getTablestarttime() {return tablestarttime;}
+    public void setTablestarttime(LocalTime tablestarttime) {this.tablestarttime = tablestarttime;}
+
+    public LocalTime getTableendtime() {return tableendtime;}
+    public void setTableendtime(LocalTime tableendtime) {this.tableendtime = tableendtime;}
+
+    public String getLocation(){return location;}
+    public void setLocation(String location){this.location = location;}
 
     
     

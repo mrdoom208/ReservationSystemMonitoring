@@ -177,6 +177,47 @@
 .DefaultTable .column-header .label {
     -fx-alignment: CENTER;
 }
+.CustomerReservationTable .scroll-bar {
+    -fx-opacity: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
+.CustomerReservationTable .table-cell{
+    -fx-alignment:CENTER;
+}
+.table-number-btn {
+    -fx-text-fill: rgba(17, 204, 128,1);      
+    -fx-underline: false;
+}
 
+
+.table-number-btn:hover {
+    -fx-underline: true;
+}
+
+.button-delete {
+    -fx-background-color: #C62828;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-font-size: 16px;
+}
+
+.button-delete:hover {
+    -fx-background-color: #B71C1C; /* darker red */
+}
+.button-cancel{
+    -fx-background-color:  #EEEEEE;
+    -fx-text-fill:  #333;
+    -fx-background-radius: 5;
+    -fx-font-size: 16px;
+}
+.button-cancel:hover{
+    -fx-background-color: #CCCCCC;
+}
+
+.TableLogs .column-header .label{
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+}
 
 

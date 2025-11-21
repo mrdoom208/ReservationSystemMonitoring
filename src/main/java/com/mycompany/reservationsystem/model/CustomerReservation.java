@@ -31,10 +31,13 @@ public class CustomerReservation {
     private String status;
     private String reference;
     private LocalDate date;
-    private LocalTime time;
+    private LocalTime reservationPendingtime;
+    private LocalTime reservationConfirmtime;
+    private LocalTime reservationSeatedtime;
+    private LocalTime reservationCompletetime;
     
     @ManyToOne
-    @JoinColumn(name="table_id")
+    @JoinColumn(name="table_id",nullable = true)
     private ManageTables table;
     
     
@@ -70,15 +73,30 @@ public class CustomerReservation {
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
     
-    public LocalTime getTime() { return time; }
-    public void setTime(LocalTime time) { this.time = time; }
+    public LocalTime getReservationPendingtime() {return reservationPendingtime;}
+
+    public void setReservationPendingtime(LocalTime reservationPendingtime) {this.reservationPendingtime = reservationPendingtime;}
+
+    public LocalTime getReservationStarttime() {return reservationConfirmtime;}
+
+    public void setReservationStarttime(LocalTime reservationStarttime) {this.reservationConfirmtime = reservationStarttime;}
     
-    public Long getTableId() {
-    return table != null ? table.getId() : null;
+    public LocalTime getReservationSeatedtime() {return reservationSeatedtime;}
+
+    public void setReservationSeatedtime(LocalTime reservationStarttime) {this.reservationSeatedtime = reservationStarttime;}
+
+    public LocalTime getReservationCompletetime() {return reservationCompletetime;}
+
+    public void setReservationCompletetime(LocalTime reservationCompletetime) {this.reservationCompletetime = reservationCompletetime;}
+
+    
+    public Long getTableId() {return table != null ? table.getId() : null;}
+    
+    public void setTable(ManageTables table) {this.table = table;}
     
     
 }
     
     
     
-}
+
