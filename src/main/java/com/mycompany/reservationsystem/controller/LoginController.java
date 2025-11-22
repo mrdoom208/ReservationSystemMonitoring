@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.text.*;
 import javafx.util.Duration;
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -114,13 +115,30 @@ public class LoginController {
                     Parent root = loader.load();
 
                     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+         
+
                     Scene scene = new Scene(root);
                     stage.setScene(scene);
                     stage.setResizable(true);
                     stage.setMinWidth(1300);
                     stage.setMinHeight(720);
                     stage.centerOnScreen();
+                   
+
                     stage.show();
+                    Platform.runLater(() -> {
+                        stage.setFullScreen(true);
+
+                        stage.fullScreenProperty().addListener((obs, oldV, newV) -> {
+                            if (!newV) {
+                                stage.setMinWidth(1300);
+                                stage.setMinHeight(720);
+
+                                if (stage.getWidth() < 1300) stage.setWidth(1300);
+                                if (stage.getHeight() < 720) stage.setHeight(720);
+                            }
+                        });
+                     });
                 }catch (IOException e) {
                     e.printStackTrace();
                 }    

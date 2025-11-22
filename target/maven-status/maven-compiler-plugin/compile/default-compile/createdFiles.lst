@@ -1,5 +1,6 @@
 com/mycompany/reservationsystem/App.class
 com/mycompany/reservationsystem/repository/UserRepository.class
+com/mycompany/reservationsystem/controller/AdministratorUIController$7.class
 com/mycompany/reservationsystem/controller/AdministratorUIController$2.class
 com/mycompany/reservationsystem/repository/ManageTablesRepository.class
 com/mycompany/reservationsystem/controller/AdministratorUIController.class
@@ -13,7 +14,9 @@ com/mycompany/reservationsystem/model/ReservationTableLogs.class
 com/mycompany/reservationsystem/controller/AdministratorUIController$1.class
 com/mycompany/reservationsystem/dto/CustomerReservationDTO.class
 com/mycompany/reservationsystem/controller/restrictions.class
+com/mycompany/reservationsystem/controller/AdministratorUIController$8.class
 com/mycompany/reservationsystem/websocket/ReservationListener.class
+com/mycompany/reservationsystem/controller/AdministratorUIController$6.class
 com/mycompany/reservationsystem/Service/ReservationService.class
 com/mycompany/reservationsystem/dto/ManageTablesDTO.class
 com/mycompany/reservationsystem/controller/AdministratorUIController$3.class
@@ -24,3 +27,4 @@ com/mycompany/reservationsystem/repository/CustomerReservationRepository.class
 com/mycompany/reservationsystem/repository/ReservationTableLogsRepository.class
 com/mycompany/reservationsystem/model/User.class
 com/mycompany/reservationsystem/websocket/WebSocketClient$1.class
+com/mycompany/reservationsystem/controller/AdministratorUIController$5.class

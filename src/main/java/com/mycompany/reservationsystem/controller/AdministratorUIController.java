@@ -17,6 +17,7 @@ import com.mycompany.reservationsystem.repository.ManageTablesRepository;
 import com.mycompany.reservationsystem.repository.ReservationTableLogsRepository;
 import com.mycompany.reservationsystem.websocket.ReservationListener;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
+
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -52,6 +53,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -86,7 +89,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableColumn<CustomerReservation, LocalTime> TimeColm,regSCNR,seatedSCNR,cancelSCNR,noshowSCNR;
     @FXML
-    private TableColumn<CustomerReservation, LocalDate> DateColm,dateSCNR;
+    private TableColumn<CustomerReservation, LocalDate> dateSCNR;
     @FXML
     private TableColumn<ManageTablesDTO, String> TableNoColum, TableCustomerColum, TableStatusColum, TablenoTM,StatusTM,CustomerTM,LocationTM;
     @FXML
@@ -239,9 +242,9 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     public void setupRecentReservation() {
 
-        TableColumn<?, ?>[] column = {CustomerColm, PaxColm, DateColm, TimeColm};
-        double[] widthFactors = {0.35, 0.12, 0.29, 0.24};
-        String[] namecol = {"name","pax","date","reservationPendingtime"};
+        TableColumn<?, ?>[] column = {CustomerColm, PaxColm, TimeColm};
+        double[] widthFactors = {0.4, 0.20, 0.4};
+        String[] namecol = {"name","pax","reservationPendingtime"};
 
         for (int i = 0; i < column.length; i++) {
             TableColumn<?, ?> col = column[i];
@@ -273,29 +276,30 @@ public class AdministratorUIController implements Initializable, ReservationList
             col.prefWidthProperty().bind(ManageTableView.widthProperty().multiply(widthFactors[i]));
             col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
         }
-        ManageTableView.setRowFactory(tv -> new TableRow<ManageTablesDTO>() {
+        TableStatusColum.setCellFactory(tv -> new TableCell<ManageTablesDTO, String>() {
             @Override
-            protected void updateItem(ManageTablesDTO item, boolean empty) {
+            protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
 
                 if (item == null || empty) {
                     setStyle("");
                 } else {
-                    String status = item.getStatus(); // Make sure your DTO has getStatus()
+                    setText(item); // Make sure your DTO has getStatus()
                     String bgColor;
 
-                    switch (status) {
+                    switch (item) {
                         case "Available" ->
-                            bgColor = "#4CAF50";
+                            bgColor = "#2a4d2a";
                         case "Occupied" ->
-                            bgColor = "#F44336";
+                            bgColor = "#5a1e1e";
                         case "Reserved" ->
-                            bgColor = "#FFC107";
+                            bgColor = "#7A5A00";
                         default ->
                             bgColor = "white";
                     }
 
-                    setStyle("-fx-background-color: " + bgColor + "; -fx-text-fill: white;");
+                    setStyle("-fx-background-color: " + bgColor + "; -fx-padding: 5;");
+                    
                 }
             }
         });
@@ -314,7 +318,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         title.getStyleClass().add("notification-title");
         Label Message = new Label(message);
         Message.getStyleClass().add("notification-message");
-
+                    
         Button closeBtn = new Button("X");
         closeBtn.getStyleClass().add("close-notif-btn");
         closeBtn.setOnAction(e -> notificationArea.getChildren().remove(pane));
@@ -407,6 +411,32 @@ public class AdministratorUIController implements Initializable, ReservationList
                 }
             }
         });
+        StatusCRT.setCellFactory(tv -> new TableCell<CustomerReservation, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setStyle("");
+                } else {
+                    setText(item); // Make sure your DTO has getStatus()
+                    String bgColor;
+
+                    switch (item) {
+                        case "Confirm" ->
+                            bgColor = "#2196F3";
+                        case "Pending" ->
+                            bgColor = "#B0BEC5";
+                       
+                        default ->
+                            bgColor = "transparent";
+                    }
+
+                    setStyle("-fx-background-color: " + bgColor + "; -fx-padding: 5;");
+                    
+                }
+            }
+        });
 
         TableColumn<?, ?>[] column = {ReferenceCRT, NameCRT, PaxCRT, StatusCRT, PreferCRT, PhoneCRT, EmailCRT, TimeCRT, TableNoCRT};
         double[] widthFactors = {0.1, 0.15, 0.06, 0.1, 0.1, 0.12, 0.15, 0.13, 0.09};
@@ -433,7 +463,8 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
     
     public void loadCustomerReservationTable() {
-        List<CustomerReservation> Data = customerReservationRepository.findByStatus("Pending");
+        List<String> statuses = List.of("Pending", "Confirm");
+        List<CustomerReservation> Data = customerReservationRepository.findByStatusIn(statuses);
         pendingReservations.setAll(Data);
         pending.setText(String.valueOf(customerReservationRepository.countByStatus("Pending")));
         confirm.setText(String.valueOf(customerReservationRepository.countByStatus("Confirm")));
@@ -869,8 +900,44 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
     
     private void setupSCNReservation(){
+        SCNReservations.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+        if (newSkin != null) {
+        ScrollBar hBar = (ScrollBar) SCNReservations.lookup(".scroll-bar:horizontal");
+        if (hBar != null) {
+            hBar.setVisible(false);
+            hBar.setManaged(false); // removes layout space
+        }
+        }
+        });
+        statusSCNR.setCellFactory(tv -> new TableCell<CustomerReservation, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setStyle("");
+                } else {
+                    setText(item); // Make sure your DTO has getStatus()
+                    String bgColor;
+
+                    switch (item) {
+                        case "Seated" ->
+                            bgColor = "#2E7D32";
+                        case "Cancelled" ->
+                            bgColor = "#D32F2F";
+                        case "No Show" ->
+                            bgColor = "#9C27B0";
+                        default ->
+                            bgColor = "transparent";
+                    }
+
+                    setStyle("-fx-background-color: " + bgColor + "; -fx-padding: 5;");
+                    
+                }
+            }
+        });
         TableColumn<?, ?>[] column = {refSCNR, customerSCNR, paxSCNR, phoneSCNR, statusSCNR, regSCNR, seatedSCNR, cancelSCNR, noshowSCNR,dateSCNR};
-        double[] widthFactors = {0.1, 0.15, 0.05, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,0.1};
+        double[] widthFactors = {0.1, 0.15, 0.05, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,0.01};
         String[] namecol = {"reference", "name", "pax", "phone", "status", "reservationPendingtime", "reservationSeatedtime", "reservationCompletetime", "reservationCompletetime","date"};
 
         for (int i = 0; i < column.length; i++) {
@@ -889,7 +956,10 @@ public class AdministratorUIController implements Initializable, ReservationList
             col.setReorderable(false);
             col.prefWidthProperty().bind(SCNReservations.widthProperty().multiply(widthFactors[i]));
             col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
+            
         }
+        SCNReservations.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
 
         
     }
@@ -915,23 +985,92 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     }
     
+    
     public void setupTableManager() {
+        StatusTM.setCellFactory(tv -> new TableCell<ManageTablesDTO, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setStyle("");
+                } else {
+                    setText(item); // Make sure your DTO has getStatus()
+                    String bgColor;
+
+                    switch (item) {
+                        case "Available" ->
+                            bgColor = "#2a4d2a";
+                        case "Occupied" ->
+                            bgColor = "#5a1e1e";
+                        case "Reserved" ->
+                            bgColor = "#7A5A00";
+                        default ->
+                            bgColor = "white";
+                    }
+
+                    setStyle("-fx-background-color: " + bgColor + "; -fx-margin: 8 16 8 16;");
+                    
+                }
+            }
+        });
+
 
         // --- Action Column with Buttons ---
         ActionTM.setCellFactory(col -> new TableCell<ManageTablesDTO, Void>() {
+            FontIcon utensilIcon = new FontIcon(FontAwesomeSolid.UTENSILS);
+            FontIcon editIcon = new FontIcon(FontAwesomeSolid.PEN_SQUARE);
+            FontIcon deleteIcon = new FontIcon(FontAwesomeSolid.TRASH);
+            FontIcon completeIcon = new FontIcon(FontAwesomeSolid.RECEIPT);
+            
+            
             private final Button btnStart = new Button("Start Service");
+            
             private final Button btnEdit = new Button("Edit");
             private final Button btnDelete = new Button("Delete");
             private final Button btnComplete = new Button("Finished!");
             private final HBox hbox = new HBox(5);
 
             {
+                utensilIcon.setIconSize(14);
+                utensilIcon.setIconColor(Color.web("#ffffff"));
+                editIcon.setIconSize(14);
+                editIcon.setIconColor(Color.web("#000000"));
+                deleteIcon.setIconSize(14);
+                deleteIcon.setIconColor(Color.web("#ffffff"));
+                completeIcon.setIconSize(14);
+                completeIcon.setIconColor(Color.web("#ffffff"));
+                
+                
+                
+                
+                btnStart.setGraphic(utensilIcon);
+                btnStart.setContentDisplay(javafx.scene.control.ContentDisplay.LEFT);
+                btnStart.getStyleClass().add("start-service");
+                
+                btnEdit.setGraphic(editIcon);
+                btnEdit.setContentDisplay(javafx.scene.control.ContentDisplay.LEFT);
+                btnEdit.getStyleClass().add("edit");
+                
+                btnDelete.setGraphic(deleteIcon);
+                btnDelete.setContentDisplay(javafx.scene.control.ContentDisplay.LEFT);
+                btnDelete.getStyleClass().add("delete");
+                
+                btnComplete.setGraphic(completeIcon);
+                btnComplete.setContentDisplay(javafx.scene.control.ContentDisplay.LEFT);
+                btnComplete.getStyleClass().add("complete");
+
+
+            
                 hbox.setAlignment(Pos.CENTER);
                 btnStart.setMaxWidth(Double.MAX_VALUE);
                 btnEdit.setMaxWidth(Double.MAX_VALUE);
                 btnDelete.setMaxWidth(Double.MAX_VALUE);
-                btnDelete.setMaxWidth(Double.MAX_VALUE);
-                HBox.setHgrow(btnStart, Priority.ALWAYS);
+                btnStart.setMaxHeight(Double.MAX_VALUE);
+                btnEdit.setMaxHeight(Double.MAX_VALUE);
+                btnDelete.setMaxHeight(Double.MAX_VALUE);
+                
+                HBox.setHgrow(btnComplete, Priority.ALWAYS);
                 HBox.setHgrow(btnStart, Priority.ALWAYS);
                 HBox.setHgrow(btnEdit, Priority.ALWAYS);
                 HBox.setHgrow(btnDelete, Priority.ALWAYS);
@@ -941,11 +1080,12 @@ public class AdministratorUIController implements Initializable, ReservationList
                     if (data != null) {
                         data.setStatus("Occupied");
                         updateButtonsForStatus(data);
-                        loadTableView();
+                        
                         tablesService.updateStatus(data.getTableId(),data.getStatus());
                         reservationService.updateSeatedtime(data.getReference(),LocalTime.now());
                         data.setReservationSeatedtime(LocalTime.now());
-                        
+                        loadTableView();
+                        loadTableManager();
                         
                         
     
@@ -959,19 +1099,20 @@ public class AdministratorUIController implements Initializable, ReservationList
                         data.setDate(LocalDate.now());
                         
                         updateButtonsForStatus(data);
-                        getTableView().refresh();
+                        
                         ReservationTableLogs reservationtablelogs = new ReservationTableLogs(data);
                         RTLR.save(reservationtablelogs);
                         reservationService.updateStatus(data.getReference(),data.getStatus());
                         reservationService.updateTableId(data.getReference(),null);
-                        loadCustomerReservationTable();
-                        loadReservationLogs();
-                        loadTableView();
+                       
                         data.setCustomer("");
                         data.setPax(null);
                         data.setStatus("Available");
                         tablesService.updateStatus(data.getTableId(),data.getStatus());
-                        
+                        loadTableView();
+                        loadCustomerReservationTable();
+                        loadReservationLogs();
+                        loadTableManager();
                         
                         
                         
@@ -1054,7 +1195,7 @@ public class AdministratorUIController implements Initializable, ReservationList
                     hbox.getChildren().setAll(btnComplete,btnEdit, btnDelete);
                 
                 }else {
-                    hbox.getChildren().setAll(btnEdit, btnDelete);;
+                    hbox.getChildren().setAll(btnEdit, btnDelete);
                 }
             }
 
@@ -1069,7 +1210,7 @@ public class AdministratorUIController implements Initializable, ReservationList
 
         // --- Setup Other Columns ---
         TableColumn<?, ?>[] column = {TablenoTM, CustomerTM, PaxTM, StatusTM, CapacityTM, LocationTM, TimeUsedTM, ActionTM};
-        double[] widthFactors = {0.08, 0.18, 0.06, 0.13, 0.08, 0.12, 0.10, 0.25};
+        double[] widthFactors = {0.08, 0.18, 0.06, 0.11, 0.08, 0.12, 0.10, 0.27};
         String[] namecol = {"tableNo", "customer", "pax", "status", "capacity", "location", "tablestarttime", ""};
 
         for (int i = 0; i < column.length; i++) {
@@ -1114,6 +1255,40 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
     
     private void setupReservationLogs(){
+        ReservationLogs.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+        if (newSkin != null) {
+        ScrollBar hBar = (ScrollBar) ReservationLogs.lookup(".scroll-bar:horizontal");
+        if (hBar != null) {
+            hBar.setVisible(false);
+            hBar.setManaged(false); // removes layout space
+        }
+        }
+        });
+        statusRL.setCellFactory(tv -> new TableCell<ReservationTableLogs, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setStyle("");
+                } else {
+                    setText(item); // Make sure your DTO has getStatus()
+                    String bgColor;
+
+                    switch (item) {
+                        case "Complete" ->
+                            bgColor = "#4CAF50";
+                       
+                        default ->
+                            bgColor = "transparent";
+                    }
+
+                    setStyle("-fx-background-color: " + bgColor + "; -fx-padding: 5;");
+                    
+                }
+            }
+        });
+
         TableColumn<?, ?>[] column = {customerRL,paxRL,phoneRL,preferRL,statusRL,pendingRL,confirmRL,seatedRL,completeRL,tablenoRL,refRL,dateRL};
         double[] widthFactors = {0.13, 0.05, 0.1, 0.1, 0.1, 0.07, 0.07, 0.07,0.07,0.05,0.08,0.11};
         String[] namecol = {"customer", "pax", "phone", "prefer", "status", "reservationPendingtime", "reservationConfirmtime","reservationSeatedtime","reservationCompletetime","tableNo","reference","date"};
