@@ -25,7 +25,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="720.0" minWidth="1300.0" prefHeight="1700.0" prefWidth="1300.0" style="-fx-background-color: #1B1B1B;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.reservationsystem.controller.AdministratorUIController">
+<BorderPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="720.0" minWidth="1300.0" prefHeight="720.0" prefWidth="1300.0" style="-fx-background-color: #1B1B1B;" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.reservationsystem.controller.AdministratorUIController">
    <left>
       <GridPane prefHeight="720.0" prefWidth="142.0" style="-fx-background-color: #303030;" BorderPane.alignment="CENTER">
         <columnConstraints>
@@ -343,223 +343,6 @@
                   </BorderPane>
                </content>
             </ScrollPane>
-            <ScrollPane fx:id="DashboardPane" fitToWidth="true" minViewportWidth="1100.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent;" styleClass="Scrollpane">
-               <content>
-                  <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1196.0" prefWidth="1140.0" styleClass="DashboardPane">
-                     <right>
-                        <Region prefHeight="718.0" prefWidth="20.0" BorderPane.alignment="CENTER" />
-                     </right>
-                     <left>
-                        <Region prefHeight="1100.0" prefWidth="34.0" BorderPane.alignment="CENTER" />
-                     </left>
-                     <center>
-                        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-                           <children>
-                              <Label maxHeight="42.0" maxWidth="200.0" minHeight="42.0" minWidth="200.0" prefHeight="42.0" prefWidth="200.0" styleClass="BoldText" text="Dashboard" textFill="WHITE" VBox.vgrow="NEVER">
-                                 <font>
-                                    <Font size="30.0" />
-                                 </font>
-                                 <padding>
-                                    <Insets top="10.0" />
-                                 </padding>
-                              </Label>
-                              <Region prefHeight="30.0" prefWidth="1275.0" />
-                              <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="1086.0" spacing="10.0" VBox.vgrow="ALWAYS">
-                                 <children>
-                                    <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="211.0" styleClass="Section" text="Statistics Overview" textFill="WHITE" VBox.vgrow="ALWAYS">
-                                       <font>
-                                          <Font size="24.0" />
-                                       </font>
-                                    </Label>
-                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="80.0" VBox.vgrow="ALWAYS">
-                                       <children>
-                                          <StackPane prefHeight="150.0" prefWidth="200.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
-                                             <children>
-                                                <Label fx:id="Total_CustomerDbd" styleClass="Active-Statistics" text="100" StackPane.alignment="CENTER">
-                                                   <font>
-                                                      <Font size="45.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label styleClass="PlainText" text="Total Customer" StackPane.alignment="TOP_CENTER">
-                                                   <StackPane.margin>
-                                                      <Insets top="10.0" />
-                                                   </StackPane.margin>
-                                                </Label>
-                                             </children>
-                                          </StackPane>
-                                          <StackPane prefHeight="150.0" prefWidth="200.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
-                                             <children>
-                                                <Label styleClass="PlainText" text="Active Table" StackPane.alignment="TOP_CENTER">
-                                                   <StackPane.margin>
-                                                      <Insets top="10.0" />
-                                                   </StackPane.margin>
-                                                </Label>
-                                                <Label styleClass="Active-Statistics" text="10/15" StackPane.alignment="CENTER">
-                                                   <font>
-                                                      <Font size="45.0" />
-                                                   </font>
-                                                </Label>
-                                             </children>
-                                          </StackPane>
-                                          <StackPane prefHeight="150.0" prefWidth="200.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
-                                             <children>
-                                                <Label fx:id="Total_Pending" styleClass="Active-Statistics" text="10">
-                                                   <font>
-                                                      <Font size="45.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label styleClass="PlainText" text="Pending" StackPane.alignment="TOP_CENTER">
-                                                   <StackPane.margin>
-                                                      <Insets top="10.0" />
-                                                   </StackPane.margin>
-                                                </Label>
-                                             </children>
-                                          </StackPane>
-                                          <StackPane prefHeight="150.0" prefWidth="200.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
-                                             <children>
-                                                <Label styleClass="PlainText" text="Cancelled" StackPane.alignment="TOP_CENTER">
-                                                   <StackPane.margin>
-                                                      <Insets top="10.0" />
-                                                   </StackPane.margin>
-                                                </Label>
-                                                <Label fx:id="Total_Cancelled" styleClass="Active-Statistics" text="15">
-                                                   <font>
-                                                      <Font size="45.0" />
-                                                   </font>
-                                                </Label>
-                                             </children>
-                                          </StackPane>
-                                       </children>
-                                    </HBox>
-                                 </children>
-                              </VBox>
-                              <Region prefHeight="45.0" prefWidth="1055.0" />
-                              <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="465.0" prefWidth="1100.0" VBox.vgrow="ALWAYS">
-                                 <children>
-                                    <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="457.0" prefWidth="660.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
-                                       <HBox.margin>
-                                          <Insets />
-                                       </HBox.margin>
-                                       <padding>
-                                          <Insets bottom="5.0" left="10.0" right="15.0" top="10.0" />
-                                       </padding>
-                                       <children>
-                                          <BorderPane prefHeight="285.0" prefWidth="635.0" VBox.vgrow="ALWAYS">
-                                             <center>
-                                                 <LineChart fx:id="myBarChart" legendVisible="false" maxHeight="1.7976931348623157E308" prefWidth="661.0" BorderPane.alignment="CENTER">
-                                                  <xAxis>
-                                                    <CategoryAxis fx:id="xAxis" />
-                                                  </xAxis>
-                                                  <yAxis>
-                                                    <NumberAxis fx:id="yAxis" />
-                                                  </yAxis>
-                                                   <padding>
-                                                      <Insets top="-10.0" />
-                                                   </padding>
-                                                </LineChart>
-                                             </center>
-                                             <left>
-                                                <StackPane prefHeight="398.0" prefWidth="18.0" BorderPane.alignment="CENTER">
-                                                   <children>
-                                                      <Label contentDisplay="CENTER" styleClass="LineGraph-Label" text="CUSTOMERS" textAlignment="CENTER" wrapText="true">
-                                                         <font>
-                                                            <Font size="20.0" />
-                                                         </font>
-                                                      </Label>
-                                                   </children>
-                                                </StackPane>
-                                             </left>
-                                             <bottom>
-                                                <StackPane prefHeight="15.0" prefWidth="679.0" BorderPane.alignment="CENTER">
-                                                   <children>
-                                                      <Label prefHeight="29.0" prefWidth="52.0" styleClass="LineGraph-Label" text="DAYS" textAlignment="JUSTIFY">
-                                                         <font>
-                                                            <Font size="20.0" />
-                                                         </font>
-                                                      </Label>
-                                                   </children>
-                                                </StackPane>
-                                             </bottom>
-                                             <top>
-                                                <StackPane maxHeight="42.0" prefHeight="0.0" prefWidth="679.0" BorderPane.alignment="CENTER">
-                                                   <children>
-                                                      <Label prefHeight="11.0" prefWidth="230.0" styleClass="BoldText" text="Daily Customer">
-                                                         <font>
-                                                            <Font size="20.0" />
-                                                         </font>
-                                                      </Label>
-                                                   </children>
-                                                </StackPane>
-                                             </top>
-                                          </BorderPane>
-                                       </children>
-                                    </VBox>
-                                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="43.0" HBox.hgrow="SOMETIMES" />
-                                    <VBox maxWidth="1.7976931348623157E308" prefHeight="455.0" prefWidth="339.0" styleClass="Statistics-cell" HBox.hgrow="SOMETIMES">
-                                       <children>
-                                          <StackPane prefHeight="48.0" prefWidth="357.0" VBox.vgrow="ALWAYS">
-                                             <children>
-                                                <Label styleClass="PlainText" text="Recent Reservation " />
-                                             </children>
-                                          </StackPane>
-                                          <TableView fx:id="RecentReservationTable" fixedCellSize="0.0" prefHeight="386.0" prefWidth="357.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
-                                            <columns>
-                                              <TableColumn fx:id="CustomerColm" minWidth="0.0" prefWidth="138.0" text="Customer " />
-                                              <TableColumn fx:id="PaxColm" minWidth="0.0" prefWidth="86.0" text="Pax" />
-                                                <TableColumn fx:id="TimeColm" prefWidth="51.0" text="Time" />
-                                            </columns>
-                                             <columnResizePolicy>
-                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                             </columnResizePolicy>
-                                          </TableView>
-                                       </children>
-                                       <padding>
-                                          <Insets bottom="25.0" left="25.0" right="25.0" />
-                                       </padding>
-                                    </VBox>
-                                 </children>
-                              </HBox>
-                              <Region prefHeight="45.0" prefWidth="1055.0" />
-                              <HBox prefHeight="427.0" prefWidth="1100.0">
-                                 <children>
-                                    <VBox alignment="TOP_CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="335.0" prefWidth="757.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
-                                       <children>
-                                          <Label styleClass="Section" text="Table view" textAlignment="CENTER">
-                                             <font>
-                                                <Font size="24.0" />
-                                             </font>
-                                             <VBox.margin>
-                                                <Insets top="10.0" />
-                                             </VBox.margin>
-                                          </Label>
-                                          <TableView fx:id="ManageTableView" prefHeight="400.0" prefWidth="754.0" styleClass="DefaultTable">
-                                            <columns>
-                                              <TableColumn fx:id="TableNoColum" prefWidth="75.0" text="Table No." />
-                                              <TableColumn fx:id="TableCustomerColum" prefWidth="79.0" text="Customer" />
-                                                <TableColumn fx:id="TablePaxColum" prefWidth="75.0" text="Pax" />
-                                                <TableColumn fx:id="TableStatusColum" prefWidth="75.0" text="Status" />
-                                                <TableColumn fx:id="TableCapacityColum" prefWidth="75.0" text="TableCapacity" />
-                                                <TableColumn fx:id="TableTimeColum" prefWidth="75.0" text="Time" />
-                                            </columns>
-                                             <VBox.margin>
-                                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                                             </VBox.margin>
-                                             <columnResizePolicy>
-                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                             </columnResizePolicy>
-                                          </TableView>
-                                       </children>
-                                    </VBox>
-                                    <Region maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="200.0" prefWidth="42.0" />
-                                    <VBox fx:id="notificationArea" prefHeight="418.0" prefWidth="314.0" spacing="10.0" HBox.hgrow="SOMETIMES" />
-                                 </children>
-                              </HBox>
-                           </children>
-                        </VBox>
-                     </center>
-                  </BorderPane>
-               </content>
-            </ScrollPane>
             <ScrollPane fx:id="TableManagementPane" fitToWidth="true" prefHeight="200.0" prefViewportWidth="1158.0" prefWidth="200.0" styleClass="Scrollpane">
                <content>
                   <BorderPane prefHeight="1100.0" prefWidth="200.0" styleClass="DashboardPane">
@@ -758,7 +541,7 @@
                            <children>
                               <Label styleClass="BoldText" text="Reservation Management">
                                  <font>
-                                    <Font size="36.0" />
+                                    <Font name="Arial" size="36.0" />
                                  </font>
                                  <VBox.margin>
                                     <Insets top="10.0" />
@@ -780,8 +563,33 @@
                                                 <Button fx:id="newcustomer" mnemonicParsing="false" onAction="#addCustomerReservation" prefHeight="34.0" prefWidth="126.0" text="New Reservation" HBox.hgrow="ALWAYS" />
                                              </children>
                                              <VBox.margin>
-                                                <Insets left="25.0" right="25.0" />
+                                                <Insets />
                                              </VBox.margin>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="717.0" VBox.vgrow="ALWAYS">
+                                             <children>
+                                                <Label prefHeight="31.0" prefWidth="71.0" styleClass="static-label" text="Search:">
+                                                   <font>
+                                                      <Font size="18.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="SearchCL" prefHeight="29.0" prefWidth="158.0" />
+                                                <Region prefHeight="37.0" prefWidth="62.0" />
+                                                <Label prefHeight="24.0" prefWidth="52.0" styleClass="static-label" text="filter:">
+                                                   <font>
+                                                      <Font size="18.0" />
+                                                   </font>
+                                                </Label>
+                                                <MenuButton alignment="CENTER" mnemonicParsing="false" prefHeight="29.0" prefWidth="78.0" text="All" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                                  <items>
+                                                    <MenuItem mnemonicParsing="false" text="Confirm" />
+                                                    <MenuItem mnemonicParsing="false" text="Pending" />
+                                                  </items>
+                                                   <font>
+                                                      <Font size="18.0" />
+                                                   </font>
+                                                </MenuButton>
+                                             </children>
                                           </HBox>
                                           <TableView fx:id="CustomerReservationTable" prefHeight="377.0" prefWidth="664.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
                                              <columns>
@@ -799,7 +607,7 @@
                                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                              </columnResizePolicy>
                                              <VBox.margin>
-                                                <Insets left="25.0" right="25.0" />
+                                                <Insets />
                                              </VBox.margin>
                                           </TableView>
                                           <HBox alignment="CENTER" prefHeight="52.0" prefWidth="714.0">
@@ -809,33 +617,36 @@
                                                       <Insets />
                                                    </HBox.margin>
                                                 </Region>
-                                                <Label style="-fx-font-size: 18px;" styleClass="PlainText" text="Pending: ">
+                                                <Label style="-fx-font-size: 18px;" styleClass="static-label" text="Pending: ">
                                                    <font>
                                                       <Font size="18.0" />
                                                    </font>
                                                 </Label>
-                                                <Label fx:id="pending" style="-fx-font-size: 18px;" styleClass="PlainText" text="0">
+                                                <Label fx:id="pending" style="-fx-font-size: 18px;" styleClass="static-label" text="0">
                                                    <font>
                                                       <Font size="18.0" />
                                                    </font>
                                                 </Label>
                                                 <Region prefHeight="44.0" prefWidth="33.0" />
-                                                <Label style="-fx-font-size: 18px;" styleClass="PlainText" text="Confirm: ">
+                                                <Label style="-fx-font-size: 18px;" styleClass="static-label" text="Confirm: ">
                                                    <font>
                                                       <Font size="18.0" />
                                                    </font>
                                                 </Label>
-                                                <Label fx:id="confirm" style="-fx-font-size: 18px;" styleClass="PlainText" text="0">
+                                                <Label fx:id="confirm" style="-fx-font-size: 18px;" styleClass="static-label" text="0">
                                                    <font>
                                                       <Font size="18.0" />
                                                    </font>
                                                 </Label>
                                              </children>
                                              <VBox.margin>
-                                                <Insets left="25.0" right="25.0" />
+                                                <Insets />
                                              </VBox.margin>
                                           </HBox>
                                        </children>
+                                       <padding>
+                                          <Insets left="25.0" right="25.0" />
+                                       </padding>
                                     </VBox>
                                     <VBox fx:id="hiddenTable" prefHeight="462.0" prefWidth="709.0" styleClass="Statistics-cell" HBox.hgrow="SOMETIMES">
                                        <children>
@@ -968,6 +779,223 @@
                                     <Region prefHeight="18.0" prefWidth="1066.0" />
                                  </children>
                               </VBox>
+                           </children>
+                        </VBox>
+                     </center>
+                  </BorderPane>
+               </content>
+            </ScrollPane>
+            <ScrollPane fx:id="DashboardPane" fitToWidth="true" minViewportWidth="1100.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent;" styleClass="Scrollpane">
+               <content>
+                  <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1196.0" prefWidth="1140.0" styleClass="DashboardPane">
+                     <right>
+                        <Region prefHeight="718.0" prefWidth="20.0" BorderPane.alignment="CENTER" />
+                     </right>
+                     <left>
+                        <Region prefHeight="1100.0" prefWidth="34.0" BorderPane.alignment="CENTER" />
+                     </left>
+                     <center>
+                        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <Label maxHeight="42.0" maxWidth="200.0" minHeight="42.0" minWidth="200.0" prefHeight="42.0" prefWidth="200.0" styleClass="BoldText" text="Dashboard" textFill="WHITE" VBox.vgrow="NEVER">
+                                 <font>
+                                    <Font size="30.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets top="10.0" />
+                                 </padding>
+                              </Label>
+                              <Region prefHeight="30.0" prefWidth="1275.0" />
+                              <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="1086.0" spacing="10.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <StackPane prefHeight="47.0" prefWidth="1092.0">
+                                       <children>
+                                          <Label styleClass="BoldText" text="Statistics Overview" />
+                                       </children>
+                                    </StackPane>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="80.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <StackPane prefHeight="150.0" prefWidth="200.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Label fx:id="Total_CustomerDbd" styleClass="Active-Statistics" text="100" StackPane.alignment="CENTER">
+                                                   <font>
+                                                      <Font size="45.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label styleClass="PlainText" text="Total Customer" StackPane.alignment="TOP_CENTER">
+                                                   <StackPane.margin>
+                                                      <Insets top="10.0" />
+                                                   </StackPane.margin>
+                                                </Label>
+                                             </children>
+                                          </StackPane>
+                                          <StackPane prefHeight="150.0" prefWidth="200.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Label styleClass="PlainText" text="Occupied / Reserved / Total:" StackPane.alignment="TOP_CENTER">
+                                                   <StackPane.margin>
+                                                      <Insets top="10.0" />
+                                                   </StackPane.margin>
+                                                </Label>
+                                                <Label fx:id="activetable" styleClass="Active-Statistics" text="10/15" StackPane.alignment="CENTER">
+                                                   <font>
+                                                      <Font size="45.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </StackPane>
+                                          <StackPane prefHeight="150.0" prefWidth="200.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Label fx:id="Total_Pending" styleClass="Active-Statistics" text="10">
+                                                   <font>
+                                                      <Font size="45.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label styleClass="PlainText" text="Pending" StackPane.alignment="TOP_CENTER">
+                                                   <StackPane.margin>
+                                                      <Insets top="10.0" />
+                                                   </StackPane.margin>
+                                                </Label>
+                                             </children>
+                                          </StackPane>
+                                          <StackPane prefHeight="150.0" prefWidth="200.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Label styleClass="PlainText" text="Cancelled" StackPane.alignment="TOP_CENTER">
+                                                   <StackPane.margin>
+                                                      <Insets top="10.0" />
+                                                   </StackPane.margin>
+                                                </Label>
+                                                <Label fx:id="Total_Cancelled" styleClass="Active-Statistics" text="15">
+                                                   <font>
+                                                      <Font size="45.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </StackPane>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <Region prefHeight="45.0" prefWidth="1055.0" />
+                              <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="465.0" prefWidth="1100.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="457.0" prefWidth="660.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
+                                       <HBox.margin>
+                                          <Insets />
+                                       </HBox.margin>
+                                       <padding>
+                                          <Insets bottom="5.0" left="10.0" right="15.0" top="10.0" />
+                                       </padding>
+                                       <children>
+                                          <BorderPane prefHeight="285.0" prefWidth="635.0" VBox.vgrow="ALWAYS">
+                                             <center>
+                                                 <LineChart fx:id="myBarChart" legendVisible="false" maxHeight="1.7976931348623157E308" prefWidth="661.0" BorderPane.alignment="CENTER">
+                                                  <xAxis>
+                                                    <CategoryAxis fx:id="xAxis" />
+                                                  </xAxis>
+                                                  <yAxis>
+                                                    <NumberAxis fx:id="yAxis" />
+                                                  </yAxis>
+                                                   <padding>
+                                                      <Insets top="-10.0" />
+                                                   </padding>
+                                                </LineChart>
+                                             </center>
+                                             <left>
+                                                <StackPane prefHeight="398.0" prefWidth="18.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Label contentDisplay="CENTER" styleClass="LineGraph-Label" text="CUSTOMERS" textAlignment="CENTER" wrapText="true">
+                                                         <font>
+                                                            <Font size="20.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </StackPane>
+                                             </left>
+                                             <bottom>
+                                                <StackPane prefHeight="15.0" prefWidth="679.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Label prefHeight="29.0" prefWidth="52.0" styleClass="LineGraph-Label" text="DAYS" textAlignment="JUSTIFY">
+                                                         <font>
+                                                            <Font size="20.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </StackPane>
+                                             </bottom>
+                                             <top>
+                                                <StackPane maxHeight="42.0" prefHeight="0.0" prefWidth="679.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Label prefHeight="11.0" prefWidth="230.0" styleClass="BoldText" text="Daily Customer">
+                                                         <font>
+                                                            <Font size="20.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </StackPane>
+                                             </top>
+                                          </BorderPane>
+                                       </children>
+                                    </VBox>
+                                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="43.0" HBox.hgrow="SOMETIMES" />
+                                    <VBox maxWidth="1.7976931348623157E308" prefHeight="455.0" prefWidth="339.0" styleClass="Statistics-cell" HBox.hgrow="SOMETIMES">
+                                       <children>
+                                          <StackPane prefHeight="48.0" prefWidth="357.0" VBox.vgrow="ALWAYS">
+                                             <children>
+                                                <Label styleClass="PlainText" text="Recent Reservation " />
+                                             </children>
+                                          </StackPane>
+                                          <TableView fx:id="RecentReservationTable" fixedCellSize="0.0" prefHeight="386.0" prefWidth="357.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
+                                            <columns>
+                                              <TableColumn fx:id="CustomerColm" minWidth="0.0" prefWidth="138.0" text="Customer " />
+                                              <TableColumn fx:id="PaxColm" minWidth="0.0" prefWidth="86.0" text="Pax" />
+                                                <TableColumn fx:id="TimeColm" prefWidth="51.0" text="Time" />
+                                            </columns>
+                                             <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TableView>
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="25.0" left="25.0" right="25.0" />
+                                       </padding>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <Region prefHeight="45.0" prefWidth="1055.0" />
+                              <HBox prefHeight="427.0" prefWidth="1100.0">
+                                 <children>
+                                    <VBox alignment="TOP_CENTER" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="335.0" prefWidth="757.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="Section" text="Table view" textAlignment="CENTER">
+                                             <font>
+                                                <Font size="24.0" />
+                                             </font>
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <TableView fx:id="ManageTableView" prefHeight="400.0" prefWidth="754.0" styleClass="DefaultTable">
+                                            <columns>
+                                              <TableColumn fx:id="TableNoColum" prefWidth="75.0" text="Table No." />
+                                              <TableColumn fx:id="TableCustomerColum" prefWidth="79.0" text="Customer" />
+                                                <TableColumn fx:id="TablePaxColum" prefWidth="75.0" text="Pax" />
+                                                <TableColumn fx:id="TableStatusColum" prefWidth="75.0" text="Status" />
+                                                <TableColumn fx:id="TableCapacityColum" prefWidth="75.0" text="TableCapacity" />
+                                                <TableColumn fx:id="TableTimeColum" prefWidth="75.0" text="Time" />
+                                            </columns>
+                                             <VBox.margin>
+                                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                             </VBox.margin>
+                                             <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TableView>
+                                       </children>
+                                    </VBox>
+                                    <Region maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="200.0" prefWidth="42.0" />
+                                    <VBox fx:id="notificationArea" prefHeight="418.0" prefWidth="314.0" spacing="10.0" HBox.hgrow="SOMETIMES" />
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
                      </center>

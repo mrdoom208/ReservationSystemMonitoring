@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.kordamp.bootstrapfx.BootstrapFX;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,9 +36,11 @@ public class App extends Application {
         fxmlLoader.setControllerFactory(springContext::getBean);
 
         Parent root = fxmlLoader.load();
+        Font.loadFont(getClass().getResourceAsStream("/fonts/Lora-Regular.ttf"),14);
+        Font.loadFont(getClass().getResourceAsStream("/fonts/Lora-Bold.ttf"),14);
 
         scene = new Scene(root);
-        scene.getStylesheets().add(BootstrapFX.bootstrapFXStylesheet());
+
 
         stage.setScene(scene);
         stage.setTitle("Reservation System");
@@ -51,6 +54,8 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        System.setProperty("prism.lcdtext", "true"); // enable LCD text smoothing
+        System.setProperty("prism.text", "t2k");    // use TrueType text renderer
         launch(args);
     }
 }

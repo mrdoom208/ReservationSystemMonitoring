@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.*;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -114,11 +115,14 @@ public class LoginController {
                     loader.setControllerFactory(springContext::getBean);
                     Parent root = loader.load();
 
-                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                    Stage stage = new Stage();
          
 
                     Scene scene = new Scene(root);
                     stage.setScene(scene);
+                    stage.initStyle(StageStyle.UNDECORATED);
+                    stage.setMaximized(true);
+
                     stage.setResizable(true);
                     stage.setMinWidth(1300);
                     stage.setMinHeight(720);
@@ -126,19 +130,8 @@ public class LoginController {
                    
 
                     stage.show();
-                    Platform.runLater(() -> {
-                        stage.setFullScreen(true);
+                     ((Node) event.getSource()).getScene().getWindow().hide();
 
-                        stage.fullScreenProperty().addListener((obs, oldV, newV) -> {
-                            if (!newV) {
-                                stage.setMinWidth(1300);
-                                stage.setMinHeight(720);
-
-                                if (stage.getWidth() < 1300) stage.setWidth(1300);
-                                if (stage.getHeight() < 720) stage.setHeight(720);
-                            }
-                        });
-                     });
                 }catch (IOException e) {
                     e.printStackTrace();
                 }    

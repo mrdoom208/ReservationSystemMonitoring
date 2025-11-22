@@ -41,7 +41,17 @@ public class ReservationService {
             entity.setReservationSeatedtime(newtime);   // update the status
             reservationRepository.save(entity);  // save back to DB
         } else {
-            throw new RuntimeException("Reservation not found with id table: " + Ref);
+            throw new RuntimeException("Reservation not found" + Ref);
+        }
+    }
+    public void updateCompletetime(String Ref, LocalTime newtime){
+        Optional<CustomerReservation> optional = reservationRepository.findByReference(Ref);
+        if (optional.isPresent()) {
+            CustomerReservation entity = optional.get();
+            entity.setReservationCompletetime(newtime);   // update the status
+            reservationRepository.save(entity);  // save back to DB
+        } else {
+            throw new RuntimeException("Reservation not found" + Ref);
         }
     }
 }

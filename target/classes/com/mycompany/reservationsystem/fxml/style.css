@@ -1,11 +1,15 @@
+* {
+    -fx-font-family: "Lora";
+}
 .login-button{
-    -fx-background-radius: 50; 
+    -fx-font-family: "Lora", serif;
+    -fx-background-radius: 50;
     -fx-font-weight: bold; 
     -fx-text-fill: black; 
     -fx-font-size: 20;
 }
 .login-button:hover {
-    -fx-background-color: rgba(255, 0, 0, 0.5);
+    -fx-background-color: rgba(54, 33, 33, 0.5);
     -fx-text-fill: white;
    
 }
@@ -148,10 +152,10 @@
 
 
 .DefaultTable{
-    -fx-background-color: transparent;
+    -fx-background-color: #1e1e1e;
     -fx-table-cell-border-color: transparent;
     -fx-control-inner-background: #1e1e1e;
-     -fx-border-width: 0;
+    -fx-border-width: 0;
     -fx-border-color: transparent;
     -fx-table-cell-border-color: transparent;
 
@@ -165,6 +169,8 @@
     -fx-border-color: transparent;
     -fx-table-cell-border-color: transparent;
     -fx-padding:5 0 5 0;
+    -fx-cell-size: 35px;   /* default is 24px */
+
 }
 
 .DefaultTable .table-row-cell:odd {
@@ -189,10 +195,18 @@
     
 
 }
+.DefaultTable .column-header-background {
+    -fx-background-insets: 0;
+    -fx-border-width: 0 !important;
+    -fx-border-color: transparent !important;
+}
+
 
 .DefaultTable .column-header,.DefaultTable .column-header .label{
     -fx-border-color: transparent;  
+    -fx-table-cell-border-color: transparent;
     -fx-background-color: #2b2b2b;
+    -fx-border-width: 0;
     -fx-text-fill: #e0e0e0;
     -fx-font-size: 14;
     
@@ -269,7 +283,7 @@
     -fx-background-color: #2196F3;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-font-size: 10px;
     -fx-background-radius: 8px;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
@@ -282,7 +296,7 @@
 /* Edit */
 .edit {
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-font-size: 10px;
     -fx-background-radius: 8px;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
@@ -297,7 +311,7 @@
 /* Delete */
 .delete {
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-font-size: 10px;
     -fx-background-radius: 8px;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
@@ -312,7 +326,7 @@
 /* Complete */
 .complete {
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-font-size: 10px;
     -fx-background-radius: 8px;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
@@ -369,4 +383,9 @@
     -fx-padding: 0;
     -fx-background-color: transparent;
     -fx-background-insets: 0;
+}
+.static-label{
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: normal;
 }

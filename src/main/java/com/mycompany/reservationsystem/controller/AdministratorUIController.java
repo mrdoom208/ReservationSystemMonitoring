@@ -28,6 +28,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -74,9 +75,11 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private ScrollPane DashboardPane, ReservationPane, TableManagementPane, ManageStaffAndAccountsPane;
     @FXML
-    private Label Total_CustomerDbd, Total_Cancelled, Total_Pending, CusToTable,totaltables,totalfree,totalbusy,pending,confirm;
+    private Label Total_CustomerDbd, activetable,Total_Cancelled, Total_Pending, CusToTable,totaltables,totalfree,totalbusy,pending,confirm;
     @FXML
     private LineChart<String, Number> myBarChart;
+    @FXML
+    private TextField SearchCL;
 
     @FXML
     private TableView<CustomerReservation> RecentReservationTable,SCNReservations;
@@ -119,6 +122,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     private final ObservableList<ManageTablesDTO> manageTablesData = FXCollections.observableArrayList();
     private final ObservableList<ManageTablesDTO> tableManagerData = FXCollections.observableArrayList();
     private final ObservableList<ManageTables> availableTables = FXCollections.observableArrayList();
+
     @FXML
     private TableView<ManageTables> AvailableTable;
     @FXML
@@ -219,6 +223,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
 
     public void updateLabels() {
+        activetable.setText(String.valueOf(manageTablesRepository.countByStatus("Occupied"))+"/"+String.valueOf(manageTablesRepository.countByStatus("Reserved"))+"/"+String.valueOf(manageTablesRepository.count()));
         Total_CustomerDbd.setText(String.valueOf(customerReservationRepository.count()));
         Total_Pending.setText(String.valueOf(customerReservationRepository.countByStatus("Pending")));
         Total_Cancelled.setText(String.valueOf(customerReservationRepository.countByStatus("Cancelled")));
@@ -359,8 +364,48 @@ public class AdministratorUIController implements Initializable, ReservationList
 
         myBarChart.getData().add(series);
     }
-
+    FilteredList<CustomerReservation> filteredData;
     public void setupCustomerReservationTable() {
+        filteredData = new FilteredList<>(pendingReservations, p -> true);
+
+        SearchCL.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(item -> {
+                // If search field is empty, display all
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                // Compare name with search text
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                // Check all columns
+                if (item.getName() != null && item.getName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getPhone() != null && item.getPhone().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getEmail() != null && item.getEmail().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getStatus() != null && item.getStatus().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getReference() != null && item.getReference().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getPrefer() != null && item.getPrefer().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getPhone() != null && item.getPhone().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+
+
+                // You can add other fields similarly
+                return false; // no match
+            });
+        });
+
         TableNoCRT.setCellFactory(col -> new TableCell<CustomerReservation, Long>() {
             @Override
             protected void updateItem(Long item, boolean empty) {
@@ -418,21 +463,24 @@ public class AdministratorUIController implements Initializable, ReservationList
 
                 if (item == null || empty) {
                     setStyle("");
+                    setText(null);
+                    setGraphic(null);
                 } else {
                     setText(item); // Make sure your DTO has getStatus()
                     String bgColor;
+                    String ftColor;
 
                     switch (item) {
                         case "Confirm" ->
                             bgColor = "#2196F3";
                         case "Pending" ->
                             bgColor = "#B0BEC5";
-                       
+
                         default ->
                             bgColor = "transparent";
                     }
 
-                    setStyle("-fx-background-color: " + bgColor + "; -fx-padding: 5;");
+                    setStyle("-fx-background-color: " + bgColor + ";");
                     
                 }
             }
@@ -459,6 +507,7 @@ public class AdministratorUIController implements Initializable, ReservationList
             col.prefWidthProperty().bind(CustomerReservationTable.widthProperty().multiply(widthFactors[i]));
             col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
         }
+
 
     }
     
@@ -588,10 +637,8 @@ public class AdministratorUIController implements Initializable, ReservationList
        hiddenTable.setVisible(false);
        hiddenTable.setManaged(false);
        ReservationPane.setVvalue(scrollPosition);
-
-       
-    
-        
+       updateLabels();
+       TableManager.refresh();
     }
     
     private void editTablerow(String tableno,String customer,int pax,String status,int capacity,String location){
@@ -692,6 +739,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("New Customer Reservation");
+        dialog.initModality(Modality.WINDOW_MODAL);
     
 
     // Create fields
@@ -937,7 +985,7 @@ public class AdministratorUIController implements Initializable, ReservationList
             }
         });
         TableColumn<?, ?>[] column = {refSCNR, customerSCNR, paxSCNR, phoneSCNR, statusSCNR, regSCNR, seatedSCNR, cancelSCNR, noshowSCNR,dateSCNR};
-        double[] widthFactors = {0.1, 0.15, 0.05, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,0.01};
+        double[] widthFactors = {0.1, 0.15, 0.05, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,0.1};
         String[] namecol = {"reference", "name", "pax", "phone", "status", "reservationPendingtime", "reservationSeatedtime", "reservationCompletetime", "reservationCompletetime","date"};
 
         for (int i = 0; i < column.length; i++) {
@@ -1032,13 +1080,13 @@ public class AdministratorUIController implements Initializable, ReservationList
             private final HBox hbox = new HBox(5);
 
             {
-                utensilIcon.setIconSize(14);
+                utensilIcon.setIconSize(12);
                 utensilIcon.setIconColor(Color.web("#ffffff"));
-                editIcon.setIconSize(14);
+                editIcon.setIconSize(12);
                 editIcon.setIconColor(Color.web("#000000"));
-                deleteIcon.setIconSize(14);
+                deleteIcon.setIconSize(12);
                 deleteIcon.setIconColor(Color.web("#ffffff"));
-                completeIcon.setIconSize(14);
+                completeIcon.setIconSize(12);
                 completeIcon.setIconColor(Color.web("#ffffff"));
                 
                 
@@ -1080,16 +1128,18 @@ public class AdministratorUIController implements Initializable, ReservationList
                     if (data != null) {
                         data.setStatus("Occupied");
                         updateButtonsForStatus(data);
-                        
-                        tablesService.updateStatus(data.getTableId(),data.getStatus());
-                        reservationService.updateSeatedtime(data.getReference(),LocalTime.now());
+
+                        tablesService.updateStatus(data.getTableId(), data.getStatus());
+                        reservationService.updateSeatedtime(data.getReference(), LocalTime.now());
+                        reservationService.updateStatus(data.getReference(),"Seated");
                         data.setReservationSeatedtime(LocalTime.now());
                         loadTableView();
                         loadTableManager();
-                        
-                        
-    
-                        System.out.println("Service started for: " + data.getStatus());
+                        updateLabels();
+                        getTableView().refresh();
+                        loadSCNReservation();
+
+
                     }
                 });
                 btnComplete.setOnAction(event -> {
@@ -1097,28 +1147,32 @@ public class AdministratorUIController implements Initializable, ReservationList
                     if (data != null) {
                         data.setStatus("Complete");
                         data.setDate(LocalDate.now());
-                        
+                        data.setReservationCompletetime(LocalTime.now());
                         updateButtonsForStatus(data);
                         
                         ReservationTableLogs reservationtablelogs = new ReservationTableLogs(data);
                         RTLR.save(reservationtablelogs);
                         reservationService.updateStatus(data.getReference(),data.getStatus());
                         reservationService.updateTableId(data.getReference(),null);
+
                        
                         data.setCustomer("");
                         data.setPax(null);
                         data.setStatus("Available");
                         tablesService.updateStatus(data.getTableId(),data.getStatus());
-                        loadTableView();
-                        loadCustomerReservationTable();
-                        loadReservationLogs();
-                        loadTableManager();
-                        
-                        
-                        
-    
+
+
+
+
                         System.out.println("Service started for: " + data.getStatus());
                     }
+                    loadTableView();
+                    loadCustomerReservationTable();
+                    loadReservationLogs();
+                    loadTableManager();
+                    updateLabels();
+                    getTableView().refresh();
+
                 });
 
                 btnEdit.setOnAction(event -> {
@@ -1151,6 +1205,7 @@ public class AdministratorUIController implements Initializable, ReservationList
                         manageTablesRepository.deleteById(data.getTableId());
                         loadTableManager();
                         loadTableView();
+                        updateLabels();
                     });
 
                     // Create & show dialog
@@ -1175,7 +1230,9 @@ public class AdministratorUIController implements Initializable, ReservationList
                 super.updateItem(item, empty);
 
                 if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
+                    setText(null);
                     setGraphic(null);
+
                     return;
                 }
 
@@ -1270,7 +1327,10 @@ public class AdministratorUIController implements Initializable, ReservationList
                 super.updateItem(item, empty);
 
                 if (item == null || empty) {
-                    setStyle("");
+
+                        setText(null);
+                        setGraphic(null);
+
                 } else {
                     setText(item); // Make sure your DTO has getStatus()
                     String bgColor;
@@ -1335,7 +1395,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         
         
         RecentReservationTable.setItems(recentReservations);
-        CustomerReservationTable.setItems(pendingReservations);
+        CustomerReservationTable.setItems(filteredData);
         ManageTableView.setItems(manageTablesData);
         TableManager.setItems(tableManagerData);
         AvailableTable.setItems(availableTables);
