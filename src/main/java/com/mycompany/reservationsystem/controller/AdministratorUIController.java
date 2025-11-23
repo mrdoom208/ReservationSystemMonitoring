@@ -22,6 +22,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
@@ -79,7 +80,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private LineChart<String, Number> myBarChart;
     @FXML
-    private TextField SearchCL;
+    private TextField SearchCL,SearchTM;
 
     @FXML
     private TableView<CustomerReservation> RecentReservationTable,SCNReservations;
@@ -352,18 +353,29 @@ public class AdministratorUIController implements Initializable, ReservationList
     public void barchart() {
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.getData().add(new XYChart.Data<>("Jan", 120));
-        series.getData().add(new XYChart.Data<>("Feb", 150));
-        series.getData().add(new XYChart.Data<>("Mar", 100));
-        series.getData().add(new XYChart.Data<>("April", 90));
-        series.getData().add(new XYChart.Data<>("June", 10));
-        series.getData().add(new XYChart.Data<>("July", 50));
-        series.getData().add(new XYChart.Data<>("August", 60));
-        series.getData().add(new XYChart.Data<>("Septeber", 40));
-        series.getData().add(new XYChart.Data<>("Octoberr", 30));
+        DateTimeFormatter dateformat = DateTimeFormatter.ofPattern("MM-dd");
+        LocalDate today = LocalDate.now();
+        List<String> last7Days = new ArrayList<>();
+        for (int i = 30; i >= 0; i--) {
+            last7Days.add(today.minusDays(i).format(dateformat));
+        }
+        LocalDate SevenDaysAgo = today.minusDays(30);
+        List<CustomerReservation> reservations = customerReservationRepository.findAll()
+                .stream()
+                .filter(r -> r.getDate() !=null)
+                .filter(r -> !r.getDate().isBefore(SevenDaysAgo)&&!r.getDate().isAfter(today))
+                .toList();
+        for (String day : last7Days) {
+            long count = reservations.stream()
+                    .filter(r -> r.getDate().format(dateformat).equals(day))
+                    .count();
+            series.getData().add(new XYChart.Data<>(day, count));
+        }
+
 
         myBarChart.getData().add(series);
     }
+    FilteredList<ManageTablesDTO> tablesfilteredData;
     FilteredList<CustomerReservation> filteredData;
     public void setupCustomerReservationTable() {
         filteredData = new FilteredList<>(pendingReservations, p -> true);
@@ -474,7 +486,7 @@ public class AdministratorUIController implements Initializable, ReservationList
                         case "Confirm" ->
                             bgColor = "#2196F3";
                         case "Pending" ->
-                            bgColor = "#B0BEC5";
+                            bgColor = "#455A64";
 
                         default ->
                             bgColor = "transparent";
@@ -718,7 +730,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     dialog.showAndWait().ifPresent(response -> {
         if (response == ButtonType.OK) {
             ManageTables row = new ManageTables();
-            row.setTableNo(tableNoField.getText());
+            row.setId(Long.parseLong(tableNoField.getText()));
             row.setCapacity(Integer.parseInt(capacityField.getText()));
             row.setLocation(LocationField.getText());
             row.setStatus(StatusField.getText());
@@ -735,6 +747,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     private void addCustomerReservation(ActionEvent event){
         LocalTime currenttime = LocalTime.now();
         String formatted = currenttime.format(DateTimeFormatter.ofPattern("hh:mm:ss a"));
+        LocalDate currentdate = LocalDate.now();
         
         
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -832,12 +845,14 @@ public class AdministratorUIController implements Initializable, ReservationList
             row.setStatus("Pending");
             row.setPrefer(preferField.getText());
             row.setEmail(emailField.getText());
+            row.setDate(currentdate);
             row.setPhone(phoneField.getText());
             row.setReservationPendingtime(LocalTime.parse(pendingtimeField.getText(),DateTimeFormatter.ofPattern("hh:mm:ss a")));
             row.setReference(String.format("RSV-%05d", customerReservationRepository.count()+1));
             customerReservationRepository.save(row);
             loadCustomerReservationTable();
             loadRecentReservations();
+            barchart();
             
         }
     });
@@ -1035,13 +1050,55 @@ public class AdministratorUIController implements Initializable, ReservationList
     
     
     public void setupTableManager() {
+        tablesfilteredData = new FilteredList<>(manageTablesData, p -> true);
+
+        SearchTM.textProperty().addListener((observable, oldValue, newValue) -> {
+            tablesfilteredData.setPredicate(item -> {
+                // If search field is empty, display all
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                // Compare name with search text
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                // Check all columns
+                if (item.getCustomer() != null && item.getCustomer().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getPax() != null && String.valueOf(item.getPax()).toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getStatus() != null && item.getStatus().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getTableNo() != null && item.getTableNo().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getTablestarttime() != null && String.valueOf(item.getTablestarttime()).toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getCapacity() != null && String.valueOf(item.getCapacity()).toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                if (item.getTableId() != null && String.valueOf(item.getTableId()).toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+
+
+
+                return false; // no match
+            });
+        });
+
         StatusTM.setCellFactory(tv -> new TableCell<ManageTablesDTO, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
 
                 if (item == null || empty) {
-                    setStyle("");
+                    setGraphic(null);
+                    setText(null);
+                    setStyle(null);
                 } else {
                     setText(item); // Make sure your DTO has getStatus()
                     String bgColor;
@@ -1081,7 +1138,7 @@ public class AdministratorUIController implements Initializable, ReservationList
 
             {
                 utensilIcon.setIconSize(12);
-                utensilIcon.setIconColor(Color.web("#ffffff"));
+                utensilIcon.setIconColor(Color.web("#4A2A33"));
                 editIcon.setIconSize(12);
                 editIcon.setIconColor(Color.web("#000000"));
                 deleteIcon.setIconSize(12);
@@ -1187,7 +1244,7 @@ public class AdministratorUIController implements Initializable, ReservationList
                             else{pax = data.getPax(); customer = data.getCustomer();}
                             
                             
-                            editTablerow(data.getTableNo(),customer,pax,data.getStatus(),data.getCapacity(),data.getLocation());
+                            editTablerow(String.valueOf(data.getTableId()),customer,pax,data.getStatus(),data.getCapacity(),data.getLocation());
                             
                          }
                     });
@@ -1268,7 +1325,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         // --- Setup Other Columns ---
         TableColumn<?, ?>[] column = {TablenoTM, CustomerTM, PaxTM, StatusTM, CapacityTM, LocationTM, TimeUsedTM, ActionTM};
         double[] widthFactors = {0.08, 0.18, 0.06, 0.11, 0.08, 0.12, 0.10, 0.27};
-        String[] namecol = {"tableNo", "customer", "pax", "status", "capacity", "location", "tablestarttime", ""};
+        String[] namecol = {"tableId", "customer", "pax", "status", "capacity", "location", "tablestarttime", ""};
 
         for (int i = 0; i < column.length; i++) {
             TableColumn<?, ?> col = column[i];
@@ -1397,7 +1454,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         RecentReservationTable.setItems(recentReservations);
         CustomerReservationTable.setItems(filteredData);
         ManageTableView.setItems(manageTablesData);
-        TableManager.setItems(tableManagerData);
+        TableManager.setItems(tablesfilteredData);
         AvailableTable.setItems(availableTables);
         ReservationLogs.setItems(reservationlogsdata);
         SCNReservations.setItems(canceledReservations);

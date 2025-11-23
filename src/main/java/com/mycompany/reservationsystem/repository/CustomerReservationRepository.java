@@ -24,6 +24,7 @@ public interface CustomerReservationRepository extends JpaRepository<CustomerRes
     List<CustomerReservation> findTop10ByOrderByDateDescReservationPendingtimeDesc(Pageable pageable);
     List<CustomerReservation> findByStatus(String status);
     List<CustomerReservation> findByStatusIn(List<String> statuses);
+    
 
     Optional<CustomerReservation>findByReference(String reference);
     

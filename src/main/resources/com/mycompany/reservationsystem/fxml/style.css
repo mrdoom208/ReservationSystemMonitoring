@@ -197,8 +197,9 @@
 }
 .DefaultTable .column-header-background {
     -fx-background-insets: 0;
-    -fx-border-width: 0 !important;
-    -fx-border-color: transparent !important;
+    -fx-border-width: 0;
+    -fx-border-color: transparent;
+    -fx-background-color: #2b2b2b;
 }
 
 
@@ -280,8 +281,8 @@
 
 /* Start Service */
 .start-service {
-    -fx-background-color: #2196F3;
-    -fx-text-fill: white;
+    -fx-background-color: #FAC4D2;
+    -fx-text-fill: #4A2A33;
     -fx-font-weight: bold;
     -fx-font-size: 10px;
     -fx-background-radius: 8px;
@@ -290,7 +291,7 @@
     -fx-transition: all 0.2s ease-in-out;
 }
 .start-service:hover {
-    -fx-background-color: #42A5F5;
+    -fx-background-color: #F7A8BE;
 }
 
 /* Edit */
@@ -388,4 +389,65 @@
     -fx-text-fill: white;
     -fx-font-size: 18px;
     -fx-font-weight: normal;
+}
+
+
+
+
+
+.chart {
+    -fx-background-color: transparent; /* dark background */
+    -fx-border-color: transparent;
+}
+
+/* Chart Plot Area */
+.chart-plot-background {
+    -fx-background-color: transparent; /* same as chart */
+    -fx-border-color: transparent;
+}
+
+/* X and Y Axis */
+.axis {
+    -fx-tick-label-fill: #e0e0e0;  /* axis labels in light grey */
+    -fx-label-fill: #e0e0e0;       /* axis title */
+    -fx-border-color: transparent;
+}
+
+.axis .tick-mark {
+    -fx-stroke: #555555;           /* tick lines */
+}
+
+.axis .axis-line {
+    -fx-stroke: #888888;           /* axis line */
+}
+
+/* Grid Lines */
+.chart-horizontal-grid-lines, .chart-vertical-grid-lines {
+    -fx-stroke: transparent;           /* grid lines color */
+}
+
+/* Legend */
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e0e0e0;
+}
+
+/* Series Lines */
+.chart-series-line {
+    -fx-stroke-width: 2px;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: #ff6b6b;           /* series 1 color (red) */
+}
+
+.default-color1.chart-series-line {
+    -fx-stroke: #4ecdc4;           /* series 2 color (cyan) */
+}
+
+/* Symbols (data points) */
+.chart-line-symbol {
+    -fx-background-color: #ff6b6b;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px;
 }

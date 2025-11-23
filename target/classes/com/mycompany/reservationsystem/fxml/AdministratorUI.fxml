@@ -343,190 +343,6 @@
                   </BorderPane>
                </content>
             </ScrollPane>
-            <ScrollPane fx:id="TableManagementPane" fitToWidth="true" prefHeight="200.0" prefViewportWidth="1158.0" prefWidth="200.0" styleClass="Scrollpane">
-               <content>
-                  <BorderPane prefHeight="1100.0" prefWidth="200.0" styleClass="DashboardPane">
-                     <left>
-                        <Region prefHeight="200.0" prefWidth="34.0" BorderPane.alignment="CENTER" />
-                     </left>
-                     <right>
-                        <Region prefHeight="200.0" prefWidth="20.0" BorderPane.alignment="CENTER" />
-                     </right>
-                     <center>
-                        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-                           <children>
-                              <Label styleClass="BoldText" text="Table Management">
-                                 <font>
-                                    <Font size="36.0" />
-                                 </font>
-                                 <VBox.margin>
-                                    <Insets top="10.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <Region prefHeight="64.0" prefWidth="1066.0" />
-                              <VBox alignment="CENTER_LEFT" prefHeight="504.0" prefWidth="1066.0" styleClass="Statistics-cell">
-                                 <children>
-                                    <Label styleClass="BoldText" text="MANAGE TABLE">
-                                       <font>
-                                          <Font size="30.0" />
-                                       </font>
-                                       <VBox.margin>
-                                          <Insets bottom="15.0" top="15.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="31.0" prefWidth="1016.0">
-                                       <children>
-                                          <Label styleClass="PlainText" text="Search: ">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <TextField>
-                                             <font>
-                                                <Font size="15.0" />
-                                             </font>
-                                          </TextField>
-                                          <Region prefHeight="31.0" prefWidth="37.0" />
-                                          <Label styleClass="PlainText" text="Filter: ">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <MenuButton mnemonicParsing="false" text="All">
-                                            <items>
-                                              <MenuItem mnemonicParsing="false" text="Available" />
-                                              <MenuItem mnemonicParsing="false" text="Occupied" />
-                                                <MenuItem mnemonicParsing="false" text="Reserve" />
-                                            </items>
-                                             <font>
-                                                <Font size="15.0" />
-                                             </font>
-                                          </MenuButton>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets bottom="15.0" left="25.0" right="25.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <TableView fx:id="TableManager" prefHeight="320.0" prefWidth="966.0" styleClass="DefaultTable">
-                                      <columns>
-                                        <TableColumn fx:id="TablenoTM" prefWidth="75.0" text="Table No." />
-                                        <TableColumn fx:id="CustomerTM" prefWidth="75.0" text="Customer" />
-                                          <TableColumn fx:id="PaxTM" prefWidth="75.0" text="Pax" />
-                                          <TableColumn fx:id="StatusTM" prefWidth="75.0" text="Status" />
-                                          <TableColumn fx:id="CapacityTM" prefWidth="75.0" text="Capacity" />
-                                          <TableColumn fx:id="LocationTM" prefWidth="75.0" text="Location" />
-                                          <TableColumn fx:id="TimeUsedTM" prefWidth="75.0" text="Time Used" />
-                                          <TableColumn fx:id="ActionTM" prefWidth="75.0" text="Actions" />
-                                      </columns>
-                                       <columnResizePolicy>
-                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                       </columnResizePolicy>
-                                       <VBox.margin>
-                                          <Insets />
-                                       </VBox.margin>
-                                    </TableView>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                       <children>
-                                          <Button fx:id="AddTablebtn" mnemonicParsing="false" onAction="#onAddTableClicked" text="Add Table">
-                                             <HBox.margin>
-                                                <Insets />
-                                             </HBox.margin>
-                                             <font>
-                                                <Font size="15.0" />
-                                             </font>
-                                             <styleClass>
-                                                <String fx:value="btn btn-danger" />
-                                                <String fx:value="btn btn-primary" />
-                                             </styleClass>
-                                          </Button>
-                                          <Region prefHeight="67.0" prefWidth="39.0" />
-                                          <Region prefHeight="72.0" prefWidth="443.0" HBox.hgrow="ALWAYS" />
-                                          <Label styleClass="PlainText" text="Total: ">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Label fx:id="totaltables" styleClass="PlainText" text="0">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Region prefHeight="200.0" prefWidth="30.0" />
-                                          <Label styleClass="PlainText" text="Free: ">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Label fx:id="totalfree" styleClass="PlainText" text="0">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Region prefHeight="67.0" prefWidth="30.0" />
-                                          <Label styleClass="PlainText" text="Busy: ">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Label fx:id="totalbusy" styleClass="PlainText" text="0">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets />
-                                       </VBox.margin>
-                                    </HBox>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets bottom="25.0" />
-                                 </VBox.margin>
-                                 <padding>
-                                    <Insets left="25.0" right="25.0" />
-                                 </padding>
-                              </VBox>
-                              <Region prefHeight="88.0" prefWidth="1066.0" />
-                              <VBox alignment="CENTER" prefHeight="434.0" prefWidth="1066.0" styleClass="Statistics-cell">
-                                 <children>
-                                    <Label styleClass="BoldText" text="Table History">
-                                       <font>
-                                          <Font size="30.0" />
-                                       </font>
-                                       <VBox.margin>
-                                          <Insets bottom="15.0" top="15.0" />
-                                       </VBox.margin>
-                                    </Label>
-                                    <TableView prefHeight="299.0" prefWidth="1036.0" styleClass="DefaultTable">
-                                      <columns>
-                                        <TableColumn prefWidth="95.0" text="Reference" />
-                                          <TableColumn prefWidth="114.0" text="Customer" />
-                                          <TableColumn prefWidth="56.0" text="Pax" />
-                                          <TableColumn prefWidth="88.0" text="Status" />
-                                          <TableColumn prefWidth="87.0" text="Table No" />
-                                          <TableColumn prefWidth="96.0" text="Capacity" />
-                                          <TableColumn prefWidth="118.0" text="Reserved Time" />
-                                          <TableColumn prefWidth="133.0" text="Occupied Time" />
-                                          <TableColumn prefWidth="138.0" text="Complete Time" />
-                                          <TableColumn minWidth="0.0" prefWidth="74.0" text="Action" />
-                                      </columns>
-                                       
-                                       <VBox.margin>
-                                          <Insets bottom="25.0" left="25.0" right="25.0" />
-                                       </VBox.margin>
-                                    </TableView>
-                                    <Region prefHeight="18.0" prefWidth="1066.0" />
-                                 </children>
-                              </VBox>
-                           </children>
-                           <BorderPane.margin>
-                              <Insets bottom="25.0" left="25.0" right="25.0" />
-                           </BorderPane.margin>
-                        </VBox>
-                     </center>
-                  </BorderPane>
-               </content>
-            </ScrollPane>
             <ScrollPane fx:id="ReservationPane" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" styleClass="Scrollpane">
                <content>
                   <BorderPane prefHeight="1694.0" prefWidth="1154.0" styleClass="DashboardPane">
@@ -997,6 +813,190 @@
                                  </children>
                               </HBox>
                            </children>
+                        </VBox>
+                     </center>
+                  </BorderPane>
+               </content>
+            </ScrollPane>
+            <ScrollPane fx:id="TableManagementPane" fitToWidth="true" prefHeight="200.0" prefViewportWidth="1158.0" prefWidth="200.0" styleClass="Scrollpane">
+               <content>
+                  <BorderPane prefHeight="1100.0" prefWidth="200.0" styleClass="DashboardPane">
+                     <left>
+                        <Region prefHeight="200.0" prefWidth="34.0" BorderPane.alignment="CENTER" />
+                     </left>
+                     <right>
+                        <Region prefHeight="200.0" prefWidth="20.0" BorderPane.alignment="CENTER" />
+                     </right>
+                     <center>
+                        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <Label styleClass="BoldText" text="Table Management">
+                                 <font>
+                                    <Font size="36.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets top="10.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Region prefHeight="64.0" prefWidth="1066.0" />
+                              <VBox alignment="CENTER_LEFT" prefHeight="504.0" prefWidth="1066.0" styleClass="Statistics-cell">
+                                 <children>
+                                    <Label styleClass="BoldText" text="MANAGE TABLE">
+                                       <font>
+                                          <Font size="30.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets bottom="15.0" top="15.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="31.0" prefWidth="1016.0">
+                                       <children>
+                                          <Label styleClass="PlainText" text="Search: ">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <TextField fx:id="SearchTM">
+                                             <font>
+                                                <Font size="15.0" />
+                                             </font>
+                                          </TextField>
+                                          <Region prefHeight="31.0" prefWidth="37.0" />
+                                          <Label styleClass="PlainText" text="Filter: ">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <MenuButton mnemonicParsing="false" text="All">
+                                            <items>
+                                              <MenuItem mnemonicParsing="false" text="Available" />
+                                              <MenuItem mnemonicParsing="false" text="Occupied" />
+                                                <MenuItem mnemonicParsing="false" text="Reserve" />
+                                            </items>
+                                             <font>
+                                                <Font size="15.0" />
+                                             </font>
+                                          </MenuButton>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets bottom="15.0" left="25.0" right="25.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <TableView fx:id="TableManager" prefHeight="320.0" prefWidth="966.0" styleClass="DefaultTable">
+                                      <columns>
+                                        <TableColumn fx:id="TablenoTM" prefWidth="75.0" text="Table No." />
+                                        <TableColumn fx:id="CustomerTM" prefWidth="75.0" text="Customer" />
+                                          <TableColumn fx:id="PaxTM" prefWidth="75.0" text="Pax" />
+                                          <TableColumn fx:id="StatusTM" prefWidth="75.0" text="Status" />
+                                          <TableColumn fx:id="CapacityTM" prefWidth="75.0" text="Capacity" />
+                                          <TableColumn fx:id="LocationTM" prefWidth="75.0" text="Location" />
+                                          <TableColumn fx:id="TimeUsedTM" prefWidth="75.0" text="Time Used" />
+                                          <TableColumn fx:id="ActionTM" prefWidth="75.0" text="Actions" />
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                    </TableView>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <Button fx:id="AddTablebtn" mnemonicParsing="false" onAction="#onAddTableClicked" text="Add Table">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font size="15.0" />
+                                             </font>
+                                             <styleClass>
+                                                <String fx:value="btn btn-danger" />
+                                                <String fx:value="btn btn-primary" />
+                                             </styleClass>
+                                          </Button>
+                                          <Region prefHeight="67.0" prefWidth="39.0" />
+                                          <Region prefHeight="72.0" prefWidth="443.0" HBox.hgrow="ALWAYS" />
+                                          <Label styleClass="PlainText" text="Total: ">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="totaltables" styleClass="PlainText" text="0">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="200.0" prefWidth="30.0" />
+                                          <Label styleClass="PlainText" text="Free: ">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="totalfree" styleClass="PlainText" text="0">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="67.0" prefWidth="30.0" />
+                                          <Label styleClass="PlainText" text="Busy: ">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="totalbusy" styleClass="PlainText" text="0">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                    </HBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="25.0" />
+                                 </VBox.margin>
+                                 <padding>
+                                    <Insets left="25.0" right="25.0" />
+                                 </padding>
+                              </VBox>
+                              <Region prefHeight="88.0" prefWidth="1066.0" />
+                              <VBox alignment="CENTER" prefHeight="434.0" prefWidth="1066.0" styleClass="Statistics-cell">
+                                 <children>
+                                    <Label styleClass="BoldText" text="Table History">
+                                       <font>
+                                          <Font size="30.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets bottom="15.0" top="15.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <TableView prefHeight="299.0" prefWidth="1036.0" styleClass="DefaultTable">
+                                      <columns>
+                                        <TableColumn prefWidth="95.0" text="Reference" />
+                                          <TableColumn prefWidth="114.0" text="Customer" />
+                                          <TableColumn prefWidth="56.0" text="Pax" />
+                                          <TableColumn prefWidth="88.0" text="Status" />
+                                          <TableColumn prefWidth="87.0" text="Table No" />
+                                          <TableColumn prefWidth="96.0" text="Capacity" />
+                                          <TableColumn prefWidth="118.0" text="Reserved Time" />
+                                          <TableColumn prefWidth="133.0" text="Occupied Time" />
+                                          <TableColumn prefWidth="138.0" text="Complete Time" />
+                                          <TableColumn minWidth="0.0" prefWidth="74.0" text="Action" />
+                                      </columns>
+                                       
+                                       <VBox.margin>
+                                          <Insets bottom="25.0" left="25.0" right="25.0" />
+                                       </VBox.margin>
+                                    </TableView>
+                                    <Region prefHeight="18.0" prefWidth="1066.0" />
+                                 </children>
+                              </VBox>
+                           </children>
+                           <BorderPane.margin>
+                              <Insets bottom="25.0" left="25.0" right="25.0" />
+                           </BorderPane.margin>
                         </VBox>
                      </center>
                   </BorderPane>
