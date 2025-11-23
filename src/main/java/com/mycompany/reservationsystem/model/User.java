@@ -4,10 +4,8 @@
  */
 package com.mycompany.reservationsystem.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 /**
  *
  * @author formentera
@@ -21,6 +19,17 @@ public class User {
 
     private String username;
     private String password;
+    private String firstname;
+    private String lastname;
+    @Enumerated(EnumType.STRING)
+    private Position position;
+    private String Status;
+
+    public enum Position {
+        ADMINISTRATOR,
+        MANAGER,
+        STAFF
+    }
     
 
     // Getters & Setters
@@ -29,6 +38,38 @@ public class User {
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
+    }
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }

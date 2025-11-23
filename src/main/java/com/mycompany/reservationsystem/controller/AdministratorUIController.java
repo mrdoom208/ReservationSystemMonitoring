@@ -9,12 +9,14 @@ import com.mycompany.reservationsystem.controller.DeleteTableDialogController;
 import com.mycompany.reservationsystem.Service.TablesService;
 import com.mycompany.reservationsystem.model.CustomerReservation;
 import com.mycompany.reservationsystem.model.ManageTables;
+import com.mycompany.reservationsystem.model.User;
 import com.mycompany.reservationsystem.repository.CustomerReservationRepository;
 import com.mycompany.reservationsystem.dto.CustomerReservationDTO;
 import com.mycompany.reservationsystem.dto.ManageTablesDTO;
 import com.mycompany.reservationsystem.model.ReservationTableLogs;
 import com.mycompany.reservationsystem.repository.ManageTablesRepository;
 import com.mycompany.reservationsystem.repository.ReservationTableLogsRepository;
+import com.mycompany.reservationsystem.repository.UserRepository;
 import com.mycompany.reservationsystem.websocket.ReservationListener;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
 
@@ -34,13 +36,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -110,9 +111,13 @@ public class AdministratorUIController implements Initializable, ReservationList
     private TableColumn<CustomerReservation, Integer> PaxCRT;
     @FXML
     private TableColumn<CustomerReservation, Long> TableNoCRT;
-
     @FXML
     private TableColumn<CustomerReservation, LocalTime> TimeCRT;
+    @FXML
+    private TableView<User> AccountTable;
+    @FXML
+    private TableColumn<User,String> usernameAT,firstnameAT,lastnameAT,positionAT,statusAT;
+
     
     private CustomerReservation selectedReservation;
     
@@ -123,6 +128,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     private final ObservableList<ManageTablesDTO> manageTablesData = FXCollections.observableArrayList();
     private final ObservableList<ManageTablesDTO> tableManagerData = FXCollections.observableArrayList();
     private final ObservableList<ManageTables> availableTables = FXCollections.observableArrayList();
+    private final ObservableList<User> UserData = FXCollections.observableArrayList();
 
     @FXML
     private TableView<ManageTables> AvailableTable;
@@ -132,17 +138,18 @@ public class AdministratorUIController implements Initializable, ReservationList
     private TableColumn<ManageTables, Integer> CapacityAT,PaxTM,CapacityTM;
     @FXML
     private TableColumn<ManageTablesDTO, Void> ActionTM;
-    
+    @FXML
+    private TableColumn<User, Void> actionAT;
     @FXML 
-    private TableView<ReservationTableLogs> ReservationLogs;
+    private TableView<ReservationTableLogs> ReservationLogs,TableHistory;
     @FXML
-    private TableColumn<ReservationTableLogs,String>customerRL,phoneRL,preferRL,statusRL,tablenoRL,refRL;
+    private TableColumn<ReservationTableLogs,String>customerRL,phoneRL,preferRL,statusRL,tablenoRL,refRL,customerTH,referenceTH,statusTH,tablenoTH;
     @FXML
-    private TableColumn<ReservationTableLogs,Integer>paxRL;
+    private TableColumn<ReservationTableLogs,Integer>paxRL,capacityTH,paxTH;
     @FXML
-    private TableColumn<ReservationTableLogs,LocalTime>pendingRL,confirmRL,seatedRL,completeRL;
+    private TableColumn<ReservationTableLogs,LocalTime>pendingRL,confirmRL,seatedRL,completeRL,reservedTH,occupiedTH,completeTH;
     @FXML
-    private TableColumn<ReservationTableLogs,LocalDate>dateRL;
+    private TableColumn<ReservationTableLogs,LocalDate>dateRL,dateTH;
 
     @Autowired
     private ManageTablesRepository manageTablesRepository;
@@ -152,6 +159,9 @@ public class AdministratorUIController implements Initializable, ReservationList
     
     @Autowired
     private ReservationTableLogsRepository RTLR;
+
+    @Autowired
+    private UserRepository userRepository;
     
     @Autowired
     private TablesService tablesService;
@@ -351,15 +361,15 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
 
     public void barchart() {
-
+        myBarChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         DateTimeFormatter dateformat = DateTimeFormatter.ofPattern("MM-dd");
         LocalDate today = LocalDate.now();
         List<String> last7Days = new ArrayList<>();
-        for (int i = 30; i >= 0; i--) {
+        for (int i = 6; i >= 0; i--) {
             last7Days.add(today.minusDays(i).format(dateformat));
         }
-        LocalDate SevenDaysAgo = today.minusDays(30);
+        LocalDate SevenDaysAgo = today.minusDays(6);
         List<CustomerReservation> reservations = customerReservationRepository.findAll()
                 .stream()
                 .filter(r -> r.getDate() !=null)
@@ -377,6 +387,10 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
     FilteredList<ManageTablesDTO> tablesfilteredData;
     FilteredList<CustomerReservation> filteredData;
+    private int currentpax;
+    FilteredList<ManageTables> filteredtable;
+
+
     public void setupCustomerReservationTable() {
         filteredData = new FilteredList<>(pendingReservations, p -> true);
 
@@ -442,8 +456,10 @@ public class AdministratorUIController implements Initializable, ReservationList
                     btn.setOnMouseClicked(e -> {
                         selectedReservation = row;
                         scrollPosition = ReservationPane.getVvalue();
+                        currentpax = row.getPax();
 
                         hideTableList(row.getId());
+                        loadAvailableTable();
                         System.out.println(row.getReference());
                     });
 
@@ -534,7 +550,8 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
     
     public void setupAvailableTable() {
-        
+        filteredtable = new FilteredList<>(availableTables);
+        filteredtable.setPredicate(table -> table.getCapacity() > currentpax);
         AvailableTable.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSelection, newSelection) -> {
                     if (newSelection != null) {
@@ -547,8 +564,8 @@ public class AdministratorUIController implements Initializable, ReservationList
         );
 
         TableColumn<?, ?>[] column = {TableNoAT, CapacityAT, StatusAT, LocationAT};
-        double[] widthFactors = {0.25, 0.23, 0.25, 0.25};
-        String[] namecol = {"tableNo", "capacity", "status", "location"};
+        double[] widthFactors = {0.25, 0.25, 0.25, 0.25};
+        String[] namecol = {"Id", "capacity", "status", "location"};
 
         for (int i = 0; i < column.length; i++) {
             TableColumn<?, ?> col = column[i];
@@ -580,8 +597,8 @@ public class AdministratorUIController implements Initializable, ReservationList
         availableTables.setAll(Data);
         
     }
-
     public void hideTableList(Long CustomerId) {
+
         currentRow = CustomerId;
 
         if (CustomerId == prevRow) {
@@ -614,7 +631,7 @@ public class AdministratorUIController implements Initializable, ReservationList
             CusToTable.setText("No Reservation and Table Selected Yet");
             
         }else{
-        CusToTable.setText(selectedReservation.getReference() + "to Table" + tableno);
+        CusToTable.setText(selectedReservation.getReference());
         }
                         
 
@@ -630,6 +647,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         if (cr != null && selectedTable != null) {
             cr.setTable(selectedTable);
             selectedTable.setStatus("Reserved");
+            selectedTable.setTablestarttime(LocalTime.now());
             System.out.print(cr);
             System.out.print(selectedTable);
             
@@ -657,9 +675,10 @@ public class AdministratorUIController implements Initializable, ReservationList
      
     Dialog<ButtonType> dialog = new Dialog<>();
     dialog.setTitle("Edit Table");
-    
+    dialog.initModality(Modality.WINDOW_MODAL);
 
-    // Create fields
+
+        // Create fields
     TextField tableNoField = new TextField(tableno);
     TextField capacityField = new TextField(String.valueOf(capacity));
     TextField LocationField = new TextField(location);
@@ -862,9 +881,11 @@ public class AdministratorUIController implements Initializable, ReservationList
     private void onAddTableClicked(ActionEvent event) {
     Dialog<ButtonType> dialog = new Dialog<>();
     dialog.setTitle("Add Table");
-    
+    dialog.initModality(Modality.WINDOW_MODAL);
 
-    // Create fields
+
+
+        // Create fields
     TextField tableNoField = new TextField();
     TextField capacityField = new TextField();
     TextField LocationField = new TextField();
@@ -979,6 +1000,8 @@ public class AdministratorUIController implements Initializable, ReservationList
 
                 if (item == null || empty) {
                     setStyle("");
+                    setGraphic(null);
+                    setText(null);
                 } else {
                     setText(item); // Make sure your DTO has getStatus()
                     String bgColor;
@@ -1035,14 +1058,17 @@ public class AdministratorUIController implements Initializable, ReservationList
 
 
     private void loadReservationManagement() {
-        setupCustomerReservationTable();
         loadCustomerReservationTable();
-        setupAvailableTable();
         loadAvailableTable();
-        setupReservationLogs();
         loadReservationLogs();
-        setupSCNReservation();
+
         loadSCNReservation();
+        setupSCNReservation();
+        setupReservationLogs();
+        setupAvailableTable();
+        setupCustomerReservationTable();
+
+
         hiddenTable.setVisible(false);
         hiddenTable.setManaged(false);
 
@@ -1259,6 +1285,10 @@ public class AdministratorUIController implements Initializable, ReservationList
                     // Get controller to handle callback
                     DeleteTableDialogController controller = loader.getController();
                     controller.setOnDelete(() -> {
+                        if(customerReservationRepository.existsByTable_Id(data.getTableId())) {
+                            showAlert("Cannot delete: this table has active reservations");
+                            return;
+                        }
                         manageTablesRepository.deleteById(data.getTableId());
                         loadTableManager();
                         loadTableView();
@@ -1267,7 +1297,7 @@ public class AdministratorUIController implements Initializable, ReservationList
 
                     // Create & show dialog
                     Stage dialog = new Stage(StageStyle.UNDECORATED);
-                    dialog.initModality(Modality.APPLICATION_MODAL);
+                    dialog.initModality(Modality.WINDOW_MODAL);
                     dialog.initStyle(StageStyle.TRANSPARENT);
                     dialog.setResizable(false);
                     Scene scn = new Scene(root);
@@ -1347,7 +1377,14 @@ public class AdministratorUIController implements Initializable, ReservationList
 
         TableManager.setPlaceholder(new Label("No Table set yet"));
     }
- 
+
+    public void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Warning");
+        alert.setHeaderText(null); // no header
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
     
     private void loadTableManager(){
         List<ManageTablesDTO> tables = manageTablesRepository.getManageTablesDTO();
@@ -1361,11 +1398,58 @@ public class AdministratorUIController implements Initializable, ReservationList
         
         
     }
+    private void setupTableHistory(){
+        TableColumn<?, ?>[] column = {referenceTH,customerTH,paxTH,statusTH,tablenoTH,capacityTH,reservedTH,occupiedTH,completeTH,dateTH};
+        double[] widthFactors = {0.11, 0.2, 0.05, 0.1, 0.05,0.05,0.11,0.11,0.11,0.11};
+        String[] namecol = {"reference","customer","pax","status","tableid","tablecapacity","tablestarttime","reservationSeatedtime","reservationCompletetime","date"};
+
+        for (int i = 0; i < column.length; i++) {
+            TableColumn<?, ?> col = column[i];
+            col.setResizable(false);
+            col.setReorderable(false);
+            col.prefWidthProperty().bind(TableHistory.widthProperty().multiply(widthFactors[i]));
+            col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
+        }
+        statusTH.setCellFactory(tv -> new TableCell<ReservationTableLogs, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setStyle("");
+                } else {
+                    setText(item); // Make sure your DTO has getStatus()
+                    String bgColor;
+
+                    switch (item) {
+                        case "Complete" ->
+                                bgColor = "#2a4d2a";
+                        default ->
+                                bgColor = "white";
+                    }
+
+                    setStyle("-fx-background-color: " + bgColor + "; -fx-padding: 5;");
+
+                }
+            }
+        });
+
+        TableHistory.setPlaceholder(new Label("No Table set yet"));
+
+    }
+    private void loadTableHistory(){
+        List<ReservationTableLogs> tables = RTLR.findAll();
+        reservationlogsdata.setAll(tables);
+
+    }
+
+
     
     
     private void loadTableManagement(){
         setupTableManager();        
         loadTableManager();
+        setupTableHistory();
     }
     
     private void setupReservationLogs(){
@@ -1440,24 +1524,283 @@ public class AdministratorUIController implements Initializable, ReservationList
         reservationlogsdata.setAll(Data);
         
     }
-    
+
+    public void setupAccountTable(){
+        actionAT.setCellFactory(col -> new TableCell<User, Void>() {
+                    FontIcon editIcon = new FontIcon(FontAwesomeSolid.PEN_SQUARE);
+                    FontIcon deleteIcon = new FontIcon(FontAwesomeSolid.TRASH);
+
+                    private final Button btnEdit = new Button("Edit");
+                    private final Button btnDelete = new Button("Delete");
+                    private final HBox hbox = new HBox(5);
+
+                    {
+                        editIcon.setIconSize(12);
+                        editIcon.setIconColor(Color.web("#000000"));
+                        deleteIcon.setIconSize(12);
+                        deleteIcon.setIconColor(Color.web("#ffffff"));
+
+                        btnEdit.setGraphic(editIcon);
+                        btnEdit.setContentDisplay(javafx.scene.control.ContentDisplay.LEFT);
+                        btnEdit.getStyleClass().add("edit");
+
+                        btnDelete.setGraphic(deleteIcon);
+                        btnDelete.setContentDisplay(javafx.scene.control.ContentDisplay.LEFT);
+                        btnDelete.getStyleClass().add("delete");
+
+
+                        hbox.setAlignment(Pos.CENTER);
+                        hbox.getChildren().addAll(btnEdit, btnDelete);
+                        btnEdit.setMaxWidth(Double.MAX_VALUE);
+                        btnDelete.setMaxWidth(Double.MAX_VALUE);
+                        btnEdit.setMaxHeight(Double.MAX_VALUE);
+                        btnDelete.setMaxHeight(Double.MAX_VALUE);
+
+                        HBox.setHgrow(btnEdit, Priority.ALWAYS);
+                        HBox.setHgrow(btnDelete, Priority.ALWAYS);
+
+
+                        btnEdit.setOnAction(event -> {
+                            User data = getTableView().getItems().get(getIndex());
+                            editAccount(data);
+
+
+
+                        });
+
+                        btnDelete.setOnAction(event -> {
+                            User data = getTableView().getItems().get(getIndex());
+
+                            if (data != null) {
+                                try {
+                                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/deleteTableDialog.fxml"));
+                                    Parent root = loader.load();
+
+                                    // Get controller to handle callback
+                                    DeleteTableDialogController controller = loader.getController();
+                                    controller.setOnDelete(() -> {
+                                        if ("Active".equals(data.getStatus())) {
+                                            showAlert("This account cannot be deleted because it is currently in use");
+                                            return;
+                                        }else{
+                                            userRepository.deleteById(data.getId());
+                                            loadAccountTable();
+
+                                        }
+
+                                    });
+
+                                    // Create & show dialog
+                                    Stage dialog = new Stage(StageStyle.UNDECORATED);
+                                    dialog.initModality(Modality.WINDOW_MODAL);
+                                    dialog.initStyle(StageStyle.TRANSPARENT);
+                                    dialog.setResizable(false);
+                                    Scene scn = new Scene(root);
+                                    scn.setFill(Color.TRANSPARENT);
+                                    dialog.setScene(scn);
+                                    dialog.showAndWait();
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    protected void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
+                            setText(null);
+                            setGraphic(null);
+
+                        }else{
+                            setText(null);       // clear text
+                            setGraphic(hbox);
+                        }
+                    }
+                private User getCurrentItem() {
+                int i = getIndex();
+                if (i >= 0 && i < getTableView().getItems().size()) {
+                    return getTableView().getItems().get(i);
+                }
+                return null;
+            }
+
+                });
+
+        TableColumn<?, ?>[] column = {usernameAT,firstnameAT,lastnameAT,positionAT,statusAT,actionAT};
+        double[] widthFactors = {0.15, 0.15, 0.15, 0.15, 0.15,0.25};
+        String[] namecol = {"username", "firstname", "lastname", "position", "status",""};
+
+        for (int i = 0; i < column.length; i++) {
+            TableColumn<?, ?> col = column[i];
+
+            if (col == null) {
+                System.out.println("❌ NULL COLUMN at index " + i + " (expected: " + namecol[i] + ")");
+                continue;
+            } else {
+                System.out.println("✔ Column OK: index " + i + " = " + col.getText());
+            }
+
+            col.setResizable(false);
+            col.setReorderable(false);
+            col.prefWidthProperty().bind(AccountTable.widthProperty().multiply(widthFactors[i]));
+            if (!namecol[i].isEmpty()) {
+                col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
+            }
+        }
+
+        AccountTable.setPlaceholder(new Label("No Account yet "));
+    }
+    public void loadAccountTable(){
+        List<User> data = userRepository.findAll();
+        UserData.setAll(data);
+
+    }
+    public void loadAccountManagement(){
+        loadAccountTable();
+        setupAccountTable();
+    }
+
+    public void editAccount(User item) {
+        // Create UI elements
+        TextField usernameField = createTextField("Username");
+        TextField firstnameField = createTextField("First Name");
+        TextField lastnameField = createTextField("Last Name");
+
+        ComboBox<String> positionField = new ComboBox<>();
+        positionField.getItems().addAll("ADMINISTRATOR", "MANAGER");
+        positionField.setPromptText("Position");
+        positionField.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: white;");
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Password");
+        passwordField.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #e0e0e0;");
+
+        TextField passwordVisibleField = new TextField();
+        passwordVisibleField.setManaged(false);
+        passwordVisibleField.setVisible(false);
+        passwordVisibleField.textProperty().bindBidirectional(passwordField.textProperty());
+        passwordVisibleField.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #e0e0e0;");
+
+        Button togglePasswordButton = new Button("👁");
+        togglePasswordButton.setFocusTraversable(false);
+        togglePasswordButton.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
+        togglePasswordButton.setOnAction(e -> {
+            if (passwordVisibleField.isVisible()) {
+                passwordVisibleField.setVisible(false);
+                passwordVisibleField.setManaged(false);
+                passwordField.setVisible(true);
+                passwordField.setManaged(true);
+            } else {
+                passwordVisibleField.setVisible(true);
+                passwordVisibleField.setManaged(true);
+                passwordField.setVisible(false);
+                passwordField.setManaged(false);
+            }
+        });
+
+        StackPane passwordPane = new StackPane(passwordField, passwordVisibleField, togglePasswordButton);
+        StackPane.setAlignment(togglePasswordButton, Pos.CENTER_RIGHT);
+        StackPane.setMargin(togglePasswordButton, new Insets(0, 5, 0, 0));
+
+        ComboBox<String> statusField = new ComboBox<>();
+        statusField.getItems().addAll("Active", "Inactive");
+        statusField.setPromptText("Status");
+        statusField.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #e0e0e0;");
+
+        // Buttons
+        Button okButton = new Button("OK");
+        Button cancelButton = new Button("Cancel");
+
+        okButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        cancelButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+
+        HBox buttonBox = new HBox(10, okButton, cancelButton);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+
+        // Container for all fields
+        VBox editAccountPane = new VBox(10);
+        editAccountPane.setPadding(new Insets(15));
+        editAccountPane.setStyle("-fx-background-color: #2b2b2b; -fx-border-radius: 10; -fx-background-radius: 10;");
+        editAccountPane.getChildren().addAll(usernameField, firstnameField, lastnameField, positionField, passwordPane, statusField, buttonBox);
+
+        usernameField.setText(item.getUsername());
+        firstnameField.setText(item.getFirstname());
+        lastnameField.setText(item.getLastname());
+        passwordField.setText(item.getPassword());
+
+
+        // Stage / Dialog
+        Stage stage = new Stage();
+        stage.initModality(Modality.WINDOW_MODAL);
+        Scene scene = new Scene(editAccountPane);
+        stage.setScene(scene);
+        stage.setTitle("Edit Account");
+
+        // Button actions
+        okButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            String firstname = firstnameField.getText();
+            String lastname = lastnameField.getText();
+            String position = positionField.getValue();
+            String password = passwordField.getText();
+            String status = statusField.getValue();
+            User updatedUser = new User();
+            updatedUser.setId(item.getId());
+            updatedUser.setUsername(username);
+            updatedUser.setFirstname(firstname);
+            updatedUser.setLastname(lastname);
+            updatedUser.setPosition(User.Position.valueOf(position));
+            updatedUser.setPassword(password);
+            updatedUser.setStatus(status);
+
+
+            // TODO: Save/update user in your repository
+            userRepository.save(updatedUser);
+
+            stage.close();
+            loadAccountTable();
+        });
+
+        cancelButton.setOnAction(e -> stage.close());
+
+        stage.showAndWait();
+    }
+
+
+    // Helper method
+    private TextField createTextField(String placeholder) {
+        TextField tf = new TextField();
+        tf.setPromptText(placeholder);
+        tf.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #e0e0e0;");
+        return tf;
+    }
+
+
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
         Dashboardbtn.fire();
-        System.out.println("ActionTM = " + ActionTM);
         loadDashboard();
         loadReservationManagement();
         loadTableManagement();
+        loadAccountManagement();
         
         
         RecentReservationTable.setItems(recentReservations);
         CustomerReservationTable.setItems(filteredData);
         ManageTableView.setItems(manageTablesData);
         TableManager.setItems(tablesfilteredData);
-        AvailableTable.setItems(availableTables);
+        AvailableTable.setItems(filteredtable);
         ReservationLogs.setItems(reservationlogsdata);
         SCNReservations.setItems(canceledReservations);
+        TableHistory.setItems(reservationlogsdata);
+        AccountTable.setItems(UserData);
         
 
         handleClick();
