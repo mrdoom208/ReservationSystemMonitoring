@@ -3,10 +3,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.mycompany.reservationsystem.controller;
+import com.mycompany.reservationsystem.model.ActivityLogs;
 import com.mycompany.reservationsystem.model.User;
+import com.mycompany.reservationsystem.repository.ActivityLogsRepository;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
 import com.mycompany.reservationsystem.repository.UserRepository;
 import java.io.IOException;
+import java.time.LocalDateTime;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -46,6 +50,8 @@ public class LoginController {
     
     @Autowired
     private ConfigurableApplicationContext springContext;
+    @Autowired
+    private ActivityLogsRepository activityLogsRepository;
     
     private boolean manager = false;
     
@@ -105,6 +111,7 @@ public class LoginController {
         String passf = passwordfield.getText();
         
         User found = userRepository.findByUsernameAndPassword(userf, passf);
+        System.out.println();
         if (found != null) {
             
             try {
@@ -114,6 +121,16 @@ public class LoginController {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../"+fxmlFile));
                     loader.setControllerFactory(springContext::getBean);
                     Parent root = loader.load();
+                    AdministratorUIController controller = loader.getController();
+                    controller.setUser(found);
+                    ActivityLogs logs = new ActivityLogs();
+                    logs.setTimestamp(LocalDateTime.now());
+                    logs.setAction("Login");
+                    logs.setTarget("");
+                    logs.setValue("");
+                    logs.setUser(found.getUsername());
+                    activityLogsRepository.save(logs);
+
 
                     Stage stage = new Stage();
          

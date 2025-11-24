@@ -7,21 +7,16 @@ package com.mycompany.reservationsystem.controller;
 import com.mycompany.reservationsystem.Service.ReservationService;
 import com.mycompany.reservationsystem.controller.DeleteTableDialogController;
 import com.mycompany.reservationsystem.Service.TablesService;
-import com.mycompany.reservationsystem.model.CustomerReservation;
-import com.mycompany.reservationsystem.model.ManageTables;
-import com.mycompany.reservationsystem.model.User;
-import com.mycompany.reservationsystem.repository.CustomerReservationRepository;
+import com.mycompany.reservationsystem.model.*;
+import com.mycompany.reservationsystem.repository.*;
 import com.mycompany.reservationsystem.dto.CustomerReservationDTO;
 import com.mycompany.reservationsystem.dto.ManageTablesDTO;
-import com.mycompany.reservationsystem.model.ReservationTableLogs;
-import com.mycompany.reservationsystem.repository.ManageTablesRepository;
-import com.mycompany.reservationsystem.repository.ReservationTableLogsRepository;
-import com.mycompany.reservationsystem.repository.UserRepository;
 import com.mycompany.reservationsystem.websocket.ReservationListener;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -71,6 +66,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AdministratorUIController implements Initializable, ReservationListener {
+    private User currentuser;
+
+    void  setUser(User user) {
+        this.currentuser = user;
+    }
 
     @FXML
     private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Mergebtn,AddTablebtn;
@@ -168,6 +168,9 @@ public class AdministratorUIController implements Initializable, ReservationList
     
     @Autowired
     private ReservationService reservationService;
+
+    @Autowired
+    private ActivityLogsRepository activityLogsRepository;
     
     
     private Long prevRow;
@@ -660,6 +663,15 @@ public class AdministratorUIController implements Initializable, ReservationList
             System.out.println(cr);
             
         }
+        ActivityLogs logs = new ActivityLogs();
+        logs.setTimestamp(LocalDateTime.now());
+        logs.setAction("Reserved");
+        logs.setTarget("Table No. "+cr.getTableId());
+        logs.setValue(cr.getReference());
+        logs.setUser(currentuser.getUsername());
+        activityLogsRepository.save(logs);
+
+
        loadTableView();
        loadAvailableTable();
        loadTableManager();
@@ -754,6 +766,17 @@ public class AdministratorUIController implements Initializable, ReservationList
             row.setLocation(LocationField.getText());
             row.setStatus(StatusField.getText());
             manageTablesRepository.save(row);
+            ActivityLogs logs = new ActivityLogs();
+            logs.setTimestamp(LocalDateTime.now());
+            logs.setAction("Edit");
+            logs.setTarget("Table no."+ row.getId());
+            logs.setValue("Table No: "+row.getId()+"Capacity: "+row.getCapacity()+"Location"+row.getLocation());
+            logs.setUser(currentuser.getUsername());
+
+            activityLogsRepository.save(logs);
+            loadTableManager();
+            loadTableView();
+            updateLabels();
             loadTableManager();
             loadAvailableTable();
             loadTableView();
@@ -868,6 +891,15 @@ public class AdministratorUIController implements Initializable, ReservationList
             row.setPhone(phoneField.getText());
             row.setReservationPendingtime(LocalTime.parse(pendingtimeField.getText(),DateTimeFormatter.ofPattern("hh:mm:ss a")));
             row.setReference(String.format("RSV-%05d", customerReservationRepository.count()+1));
+
+            ActivityLogs logs = new ActivityLogs();
+            logs.setTimestamp(LocalDateTime.now());
+            logs.setAction("Add Reservation");
+            logs.setTarget(row.getReference());
+            logs.setValue(row.getName());
+            logs.setUser(currentuser.getUsername());
+
+            activityLogsRepository.save(logs);
             customerReservationRepository.save(row);
             loadCustomerReservationTable();
             loadRecentReservations();
@@ -952,6 +984,18 @@ public class AdministratorUIController implements Initializable, ReservationList
             row.setLocation(LocationField.getText());
             row.setStatus(StatusField.getText());
             manageTablesRepository.save(row);
+
+            ActivityLogs logs = new ActivityLogs();
+            logs.setTimestamp(LocalDateTime.now());
+            logs.setAction("Add Table");
+            logs.setTarget("Table no."+ row.getTableNo());
+            logs.setValue("Capacity: "+row.getCapacity()+" Location: "+row.getLocation());
+            logs.setUser(currentuser.getUsername());
+            activityLogsRepository.save(logs);
+            loadTableManager();
+            loadTableView();
+            updateLabels();
+
             loadTableManager();
             loadAvailableTable();
             loadTableView();
@@ -1222,6 +1266,15 @@ public class AdministratorUIController implements Initializable, ReservationList
                         getTableView().refresh();
                         loadSCNReservation();
 
+                        ActivityLogs logs = new ActivityLogs();
+                        logs.setTimestamp(LocalDateTime.now());
+                        logs.setAction("Occupied");
+                        logs.setTarget("Table No." + data.getTableId());
+                        logs.setValue(data.getCustomer());
+                        logs.setUser(currentuser.getUsername());
+
+                        activityLogsRepository.save(logs);
+
 
                     }
                 });
@@ -1232,6 +1285,14 @@ public class AdministratorUIController implements Initializable, ReservationList
                         data.setDate(LocalDate.now());
                         data.setReservationCompletetime(LocalTime.now());
                         updateButtonsForStatus(data);
+
+                        ActivityLogs logs = new ActivityLogs();
+                        logs.setTimestamp(LocalDateTime.now());
+                        logs.setAction("Complete");
+                        logs.setTarget("Table no."+ data.getTableId());
+                        logs.setValue(data.getReference());
+                        logs.setUser(currentuser.getUsername());
+                        activityLogsRepository.save(logs);
                         
                         ReservationTableLogs reservationtablelogs = new ReservationTableLogs(data);
                         RTLR.save(reservationtablelogs);
@@ -1290,6 +1351,14 @@ public class AdministratorUIController implements Initializable, ReservationList
                             return;
                         }
                         manageTablesRepository.deleteById(data.getTableId());
+                        ActivityLogs logs = new ActivityLogs();
+                        logs.setTimestamp(LocalDateTime.now());
+                        logs.setAction("Delete");
+                        logs.setTarget("Table no."+ data.getTableId());
+                        logs.setValue("");
+                        logs.setUser(currentuser.getUsername());
+
+                        activityLogsRepository.save(logs);
                         loadTableManager();
                         loadTableView();
                         updateLabels();
