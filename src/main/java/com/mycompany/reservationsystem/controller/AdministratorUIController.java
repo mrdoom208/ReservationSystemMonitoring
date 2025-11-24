@@ -77,7 +77,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private ScrollPane DashboardPane, ReservationPane, TableManagementPane, ManageStaffAndAccountsPane;
     @FXML
-    private Label Total_CustomerDbd, activetable,Total_Cancelled, Total_Pending, CusToTable,totaltables,totalfree,totalbusy,pending,confirm;
+    private Label Total_CustomerDbd, activetable,Total_Cancelled, Total_Pending, CusToTable,totaltables,totalfree,totalbusy,pending,confirm,header;
     @FXML
     private LineChart<String, Number> myBarChart;
     @FXML
@@ -106,6 +106,12 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableView<CustomerReservation> CustomerReservationTable;
     @FXML
+    private TableView<ActivityLogs> ActivityLogsTable;
+    @FXML
+    private TableColumn<ActivityLogs,String> userAL,actionAL,targetAL,valueAL;
+    @FXML
+    private TableColumn<ActivityLogs,LocalDateTime>timestampsAL;
+    @FXML
     private TableColumn<CustomerReservation, String> NameCRT, StatusCRT, PreferCRT, PhoneCRT, EmailCRT, ReferenceCRT;
     @FXML
     private TableColumn<CustomerReservation, Integer> PaxCRT;
@@ -129,6 +135,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     private final ObservableList<ManageTablesDTO> tableManagerData = FXCollections.observableArrayList();
     private final ObservableList<ManageTables> availableTables = FXCollections.observableArrayList();
     private final ObservableList<User> UserData = FXCollections.observableArrayList();
+    private final ObservableList<ActivityLogs> activitylogsdata = FXCollections.observableArrayList();
 
     @FXML
     private TableView<ManageTables> AvailableTable;
@@ -209,15 +216,19 @@ public class AdministratorUIController implements Initializable, ReservationList
         switch (clicked.getId()) {
             case "Dashboardbtn":
                 DashboardPane.setVisible(true);
+                header.setText("Dashboard");
                 break;
             case "ReservationManagementbtn":
                 ReservationPane.setVisible(true);
+                header.setText("Reservation Management");
                 break;
             case "TableManagementbtn":
                 TableManagementPane.setVisible(true);
+                header.setText("Table Management");
                 break;
             case "ManageStaffAndAccountsbtn":
                 ManageStaffAndAccountsPane.setVisible(true);
+                header.setText("Account Management");
             default:
                 break;
 
@@ -1731,6 +1742,8 @@ public class AdministratorUIController implements Initializable, ReservationList
     public void loadAccountManagement(){
         loadAccountTable();
         setupAccountTable();
+        loadActivityLogs();
+        setupActivityLogs();
     }
 
     public void editAccount(User item) {
@@ -1847,6 +1860,41 @@ public class AdministratorUIController implements Initializable, ReservationList
         tf.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #e0e0e0;");
         return tf;
     }
+    private void setupActivityLogs(){
+        TableColumn<?, ?>[] column = {timestampsAL,userAL,actionAL,targetAL,valueAL};
+        double[] widthFactors = {0.2, 0.2, 0.2, 0.2, 0.2};
+        String[] namecol = {"timestamp", "user", "action", "target", "value"};
+
+        for (int i = 0; i < column.length; i++) {
+            TableColumn<?, ?> col = column[i];
+
+            if (col == null) {
+                System.out.println("❌ NULL COLUMN at index " + i + " (expected: " + namecol[i] + ")");
+                continue;
+            } else {
+                System.out.println("✔ Column OK: index " + i + " = " + col.getText());
+            }
+
+            col.setResizable(false);
+            col.setReorderable(false);
+            col.prefWidthProperty().bind(ActivityLogsTable.widthProperty().multiply(widthFactors[i]));
+            if (!namecol[i].isEmpty()) {
+                col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
+            }
+        }
+
+        ActivityLogsTable.setPlaceholder(new Label("No Account yet "));
+    }
+    private void loadActivityLogs(){
+        List<ActivityLogs> data = activityLogsRepository.findAll();
+        activitylogsdata.setAll(data);
+
+
+    }
+
+
+
+
 
 
 
@@ -1870,6 +1918,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         SCNReservations.setItems(canceledReservations);
         TableHistory.setItems(reservationlogsdata);
         AccountTable.setItems(UserData);
+        ActivityLogsTable.setItems(activitylogsdata);
         
 
         handleClick();

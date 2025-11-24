@@ -117,6 +117,8 @@ public class LoginController {
             try {
                 
                 System.out.println("Login Successfully");
+                    found.setStatus("Active");
+                    userRepository.save(found);
                     String fxmlFile = "fxml/AdministratorUI.fxml";    
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../"+fxmlFile));
                     loader.setControllerFactory(springContext::getBean);

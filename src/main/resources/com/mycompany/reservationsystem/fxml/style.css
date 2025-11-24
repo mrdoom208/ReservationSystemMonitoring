@@ -41,19 +41,24 @@
 #Submit:pressed {
     -fx-background-color: rgba(255, 0, 0, 0.2); 
 }
+.mainpane{
+    -fx-background-color:#303030;
+}
 
 
 .navigation-btns{
     -fx-background-color: transparent;
     -fx-text-fill: white;
-    -fx-border-color: white;
-    -fx-border-radius: 20;
+    -fx-border-color: transition;
+    -fx-border-radius: 12;
+    -fx-font-size:14;
+    -fx-alignment: CENTER_LEFT;
     
 }
 
 .navigation-btns:hover{
     -fx-background-color: rgba(255, 0, 0, 0.5);
-    -fx-background-radius:20;
+
     -fx-font-weight: normal;
  
     
@@ -62,8 +67,10 @@
 .navigation-btns-active{
     -fx-background-color: rgba(255, 0, 0, 1);
     -fx-text-fill: white;
-    -fx-background-radius:20;
+    -fx-background-radius:12;
     -fx-font-weight: bold;
+    -fx-font-size:14;
+    -fx-alignment: CENTER_LEFT;
     
     
 }
@@ -422,7 +429,10 @@
 }
 
 /* Grid Lines */
-.chart-horizontal-grid-lines, .chart-vertical-grid-lines {
+.chart-horizontal-grid-lines{
+    -fx-stroke: #555555;           /* grid lines color */
+}
+.chart-vertical-grid-lines {
     -fx-stroke: transparent;           /* grid lines color */
 }
 
