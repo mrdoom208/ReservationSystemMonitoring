@@ -138,6 +138,13 @@ public class LoginController {
          
 
                     Scene scene = new Scene(root);
+
+                    root.styleProperty().bind(
+                            javafx.beans.binding.Bindings.concat(
+                                    "-fx-font-size: ", scene.widthProperty().divide(100), "px;"
+                            )
+                    );
+
                     stage.setScene(scene);
                     stage.initStyle(StageStyle.UNDECORATED);
                     stage.setMaximized(true);

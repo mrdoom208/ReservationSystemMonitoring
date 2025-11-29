@@ -284,10 +284,8 @@ public class AdministratorUIController implements Initializable, ReservationList
             col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
         }
 
-        int maxRows = 10;
-        double tableHeight = RecentReservationTable.getPrefHeight()-32; 
-        double rowHeight = tableHeight / maxRows;
-        RecentReservationTable.setFixedCellSize(rowHeight);
+        
+
         RecentReservationTable.setPlaceholder(new Label("No Customer Reservation yet"));
 
         
