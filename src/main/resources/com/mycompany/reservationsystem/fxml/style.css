@@ -140,6 +140,13 @@
     -fx-text-fill: white;
     -fx-font-weight: normal;
 }
+.label-Statistics{
+    -fx-font-size: 1em;  /* was 50px */
+    -fx-text-fill: white;
+
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, transparent, 0, 0, 0, 0);
+}
 
 .Active-Statistics{
     -fx-font-size: 3.125em;  /* was 50px */
@@ -170,6 +177,11 @@
 /*.Statistics-cell:hover{
     -fx-effect: dropshadow(gaussian, rgba(255,64,129,0.3), 30, 0.4 , 0, 0);
 }*/
+
+.category-background{
+    -fx-background-color:#303030;
+     -fx-background-radius:1em;
+}
 
 .notification-pane{
     -fx-background-color:#303030;
@@ -344,7 +356,7 @@
 
 .delete {
     -fx-font-weight: bold;
-    -fx-font-size:0.7m;  /* was 10px */
+    -fx-font-size:0.7em;  /* was 10px */
     -fx-background-radius: 8px;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
@@ -476,3 +488,43 @@
     -fx-background-insets: 0;
     -fx-background-radius: 4px;
 }
+/* ================= PieChart Title ================= */
+.pie-chart .chart-title {
+    -fx-font-size: 2em;
+    -fx-font-weight: bold;
+    -fx-text-fill: white; /* dark gray */
+    -fx-padding: 10 0 20 0; /* top right bottom left */
+}
+
+/* ================= PieChart Legend ================= */
+.pie-chart .chart-legend {
+    -fx-background-color: transparent; /* transparent background */
+
+}
+.pie-chart .chart-legend-item {
+     -fx-font-size: 1em;      /* font size */
+    -fx-font-weight: bold;     /* bold text */
+    -fx-text-fill: white;      /* text color */
+}
+
+
+
+/* ================= PieChart Labels ================= */
+.pie-chart .chart-pie-label {
+    -fx-font-size: 1.2em;
+    -fx-font-weight: bold;
+    -fx-fill: white; /* labels on slices */
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.6) , 2,0,0,1 ); /* subtle shadow */
+}
+
+/* ================= PieChart Background =================
+.pie-chart .chart {
+    -fx-background-color: transparent; /* light gray background
+    -fx-border-radius: 1em;
+    -fx-background-radius: 1em;
+}
+
+/* ================= PieChart Container =================
+.chart-plot-background {
+    -fx-background-color:black; /* remove default background
+}*/

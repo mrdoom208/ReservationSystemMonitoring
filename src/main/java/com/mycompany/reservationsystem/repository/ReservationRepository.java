@@ -29,9 +29,18 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("phone") String phone, @Param("from") LocalDate from, @Param("to") LocalDate to );
 
     @Query("""
-            SELECT new com.mycompany.reservationsystem.dto.CustomerReportDTO( c.phone, COUNT(r.id), SUM(r.revenue), AVG(r.revenue) ) FROM Reservation r JOIN r.customer c WHERE (:from IS NULL OR r.date >= :from) AND (:to IS NULL OR r.date <= :to) GROUP BY c.phone 
-            """)
-    List<CustomerReportDTO> getCustomerReport( @Param("from") LocalDate from, @Param("to") LocalDate to );
+    SELECT new com.mycompany.reservationsystem.dto.CustomerReportDTO(
+        c.phone, 
+        COUNT(r.id),
+        COALESCE(SUM(r.revenue), 0.0), 
+        COALESCE(AVG(r.revenue), 0.0)
+    ) 
+    FROM Reservation r JOIN r.customer c 
+    WHERE (:from IS NULL OR r.date >= :from) 
+      AND (:to IS NULL OR r.date <= :to) 
+    GROUP BY c.phone
+""")
+    List<CustomerReportDTO> getCustomerReport(@Param("from") LocalDate from, @Param("to") LocalDate to);
 
     @Query("""
     SELECT new com.mycompany.reservationsystem.dto.RevenueReportsDTO(

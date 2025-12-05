@@ -29,7 +29,7 @@ public class Reservation {
     private String status;
     private String reference;
     private LocalDate date;
-    private int revenue;
+    private Double revenue;
 
     private LocalTime reservationPendingtime;
     private LocalTime reservationConfirmtime;
@@ -81,8 +81,8 @@ public class Reservation {
         this.status = status;
     }
 
-    public int getRevenue(){ return revenue;}
-    public void setRevenue(int revenue){this.revenue = revenue;}
+    public double getRevenue(){ return revenue;}
+    public void setRevenue(double revenue){this.revenue = revenue;}
 
     public String getReference() {
         return reference;

@@ -10,8 +10,8 @@ public class CustomerReportDTO {
     public CustomerReportDTO(String phone, Long totalReservation, Double totalRevenue, Double averageRevenue) {
         this.phone = phone;
         this.totalReservation = totalReservation != null ? totalReservation : 0L;
-        this.totalRevenue = totalRevenue != null ? totalRevenue : 0.0;
-        this.averageRevenue = averageRevenue != null ? Math.round(averageRevenue * 100.0) / 100.0 : 0.0;
+        this.totalRevenue = totalRevenue != null ? Math.round(totalRevenue * 100.0) / 100.0 : 0.00;
+        this.averageRevenue = averageRevenue != null ? Math.round(averageRevenue * 100.0) / 100.0 : 0.00;
     }
 
     public String getPhone() { return phone; }

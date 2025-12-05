@@ -752,8 +752,10 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
     
     public void setupAvailableTable() {
+
         filteredtable = new FilteredList<>(availableTables);
         AvailableTable.setItems(filteredtable);
+        AvailableTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         filteredtable.setPredicate(table -> table.getCapacity() > currentpax);
         AvailableTable.getSelectionModel().selectedItemProperty().addListener(
@@ -2302,9 +2304,23 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     public void setupCustomerReports() {
 
+        totalrevenueCusrep.setCellFactory(col -> new TableCell<CustomerReportDTO, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : String.format("%.2f", item));
+            }
+        });
+        averageCusrep.setCellFactory(col -> new TableCell<CustomerReportDTO, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : String.format("%.2f", item));
+            }
+        });
+
 
         CustomerReservationTable.setPlaceholder(new Label("No Customer Yet"));
-
         phoneCusrep.setCellValueFactory(new PropertyValueFactory<>("phone"));
         totalreservationCusrep.setCellValueFactory(new PropertyValueFactory<>("totalReservation"));
         totalrevenueCusrep.setCellValueFactory(new PropertyValueFactory<>("totalRevenue"));
@@ -2327,6 +2343,14 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     public void setupReservatioInformation(){
 
+        revenueResInCusRep.setCellFactory(col -> new TableCell<CustomerReportDTO, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : String.format("%.2f", item));
+            }
+        });
+
         ResInCusRep.setItems(reservationCustomerDTOS);
         TableColumn<?, ?>[] column = {referenceResInCusRep,nameResInCusRep,phoneResInCusRep,statusResInCusRep,revenueResInCusRep,timeResInCusRep,dateResInCusRep};
         double[] widthFactors = {0.2,0.25,0.2,0.15,0.15,0.2,0.2};
@@ -2345,6 +2369,13 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
 
     public void setupRevenueReports(){
+       totalrevenueRevrep.setCellFactory(col -> new TableCell<RevenueReportsDTO, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : String.format("%.2f", item));
+            }
+        });
 
         RevRepTable.setItems(RevenueReportDTOS);
         TableColumn<?, ?>[] column = {dateRevrep,totalreservationRevrep,totalcustomerRevrep,totalrevenueRevrep};

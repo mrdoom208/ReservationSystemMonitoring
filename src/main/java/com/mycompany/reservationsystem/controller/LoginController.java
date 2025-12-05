@@ -142,15 +142,20 @@ public class LoginController {
 
                 root.styleProperty().bind(
                         Bindings.createStringBinding(() -> {
-                            double value = Math.min(scene.getWidth(), scene.getHeight()) / 50;
+                            double referenceWidth = 1600;   // base width
+                            double referenceHeight = 900;  // base height
 
-                            double clamped = Math.min(32, Math.max(14, value));
+                            // Scale factor based on BOTH width and height
+                            double scale = Math.min(scene.getWidth() / referenceWidth, scene.getHeight() / referenceHeight);
 
-                            return "-fx-font-size: " + clamped + "px;";
+                            // Apply scaling to a base font size
+                            double fontSize = Math.min(32, Math.max(14, 16 * scale)); // 16 is base font size
+
+                            return "-fx-font-size: " + fontSize + "px;";
                         }, scene.widthProperty(), scene.heightProperty())
                 );
                     stage.setScene(scene);
-                    stage.initStyle(StageStyle.DECORATED);
+                    stage.initStyle(StageStyle.UNDECORATED);
                     stage.setMaximized(true);
 
                     stage.setResizable(true);
