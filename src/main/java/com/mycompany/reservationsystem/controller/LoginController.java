@@ -11,6 +11,7 @@ import com.mycompany.reservationsystem.repository.UserRepository;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -139,14 +140,17 @@ public class LoginController {
 
                     Scene scene = new Scene(root);
 
-                    root.styleProperty().bind(
-                            javafx.beans.binding.Bindings.concat(
-                                    "-fx-font-size: ", scene.widthProperty().divide(100), "px;"
-                            )
-                    );
+                root.styleProperty().bind(
+                        Bindings.createStringBinding(() -> {
+                            double value = Math.min(scene.getWidth(), scene.getHeight()) / 50;
 
+                            double clamped = Math.min(32, Math.max(14, value));
+
+                            return "-fx-font-size: " + clamped + "px;";
+                        }, scene.widthProperty(), scene.heightProperty())
+                );
                     stage.setScene(scene);
-                    stage.initStyle(StageStyle.UNDECORATED);
+                    stage.initStyle(StageStyle.DECORATED);
                     stage.setMaximized(true);
 
                     stage.setResizable(true);

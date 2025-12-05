@@ -20,13 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.ScaleTransition;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -55,7 +50,6 @@ import javafx.scene.shape.Shape;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,13 +106,13 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableColumn<CustomerReportDTO, String> referenceResInCusRep,nameResInCusRep,phoneResInCusRep,statusResInCusRep;
     @FXML
-    private TableView<RevenueReportDTO>RevRepTable;
+    private TableView<RevenueReportsDTO>RevRepTable;
     @FXML
-    private TableColumn<RevenueReportDTO, Long>totalcustomerRevrep,totalreservationRevrep;
+    private TableColumn<RevenueReportsDTO, Long>totalcustomerRevrep,totalreservationRevrep;
     @FXML
-    private TableColumn<RevenueReportDTO, LocalDate>dateRevrep;
+    private TableColumn<RevenueReportsDTO, LocalDate>dateRevrep;
     @FXML
-    private TableColumn<RevenueReportDTO, Double>totalrevenueRevrep;
+    private TableColumn<RevenueReportsDTO, Double>totalrevenueRevrep;
     @FXML
     private TableView<ManageTablesDTO> ManageTableView,TableManager;
     @FXML
@@ -175,7 +169,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     private final ObservableList<User> UserData = FXCollections.observableArrayList();
     private final ObservableList<ActivityLogs> activitylogsdata = FXCollections.observableArrayList();
     private final ObservableList<ReservationCustomerDTO> reservationCustomerDTOS = FXCollections.observableArrayList();
-    private final ObservableList<RevenueReportDTO> RevenueReportDTOS = FXCollections.observableArrayList();
+    private final ObservableList<RevenueReportsDTO> RevenueReportDTOS = FXCollections.observableArrayList();
 
 
     private FilteredList<Reservation> filterReservationReports = new FilteredList<>(reservationreports, p -> true);;
@@ -2410,13 +2404,13 @@ public class AdministratorUIController implements Initializable, ReservationList
         LocalDate from = dateFromRevrep.getValue();
         LocalDate to = dateToRevrep.getValue();
 
-        List<RevenueReportDTO> results = reservationRepository.getRevenueReports(from, to);
+        List<RevenueReportsDTO> results = reservationRepository.getRevenueReports(from, to);
 
         RevenueReportDTOS.setAll(results);
         loadRevenueBarCharts(results,from,to);
 
     }
-    public void loadRevenueBarCharts(List<RevenueReportDTO> data, LocalDate dateFrom, LocalDate dateTo) {
+    public void loadRevenueBarCharts(List<RevenueReportsDTO> data, LocalDate dateFrom, LocalDate dateTo) {
 
         totalReservationChart.getData().clear();
         totalCustomerChart.getData().clear();
@@ -2431,8 +2425,8 @@ public class AdministratorUIController implements Initializable, ReservationList
         }
 
         // Map existing data by date
-        Map<LocalDate, RevenueReportDTO> dataMap = new HashMap<>();
-        for (RevenueReportDTO r : data) {
+        Map<LocalDate, RevenueReportsDTO> dataMap = new HashMap<>();
+        for (RevenueReportsDTO r : data) {
             dataMap.put(r.getDate(), r);
         }
 
@@ -2445,7 +2439,7 @@ public class AdministratorUIController implements Initializable, ReservationList
 
         // Fill series with data (0 if missing)
         for (LocalDate d : allDates) {
-            RevenueReportDTO r = dataMap.getOrDefault(d, new RevenueReportDTO(d, 0, 0, 0.0));
+            RevenueReportsDTO r = dataMap.getOrDefault(d, new RevenueReportsDTO(d, 0, 0, 0.0));
 
             String dateStr = d.toString(); // or format as you like "MM-dd"
 
@@ -2501,40 +2495,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         setupRevenueReports();
         //ActivityLogsTable.setItems(activitylogsdata);
 
-        List<BarChart<?, ?>> charts = List.of(totalReservationChart, totalCustomerChart, totalRevenueChart);
 
-        // Save the normal heights of the charts
-        Map<BarChart<?, ?>, Double> normalHeights = new HashMap<>();
-        for (BarChart<?, ?> c : charts) {
-            normalHeights.put(c, c.getPrefHeight());
-
-        }
-
-        for (BarChart<?, ?> c : charts) {
-            c.setOnMouseEntered(e -> {
-                for (BarChart<?, ?> other : charts) {
-                    double targetHeight = (other == c) ? normalHeights.get(other) * 1.2
-                            : normalHeights.get(other) * 0.9;
-                    Timeline timeline = new Timeline(
-                            new KeyFrame(Duration.millis(200),
-                                    new KeyValue(other.prefHeightProperty(), targetHeight)
-                            )
-                    );
-                    timeline.play();
-                }
-            });
-
-            c.setOnMouseExited(e -> {
-                for (BarChart<?, ?> other : charts) {
-                    Timeline timeline = new Timeline(
-                            new KeyFrame(Duration.millis(200),
-                                    new KeyValue(other.prefHeightProperty(), normalHeights.get(other))
-                            )
-                    );
-                    timeline.play();
-                }
-            });
-        }
         
 
         handleClick();

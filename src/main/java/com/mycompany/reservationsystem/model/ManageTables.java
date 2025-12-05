@@ -37,7 +37,7 @@ public class ManageTables {
     
     
     @OneToMany(mappedBy = "table")
-    private List<CustomerReservation> reservations;
+    private List<Reservation> reservations;
     
     
     

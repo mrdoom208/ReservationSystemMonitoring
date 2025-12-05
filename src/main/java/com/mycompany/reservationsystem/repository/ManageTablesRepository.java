@@ -5,7 +5,6 @@
 package com.mycompany.reservationsystem.repository;
 
 import com.mycompany.reservationsystem.dto.ManageTablesDTO;
-import com.mycompany.reservationsystem.model.CustomerReservation;
 import com.mycompany.reservationsystem.model.ManageTables;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,29 +17,32 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ManageTablesRepository extends JpaRepository<ManageTables,Long>{
-   @Query("SELECT new com.mycompany.reservationsystem.dto.ManageTablesDTO(" +
-        "t.tableNo, " +                      // table number
-        "t.status, " +                       // table status
-        "t.capacity, " +                     // table capacity
-        "r.name, " +                     // customer name
-        "r.pax, " +                          // number of guests
-        "t.location, " +                     // table location
-        "r.prefer, " +                       // customer preference
-        "r.status, " +                       // reservation status
-        "r.reference, " +                    // reservation reference
-        "r.phone, " +                        // customer phone
-        "r.email, " +                        // customer email
-        "r.reservationPendingtime, " +       // pending time
-        "r.reservationConfirmtime, " +       // confirm time
-        "r.reservationSeatedtime, " +        // seated time
-        "r.reservationCompletetime, " +      // complete time
-        "t.id, " +                           // table id
-        "t.tablestarttime, " +               // table start time
-        "t.tableendtime, " +                 // table end time
-        "r.date" +                           // reservation date
-        ") " +
-        "FROM ManageTables t " +
-        "LEFT JOIN t.reservations r")
+    @Query("""
+SELECT new com.mycompany.reservationsystem.dto.ManageTablesDTO(
+    t.tableNo,
+    t.status,
+    t.capacity,
+    c.name,
+    r.pax,
+    t.location,
+    r.prefer,
+    r.status,
+    r.reference,
+    c.phone,
+    c.email,
+    r.reservationPendingtime,
+    r.reservationConfirmtime,
+    r.reservationSeatedtime,
+    r.reservationCompletetime,
+    t.id,
+    t.tablestarttime,
+    t.tableendtime,
+    r.date
+)
+FROM ManageTables t
+LEFT JOIN t.reservations r
+LEFT JOIN r.customer c
+""")
     List<ManageTablesDTO> getManageTablesDTO();
     List<ManageTables> findByStatus(String status);
     

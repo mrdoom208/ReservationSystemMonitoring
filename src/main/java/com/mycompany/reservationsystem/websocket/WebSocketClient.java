@@ -1,6 +1,6 @@
 package com.mycompany.reservationsystem.websocket;
 
-import com.mycompany.reservationsystem.dto.CustomerReservationDTO;
+import com.mycompany.reservationsystem.dto.WebupdateDTO;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +29,12 @@ public class WebSocketClient {
                 session.subscribe("/topic/forms", new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
-                        return CustomerReservationDTO.class;
+                        return WebupdateDTO.class;
                     }
 
                     @Override
                     public void handleFrame(StompHeaders headers, Object payload) {
-                        CustomerReservationDTO reservation = (CustomerReservationDTO) payload;
+                        WebupdateDTO reservation = (WebupdateDTO) payload;
                         System.out.println("New reservation: " + reservation);
                         
                         for (ReservationListener l : listeners) {

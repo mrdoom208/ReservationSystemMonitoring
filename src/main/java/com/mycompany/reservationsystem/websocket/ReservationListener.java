@@ -4,12 +4,12 @@
  */
 package com.mycompany.reservationsystem.websocket;
 
-import com.mycompany.reservationsystem.dto.CustomerReservationDTO;
+import com.mycompany.reservationsystem.dto.WebupdateDTO;
 
 /**
  *
  * @author formentera
  */
 public interface ReservationListener {
-    void onNewReservation(CustomerReservationDTO reservation);
+    void onNewReservation(WebupdateDTO reservation);
 }

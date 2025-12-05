@@ -10,7 +10,7 @@ package com.mycompany.reservationsystem.dto;
  *
  * @author formentera
  */
-public class CustomerReservationDTO{
+public class WebupdateDTO {
     private Long id;
 
     private String name;

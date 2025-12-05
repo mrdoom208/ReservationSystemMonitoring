@@ -1,9 +1,11 @@
 package com.mycompany.reservationsystem.Service;
 
-import com.mycompany.reservationsystem.model.CustomerReservation;
 import com.mycompany.reservationsystem.model.ManageTables;
-import com.mycompany.reservationsystem.repository.CustomerReservationRepository;
+
 import java.time.LocalTime;
+
+import com.mycompany.reservationsystem.model.Reservation;
+import com.mycompany.reservationsystem.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
@@ -12,12 +14,12 @@ import java.util.Optional;
 public class ReservationService {
 
     @Autowired
-    private CustomerReservationRepository reservationRepository;
+    private ReservationRepository reservationRepository;
 
     public void updateStatus(String Ref, String newStatus) {
-        Optional<CustomerReservation> optional = reservationRepository.findByReference(Ref);
+        Optional<Reservation> optional = reservationRepository.findByReference(Ref);
         if (optional.isPresent()) {
-            CustomerReservation entity = optional.get();
+            Reservation entity = optional.get();
             entity.setStatus(newStatus);   // update the status
             reservationRepository.save(entity);  // save back to DB
         } else {
@@ -25,9 +27,9 @@ public class ReservationService {
         }
     }
     public void updateTableId(String Ref, ManageTables table) {
-        Optional<CustomerReservation> optional = reservationRepository.findByReference(Ref);
+        Optional<Reservation> optional = reservationRepository.findByReference(Ref);
         if (optional.isPresent()) {
-            CustomerReservation entity = optional.get();
+            Reservation entity = optional.get();
             entity.setTable(table);   // update the status
             reservationRepository.save(entity);  // save back to DB
         } else {
@@ -35,9 +37,9 @@ public class ReservationService {
         }
     }
     public void updateSeatedtime(String Ref, LocalTime newtime){
-        Optional<CustomerReservation> optional = reservationRepository.findByReference(Ref);
+        Optional<Reservation> optional = reservationRepository.findByReference(Ref);
         if (optional.isPresent()) {
-            CustomerReservation entity = optional.get();
+            Reservation entity = optional.get();
             entity.setReservationSeatedtime(newtime);   // update the status
             reservationRepository.save(entity);  // save back to DB
         } else {
@@ -45,9 +47,9 @@ public class ReservationService {
         }
     }
     public void updateCompletetime(String Ref, LocalTime newtime){
-        Optional<CustomerReservation> optional = reservationRepository.findByReference(Ref);
+        Optional<Reservation> optional = reservationRepository.findByReference(Ref);
         if (optional.isPresent()) {
-            CustomerReservation entity = optional.get();
+            Reservation entity = optional.get();
             entity.setReservationCompletetime(newtime);   // update the status
             reservationRepository.save(entity);  // save back to DB
         } else {
