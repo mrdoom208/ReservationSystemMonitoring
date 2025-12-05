@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="1024.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.reservationsystem.controller.LoginController">
+   <children>
+      <VBox prefHeight="600.0" prefWidth="427.0" style="-fx-background-color: black;" HBox.hgrow="ALWAYS">
+         <children>
+            <Pane prefHeight="200.0" prefWidth="200.0">
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+               <children>
+                  <Circle fill="RED" layoutX="110.0" layoutY="100.0" radius="69.0" stroke="BLACK" strokeType="INSIDE" />
+               </children>
+            </Pane>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text=" Hello," wrappingWidth="348.968017578125" VBox.vgrow="ALWAYS">
+                     <font>
+                        <Font size="80.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="20.0" />
+                     </VBox.margin>
+                  </Text>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: Bold;" text=" Welcome!" VBox.vgrow="ALWAYS">
+                     <font>
+                        <Font size="80.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="20.0" />
+                     </VBox.margin>
+                  </Text>
+               </children>
+            </VBox>
+            <HBox prefHeight="139.0" prefWidth="400.0">
+               <children>
+                  <StackPane prefHeight="127.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="Staff" mnemonicParsing="false" onAction="#Colorchange" prefHeight="48.0" prefWidth="176.0" styleClass="login-button" text="Staff">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Button>
+                     </children>
+                     <HBox.margin>
+                        <Insets left="40.0" />
+                     </HBox.margin>
+                  </StackPane>
+                  <StackPane prefHeight="119.0" prefWidth="202.0">
+                     <children>
+                        <Button fx:id="Admin" mnemonicParsing="false" onAction="#Colorchange" prefHeight="48.0" prefWidth="176.0" styleClass="login-button" text="Admin">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                           <StackPane.margin>
+                              <Insets />
+                           </StackPane.margin>
+                        </Button>
+                     </children>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </StackPane>
+               </children>
+            </HBox>
+         </children></VBox>
+      <AnchorPane prefHeight="637.0" prefWidth="424.0" style="-fx-background-color: red;" HBox.hgrow="ALWAYS">
+         <HBox.margin>
+            <Insets />
+         </HBox.margin>
+         <children>
+            <VBox layoutX="55.0" layoutY="40.0" opacity="0.93" prefHeight="561.0" prefWidth="431.0" style="-fx-background-color: rgba(0,0,0,.7); -fx-background-radius: 30;">
+               <children>
+                  <StackPane prefHeight="110.0" prefWidth="431.0">
+                     <children>
+                        <StackPane prefHeight="108.0" prefWidth="331.0" style="-fx-border-color: transparent transparent white transparent; -fx-border-width: 2;">
+                           <children>
+                              <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Login" textAlignment="CENTER" wrappingWidth="82.8800048828125">
+                                 <font>
+                                    <Font size="28.0" />
+                                 </font>
+                              </Text>
+                           </children>
+                           <StackPane.margin>
+                              <Insets left="50.0" right="50.0" />
+                           </StackPane.margin>
+                        </StackPane>
+                     </children>
+                  </StackPane>
+                  <Pane prefHeight="303.0" prefWidth="431.0">
+                     <children>
+                        <Text fx:id="Username" fill="#9a9797" layoutX="71.0" layoutY="68.0" strokeType="OUTSIDE" strokeWidth="0.0" text="USERNAME">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Text>
+                        <TextField fx:id="usernamefield" layoutX="55.0" layoutY="79.0" prefHeight="55.0" prefWidth="322.0" style="-fx-background-radius: 10; -fx-background-color: #FFB6C9;">
+                           <font>
+                              <Font size="14.0" />
+                           </font></TextField>
+                        <Text fill="#9a9797" layoutX="70.0" layoutY="174.0" strokeType="OUTSIDE" strokeWidth="0.0" text="PASSWORD">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Text>
+                        <PasswordField fx:id="passwordfield" layoutX="58.0" layoutY="185.0" prefHeight="57.0" prefWidth="316.0" style="-fx-background-radius: 10; -fx-background-color: #FFB6C9;">
+                           <font>
+                              <Font size="14.0" />
+                           </font></PasswordField>
+                     </children>
+                  </Pane>
+                  <StackPane prefHeight="111.0" prefWidth="386.0">
+                     <children>
+                        <Button fx:id="Submit" mnemonicParsing="false" onAction="#SubmitButton" prefHeight="65.0" prefWidth="258.0" text="LOGIN" />
+                     </children>
+                  </StackPane>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+   </children>
+</HBox>

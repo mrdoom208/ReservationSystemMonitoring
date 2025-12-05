@@ -2448,6 +2448,14 @@ public class AdministratorUIController implements Initializable, ReservationList
         totalRevenueChart.getData().clear();
 
         // Generate all dates between dateFrom and dateTo
+
+        LocalDate minDate = data.stream().map(RevenueReportsDTO::getDate).min(LocalDate::compareTo).orElse(null);
+        LocalDate maxDate = data.stream().map(RevenueReportsDTO::getDate).max(LocalDate::compareTo).orElse(null);
+
+        if (dateFrom == null) dateFrom = minDate;
+        if (dateTo == null) dateTo = maxDate;
+
+
         List<LocalDate> allDates = new ArrayList<>();
         LocalDate current = dateFrom;
         while (!current.isAfter(dateTo)) {
