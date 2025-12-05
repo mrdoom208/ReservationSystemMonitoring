@@ -33,13 +33,14 @@ public class ReservationTableLogs {
      String email;
      String status;
      String reference;
-     Long tableid;  
+     Long tableid;
      LocalTime reservationPendingtime;
      LocalTime reservationConfirmtime;
      LocalTime reservationSeatedtime;
      LocalTime reservationCompletetime;
      String tableNo;
      int tablecapacity;
+     Double Revenue;
      String tablelocation;
      LocalTime tablestarttime;
      LocalTime tableendtime;

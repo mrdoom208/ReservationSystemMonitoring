@@ -13,6 +13,7 @@ import com.mycompany.reservationsystem.websocket.ReservationListener;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
 
 import java.net.URL;
+import javafx.util.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -20,6 +21,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -130,7 +134,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableColumn<ManageTablesDTO, Integer> TablePaxColum, TableCapacityColum;
     @FXML
-    private VBox notificationArea, hiddenTable;
+    private VBox notificationArea, hiddenTable,rootVBox;
     @FXML
     private TableView<Reservation> CustomerReservationTable;
     @FXML
@@ -152,6 +156,14 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableColumn<User,String> usernameAT,firstnameAT,lastnameAT,positionAT,statusAT;
     @FXML
+    private TableView<TableUsageReportDTO>TableUseRep;
+    @FXML
+    private TableColumn<TableUsageReportDTO, String>tablenoTableUseRep;
+    @FXML
+    private TableColumn<TableUsageReportDTO, Integer>totalreservationTableUseRep,totalcusotmerTableUseRep;
+    @FXML
+    private TableColumn<TableUsageReportDTO, Double>totalrevenueTableUseRep;
+    @FXML
     private DatePicker dateFromResrep,dateToResrep,dateFromCusrep,dateToCusrep,dateFromRevrep,dateToRevrep;
 
 
@@ -170,7 +182,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     private final ObservableList<ActivityLogs> activitylogsdata = FXCollections.observableArrayList();
     private final ObservableList<ReservationCustomerDTO> reservationCustomerDTOS = FXCollections.observableArrayList();
     private final ObservableList<RevenueReportsDTO> RevenueReportDTOS = FXCollections.observableArrayList();
-
+    private final ObservableList<TableUsageReportDTO> TableUsageReportDTOS = FXCollections.observableArrayList();
 
     private FilteredList<Reservation> filterReservationReports = new FilteredList<>(reservationreports, p -> true);;
     private FilteredList<CustomerReportDTO> filterCustomerReports = new FilteredList<>(customerreports, p -> true);;
@@ -2320,11 +2332,25 @@ public class AdministratorUIController implements Initializable, ReservationList
         });
 
 
+
+        TableColumn<?, ?>[] column = {phoneCusrep,totalreservationCusrep,totalrevenueCusrep,averageCusrep};
+        double[] widthFactors = {0.25,0.25,0.25,0.25};
+        String[] namecol = {"phone", "totalReservation", "totalRevenue", "averageRevenue"};
+
+        for (int i = 0; i < column.length; i++) {
+            TableColumn<?, ?> col = column[i];
+            col.setResizable(false);
+            col.setReorderable(false);
+            col.setSortable(true);
+            col.prefWidthProperty().bind(CusRepTable.widthProperty().multiply(widthFactors[i]));
+            if (!namecol[i].isEmpty()) {
+                col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
+            }
+        }
+
+
         CustomerReservationTable.setPlaceholder(new Label("No Customer Yet"));
-        phoneCusrep.setCellValueFactory(new PropertyValueFactory<>("phone"));
-        totalreservationCusrep.setCellValueFactory(new PropertyValueFactory<>("totalReservation"));
-        totalrevenueCusrep.setCellValueFactory(new PropertyValueFactory<>("totalRevenue"));
-        averageCusrep.setCellValueFactory(new PropertyValueFactory<>("averageRevenue"));
+
 
         // Wrap list in FilteredList
         CusRepTable.setItems(filterCustomerReports);
@@ -2360,6 +2386,7 @@ public class AdministratorUIController implements Initializable, ReservationList
             TableColumn<?, ?> col = column[i];
             col.setResizable(false);
             col.setReorderable(false);
+            col.setSortable(true);
             col.prefWidthProperty().bind(ResInCusRep.widthProperty().multiply(widthFactors[i]));
             if (!namecol[i].isEmpty()) {
                 col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
@@ -2396,6 +2423,26 @@ public class AdministratorUIController implements Initializable, ReservationList
             loadRevenueReport(); ;
         });
 
+    }
+    public void setupTableUsageReport(){
+
+        TableUseRep.setItems(TableUsageReportDTOS);
+        TableColumn<?, ?>[] column = {tablenoTableUseRep,totalreservationTableUseRep,totalcusotmerTableUseRep,totalrevenueTableUseRep};
+        double[] widthFactors = {0.25,0.25,0.25,0.25};
+        String[] namecol = {"date", "totalReservation", "totalCustomer", "totalRevenue"};
+
+        for (int i = 0; i < column.length; i++) {
+            TableColumn<?, ?> col = column[i];
+            col.setResizable(false);
+            col.setReorderable(false);
+            col.setReorderable(true);
+            col.prefWidthProperty().bind(RevRepTable.widthProperty().multiply(widthFactors[i]));
+            if (!namecol[i].isEmpty()) {
+                col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
+            }
+        }
+
+        TableUseRep.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
 
@@ -2443,19 +2490,23 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
     public void loadRevenueBarCharts(List<RevenueReportsDTO> data, LocalDate dateFrom, LocalDate dateTo) {
 
+        // Clear previous chart data
         totalReservationChart.getData().clear();
         totalCustomerChart.getData().clear();
         totalRevenueChart.getData().clear();
 
-        // Generate all dates between dateFrom and dateTo
+        if (data == null || data.isEmpty()) {
+            return; // nothing to show
+        }
 
-        LocalDate minDate = data.stream().map(RevenueReportsDTO::getDate).min(LocalDate::compareTo).orElse(null);
-        LocalDate maxDate = data.stream().map(RevenueReportsDTO::getDate).max(LocalDate::compareTo).orElse(null);
+        // Determine date range
+        LocalDate minDate = data.stream().map(RevenueReportsDTO::getDate).min(LocalDate::compareTo).orElse(LocalDate.now());
+        LocalDate maxDate = data.stream().map(RevenueReportsDTO::getDate).max(LocalDate::compareTo).orElse(LocalDate.now());
 
         if (dateFrom == null) dateFrom = minDate;
         if (dateTo == null) dateTo = maxDate;
 
-
+        // Generate all dates in range
         List<LocalDate> allDates = new ArrayList<>();
         LocalDate current = dateFrom;
         while (!current.isAfter(dateTo)) {
@@ -2463,41 +2514,54 @@ public class AdministratorUIController implements Initializable, ReservationList
             current = current.plusDays(1);
         }
 
-        // Map existing data by date
+        // Map DTOs by date for fast lookup
         Map<LocalDate, RevenueReportsDTO> dataMap = new HashMap<>();
         for (RevenueReportsDTO r : data) {
             dataMap.put(r.getDate(), r);
         }
 
-        // Prepare series for each bar chart
+        // Formatter for X-axis labels
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
+
+        // Optional: limit number of tick labels for readability
+        int maxTicks = 20;
+        int step = Math.max(1, allDates.size() / maxTicks);
+
+        // Prepare chart series
         XYChart.Series<String, Number> totalReservationSeries = new XYChart.Series<>();
-
         XYChart.Series<String, Number> totalCustomerSeries = new XYChart.Series<>();
-
         XYChart.Series<String, Number> totalRevenueSeries = new XYChart.Series<>();
 
-        // Fill series with data (0 if missing)
-        for (LocalDate d : allDates) {
+        for (int i = 0; i < allDates.size(); i++) {
+            LocalDate d = allDates.get(i);
             RevenueReportsDTO r = dataMap.getOrDefault(d, new RevenueReportsDTO(d, 0, 0, 0.0));
 
-            String dateStr = d.toString(); // or format as you like "MM-dd"
+            // Format date label
+            String dateStr = (i % step == 0) ? d.format(formatter) : ""; // only show some labels
 
             totalReservationSeries.getData().add(new XYChart.Data<>(dateStr, r.getTotalReservation()));
             totalCustomerSeries.getData().add(new XYChart.Data<>(dateStr, r.getTotalCustomer()));
             totalRevenueSeries.getData().add(new XYChart.Data<>(dateStr, r.getTotalRevenue()));
         }
 
+        // Add series to charts
+        totalReservationChart.getData().clear();
+        totalCustomerChart.getData().forEach(series -> series.getData().clear());
+        totalRevenueChart.getData().clear();
+
         totalReservationChart.setLegendVisible(false);
         totalCustomerChart.setLegendVisible(false);
         totalRevenueChart.setLegendVisible(false);
+
         totalReservationChart.getData().add(totalReservationSeries);
         totalCustomerChart.getData().add(totalCustomerSeries);
         totalRevenueChart.getData().add(totalRevenueSeries);
+
+        // Optional: rotate X-axis labels for better readability
+        ((javafx.scene.chart.CategoryAxis) totalReservationChart.getXAxis()).setTickLabelRotation(45);
+        ((javafx.scene.chart.CategoryAxis) totalCustomerChart.getXAxis()).setTickLabelRotation(45);
+        ((javafx.scene.chart.CategoryAxis) totalRevenueChart.getXAxis()).setTickLabelRotation(45);
     }
-
-
-
-
 
 
     public void loadReports(){
@@ -2507,6 +2571,57 @@ public class AdministratorUIController implements Initializable, ReservationList
         loadRevenueReport();
         }
 
+
+    private void expand(BarChart<?, ?> target) {
+        // Heights and animation duration defined inside the method
+        double normalHeight = 200;
+        double hoverHeight = 400;
+        double shrinkHeight = 120;
+        Duration animationDuration = Duration.millis(300);
+
+        for (Node node : rootVBox.getChildren()) {
+            if (node instanceof BarChart) {
+                BarChart<?, ?> chart = (BarChart<?, ?>) node;
+                double targetHeight = (chart == target) ? hoverHeight : shrinkHeight;
+
+                Timeline timeline = new Timeline(
+                        new KeyFrame(animationDuration,
+                                new KeyValue(chart.prefHeightProperty(), targetHeight))
+                );
+                timeline.play();
+
+                VBox.setVgrow(chart, (chart == target) ? Priority.ALWAYS : Priority.NEVER);
+            }
+        }
+    }
+
+    private void resetSizes() {
+        // Heights and animation duration defined inside the method
+        double normalHeight = 200;
+        Duration animationDuration = Duration.millis(300);
+
+        for (Node node : rootVBox.getChildren()) {
+            if (node instanceof BarChart) {
+                BarChart<?, ?> chart = (BarChart<?, ?>) node;
+
+                Timeline timeline = new Timeline(
+                        new KeyFrame(animationDuration,
+                                new KeyValue(chart.prefHeightProperty(), normalHeight))
+                );
+                timeline.play();
+
+                VBox.setVgrow(chart, Priority.ALWAYS);
+            }
+        }
+    }
+
+    private void setupHoverExpand(BarChart<?, ?> chart) {
+        chart.setOnMouseEntered(e -> expand(chart));
+        chart.setOnMouseExited(e -> resetSizes());
+    }
+
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
@@ -2514,9 +2629,6 @@ public class AdministratorUIController implements Initializable, ReservationList
         reservpane.minHeightProperty().bind(reservpane.widthProperty().multiply(1.456));
         tablepane.minHeightProperty().bind(tablepane.widthProperty().multiply(0.939));
         //accountpane.minHeightProperty().bind(accountpane.widthProperty().multiply());
-
-
-
         Dashboardbtn.fire();
 
         setupRecentReservation();
@@ -2533,6 +2645,9 @@ public class AdministratorUIController implements Initializable, ReservationList
         setupReservatioInformation();
         setupRevenueReports();
         //ActivityLogsTable.setItems(activitylogsdata);
+        setupHoverExpand(totalReservationChart);
+        setupHoverExpand(totalCustomerChart);
+        setupHoverExpand(totalRevenueChart);
 
 
         

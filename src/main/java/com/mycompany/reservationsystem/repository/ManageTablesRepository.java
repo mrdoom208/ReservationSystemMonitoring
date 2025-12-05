@@ -5,6 +5,7 @@
 package com.mycompany.reservationsystem.repository;
 
 import com.mycompany.reservationsystem.dto.ManageTablesDTO;
+import com.mycompany.reservationsystem.dto.TableUsageReportDTO;
 import com.mycompany.reservationsystem.model.ManageTables;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,6 +25,7 @@ SELECT new com.mycompany.reservationsystem.dto.ManageTablesDTO(
     t.capacity,
     c.name,
     r.pax,
+    r.revenue,
     t.location,
     r.prefer,
     r.status,
@@ -38,16 +40,32 @@ SELECT new com.mycompany.reservationsystem.dto.ManageTablesDTO(
     t.tablestarttime,
     t.tableendtime,
     r.date
-)
-FROM ManageTables t
-LEFT JOIN t.reservations r
-LEFT JOIN r.customer c
-""")
+    )
+    FROM ManageTables t
+    LEFT JOIN t.reservations r
+    LEFT JOIN r.customer c
+    """)
     List<ManageTablesDTO> getManageTablesDTO();
     List<ManageTables> findByStatus(String status);
     
     long countByStatus(String status);
-    
-    
-    
+
+    @Query("""
+        SELECT new com.mycompany.reservationsystem.dto.TableUsageReportDTO(
+            t.tableNo,
+            COUNT(r.id),
+            SUM(r.pax),
+            COALESCE(SUM(r.revenue), 0)
+        )
+        FROM ManageTables t
+        LEFT JOIN t.reservation r
+        GROUP BY t.tableNo
+        ORDER BY t.tableNo
+    """)
+    List<TableUsageReportDTO> getTableUsageReport();
 }
+
+
+
+
+

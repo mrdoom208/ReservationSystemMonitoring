@@ -170,7 +170,7 @@
 
 .Statistics-cell{
      -fx-background-color:#303030;
-     -fx-background-radius:12;
+     -fx-background-radius:0.95em;
      -fx-effect: dropshadow(gaussian, transparent, 0, 0, 0, 0);
 }
 
@@ -517,14 +517,17 @@
     -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.6) , 2,0,0,1 ); /* subtle shadow */
 }
 
-/* ================= PieChart Background =================
-.pie-chart .chart {
-    -fx-background-color: transparent; /* light gray background
-    -fx-border-radius: 1em;
-    -fx-background-radius: 1em;
-}
-
-/* ================= PieChart Container =================
-.chart-plot-background {
-    -fx-background-color:black; /* remove default background
-}*/
+.BarGraph {
+      -fx-background-color:#303030;
+      -fx-background-radius:0.95em;
+      -fx-effect: dropshadow(gaussian, transparent, 0, 0, 0, 0);
+ }
+ .BarGraph .chart-title{
+     -fx-text-fill:white;
+ }
+ .BarGraph .tick-label {
+     -fx-font-size: 2.0em;
+ }
+ .BarGraph .axis-label {
+     -fx-font-size: 1.5em;
+ }
