@@ -3,10 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.mycompany.reservationsystem.controller;
-import com.mycompany.reservationsystem.model.ActivityLogs;
+import com.mycompany.reservationsystem.Service.ActivityLogService;
+import com.mycompany.reservationsystem.model.ActivityLog;
 import com.mycompany.reservationsystem.model.User;
-import com.mycompany.reservationsystem.repository.ActivityLogsRepository;
-import com.mycompany.reservationsystem.websocket.WebSocketClient;
+import com.mycompany.reservationsystem.repository.ActivityLogRepository;
 import com.mycompany.reservationsystem.repository.UserRepository;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -19,7 +19,6 @@ import javafx.scene.text.*;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import javafx.animation.PauseTransition;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -52,8 +51,9 @@ public class LoginController {
     @Autowired
     private ConfigurableApplicationContext springContext;
     @Autowired
-    private ActivityLogsRepository activityLogsRepository;
-    
+    private ActivityLogRepository activityLogRepository;
+    @Autowired
+    private ActivityLogService activityLogService;
     private boolean manager = false;
     
     
@@ -126,13 +126,20 @@ public class LoginController {
                     Parent root = loader.load();
                     AdministratorUIController controller = loader.getController();
                     controller.setUser(found);
-                    ActivityLogs logs = new ActivityLogs();
-                    logs.setTimestamp(LocalDateTime.now());
-                    logs.setAction("Login");
-                    logs.setTarget("");
-                    logs.setValue("");
-                    logs.setUser(found.getUsername());
-                    activityLogsRepository.save(logs);
+
+                activityLogService.logAction(
+                        found.getUsername(),                    // username
+                        found.getPosition().toString(),        // position/role
+                        "Account",                                     // module
+                        "Login",                             // action
+                        String.format(
+                                "User %s %s signed in",
+                                found.getFirstname(),
+                                found.getLastname()                 // old table status
+                        )
+                );
+
+
 
 
                     Stage stage = new Stage();

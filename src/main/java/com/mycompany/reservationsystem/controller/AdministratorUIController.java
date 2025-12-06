@@ -4,6 +4,7 @@
  */
 package com.mycompany.reservationsystem.controller;
 
+import com.mycompany.reservationsystem.Service.ActivityLogService;
 import com.mycompany.reservationsystem.Service.ReservationService;
 import com.mycompany.reservationsystem.Service.TablesService;
 import com.mycompany.reservationsystem.dto.*;
@@ -59,7 +60,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -76,9 +76,9 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
 
     @FXML
-    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,Mergebtn,Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ActivityLogsrpts,ApplyResrep,ApplyCusrep,ApplyRevrep,ApplyTUrep;
+    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,ActivityLogbtn,Mergebtn,Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ActivityLogsrpts,ApplyResrep,ApplyCusrep,ApplyRevrep,ApplyTUrep;
     @FXML
-    private ScrollPane DashboardPane, ReservationPane, TableManagementPane, ManageStaffAndAccountsPane,ReportsPane;
+    private ScrollPane DashboardPane, ReservationPane, TableManagementPane, ManageStaffAndAccountsPane,ReportsPane,ActivityLogPane;
     @FXML
     private Label Total_CustomerDbd, activetable,Total_Cancelled, Total_Pending, CusToTable,totaltables,totalfree,totalbusy,pending,confirm,header,seated,cancelled,noshow;
     @FXML
@@ -138,11 +138,11 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableView<Reservation> CustomerReservationTable;
     @FXML
-    private TableView<ActivityLogs> ActivityLogsTable;
+    private TableView<ActivityLog> ActivityLogsTable;
     @FXML
-    private TableColumn<ActivityLogs,String> userAL,actionAL,targetAL,valueAL;
+    private TableColumn<ActivityLog,String> userAL,actionAL,targetAL,valueAL;
     @FXML
-    private TableColumn<ActivityLogs,LocalDateTime>timestampsAL;
+    private TableColumn<ActivityLog,LocalDateTime>timestampsAL;
     @FXML
     private TableColumn<Reservation, String> NameCRT, StatusCRT, PreferCRT, PhoneCRT, EmailCRT, ReferenceCRT;
     @FXML
@@ -191,7 +191,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     private final ObservableList<ManageTablesDTO> tableManagerData = FXCollections.observableArrayList();
     private final ObservableList<ManageTables> availableTables = FXCollections.observableArrayList();
     private final ObservableList<User> UserData = FXCollections.observableArrayList();
-    private final ObservableList<ActivityLogs> activitylogsdata = FXCollections.observableArrayList();
+    private final ObservableList<ActivityLog> activitylogsdata = FXCollections.observableArrayList();
     private final ObservableList<ReservationCustomerDTO> reservationCustomerDTOS = FXCollections.observableArrayList();
     private final ObservableList<RevenueReportsDTO> RevenueReportDTOS = FXCollections.observableArrayList();
     private final ObservableList<TableUsageReportDTO> TableUsageReportDTOS = FXCollections.observableArrayList();
@@ -254,10 +254,12 @@ public class AdministratorUIController implements Initializable, ReservationList
     private ReservationService reservationService;
 
     @Autowired
-    private ActivityLogsRepository activityLogsRepository;
+    private ActivityLogRepository activityLogRepository;
+
+    @Autowired
+    private ActivityLogService activityLogService;
     private Long prevRow;
     private Long currentRow;
-    private String tableno;
     private ManageTables selectedTable;
     double scrollPosition;
     boolean DashboardDataLoaded = false;
@@ -265,19 +267,21 @@ public class AdministratorUIController implements Initializable, ReservationList
     boolean TableDataLoaded = false;
     boolean AccountDataLoaded = false;
     boolean ReportsDataLoaded = false;
+    boolean ActivityLogLoaded = false;
 
 
 
     @FXML
     private void navigate(ActionEvent event) {
         Button clicked = (Button) event.getSource();
-        Button buttons[] = {Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn};
+        Button buttons[] = {Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,ActivityLogbtn};
 
         DashboardPane.setVisible(false);
         ReservationPane.setVisible(false);
         TableManagementPane.setVisible(false);
         ManageStaffAndAccountsPane.setVisible(false);
         ReportsPane.setVisible(false);
+        ActivityLogPane.setVisible(false);
 
         for (Button btn : buttons) {
             if (btn == null) {
@@ -338,7 +342,14 @@ public class AdministratorUIController implements Initializable, ReservationList
                     loadReports();
                     ReportsDataLoaded = true;
                 }
-
+                break;
+            case "ActivityLogbtn":
+                ActivityLogPane.setVisible(true);
+                header.setText("Activity Logs");
+                if (!ActivityLogLoaded) {
+                    loadActivityLog();
+                    ActivityLogLoaded = true;
+                }
                 break;
             default:
                 break;
@@ -349,10 +360,9 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private void navigateReports(ActionEvent event) {
         Button clicked = (Button) event.getSource();
-        Button[] buttons = {Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ActivityLogsrpts};
+        Button[] buttons = {Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts};
 
         ReservationReport.setVisible(false);
-        ActivityLogsReport.setVisible(false);
         TableUsageReport.setVisible(false);
         RevenueReport.setVisible(false);
         CustomerReport.setVisible(false);
@@ -382,9 +392,6 @@ public class AdministratorUIController implements Initializable, ReservationList
                 break;
             case "Revenuerpts":
                 RevenueReport.setVisible(true);
-                break;
-            case "ActivityLogsrpts":
-                ActivityLogsReport.setVisible(true);
                 break;
             case "TableUsagerpts":
                 TableUsageReport.setVisible(true);
@@ -870,6 +877,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         Reservation cr = reservationRepository.findById(currentRow).orElse(null);
         System.out.print(cr);
         System.out.print(selectedTable);
+        String currentStatus = selectedTable.getStatus();
             
         if (cr != null && selectedTable != null) {
             cr.setTable(selectedTable);
@@ -887,13 +895,9 @@ public class AdministratorUIController implements Initializable, ReservationList
             System.out.println(cr);
             
         }
-        ActivityLogs logs = new ActivityLogs();
-        logs.setTimestamp(LocalDateTime.now());
-        logs.setAction("Reserved");
-        logs.setTarget("Table No. "+cr.getTable().getId());
-        logs.setValue(cr.getReference());
-        logs.setUser(currentuser.getUsername());
-        activityLogsRepository.save(logs);
+
+        activityLogService.logAction(currentuser.getUsername(),String.valueOf(currentuser.getPosition()),"Table","Update Status",String.format("Changed table %d status from %s to Reserved for %s", cr.getTable().getId(),currentStatus,cr.getReference()));
+
 
 
        loadTableView();
@@ -990,14 +994,11 @@ public class AdministratorUIController implements Initializable, ReservationList
             row.setLocation(LocationField.getText());
             row.setStatus(StatusField.getText());
             manageTablesRepository.save(row);
-            ActivityLogs logs = new ActivityLogs();
-            logs.setTimestamp(LocalDateTime.now());
-            logs.setAction("Edit");
-            logs.setTarget("Table no."+ row.getId());
-            logs.setValue("Table No: "+row.getId()+"Capacity: "+row.getCapacity()+"Location"+row.getLocation());
-            logs.setUser(currentuser.getUsername());
 
-            activityLogsRepository.save(logs);
+            activityLogService.logAction(currentuser.getUsername(),String.valueOf(currentuser.getPosition()),"Table","Edit Table",
+                    String.format("Change Table # %s → %s : Capacity %d → %d, Location %s → %s",
+                            tableno,String.valueOf(row.getId()),capacity,row.getCapacity(),location,row.getLocation()));
+
             loadTableManager();
             loadTableView();
             updateLabels();
@@ -1134,13 +1135,17 @@ public class AdministratorUIController implements Initializable, ReservationList
             reservationRepository.save(row);
 
             // 4. Create Activity Log
-            ActivityLogs logs = new ActivityLogs();
-            logs.setTimestamp(LocalDateTime.now());
-            logs.setAction("Add Reservation");
-            logs.setTarget(row.getReference());
-            logs.setValue(customer.getName());
-            logs.setUser(currentuser.getUsername());
-            activityLogsRepository.save(logs);
+            activityLogService.logAction(
+                    currentuser.getUsername(),                    // username
+                    currentuser.getPosition().toString(),        // position/role
+                    "Reservation",                                     // module
+                    "Add",                             // action
+                    String.format(
+                            "Add Reservation Reference %s",
+                            row.getReference()                // reservation reference
+                    )
+            );
+
 
             // 5. Refresh UI
             loadCustomerReservationTable();
@@ -1226,13 +1231,20 @@ public class AdministratorUIController implements Initializable, ReservationList
             row.setStatus(StatusField.getText());
             manageTablesRepository.save(row);
 
-            ActivityLogs logs = new ActivityLogs();
-            logs.setTimestamp(LocalDateTime.now());
-            logs.setAction("Add Table");
-            logs.setTarget("Table no."+ row.getTableNo());
-            logs.setValue("Capacity: "+row.getCapacity()+" Location: "+row.getLocation());
-            logs.setUser(currentuser.getUsername());
-            activityLogsRepository.save(logs);
+            activityLogService.logAction(
+                    currentuser.getUsername(),                    // username
+                    currentuser.getPosition().toString(),        // position/role
+                    "Table",                                     // module
+                    "Add Table",                             // action
+                    String.format(
+                            "Add Table #%d Capacity %d Location %s",
+                            row.getTableNo(),                   // table ID
+                            row.getCapacity(),                           // old table status
+                            row.getLocation()                        // reservation reference
+                    )
+            );
+
+
             loadTableManager();
             loadTableView();
             updateLabels();
@@ -1578,6 +1590,7 @@ public class AdministratorUIController implements Initializable, ReservationList
 
                 btnStart.setOnAction(event -> {
                     ManageTablesDTO data = getCurrentItem();
+                    String currentStatus = data.getStatus();
                     if (data != null) {
                         data.setStatus("Occupied");
                         updateButtonsForStatus(data);
@@ -1593,20 +1606,25 @@ public class AdministratorUIController implements Initializable, ReservationList
                         loadSCNReservation();
                         loadCustomerReservationTable();
 
-                        ActivityLogs logs = new ActivityLogs();
-                        logs.setTimestamp(LocalDateTime.now());
-                        logs.setAction("Occupied");
-                        logs.setTarget("Table No." + data.getTableId());
-                        logs.setValue(data.getCustomer());
-                        logs.setUser(currentuser.getUsername());
-
-                        activityLogsRepository.save(logs);
+                        activityLogService.logAction(
+                                currentuser.getUsername(),                    // username
+                                currentuser.getPosition().toString(),        // position/role
+                                "Table",                                     // module
+                                "Update Status",                             // action
+                                String.format(
+                                        "Changed table %d status from %s to Occupied for reservation %s",
+                                        data.getTableId(),                   // table ID
+                                        currentStatus,                           // old table status
+                                        data.getReference()                        // reservation reference
+                                )
+                        );
 
 
                     }
                 });
                 btnComplete.setOnAction(event -> {
                     ManageTablesDTO data = getCurrentItem();
+                    String currentStatus = data.getStatus();
                     if (data != null) {
                         data.setStatus("Complete");
                         data.setDate(LocalDate.now());
@@ -1614,13 +1632,19 @@ public class AdministratorUIController implements Initializable, ReservationList
 
                         updateButtonsForStatus(data);
 
-                        ActivityLogs logs = new ActivityLogs();
-                        logs.setTimestamp(LocalDateTime.now());
-                        logs.setAction("Complete");
-                        logs.setTarget("Table no."+ data.getTableId());
-                        logs.setValue(data.getReference());
-                        logs.setUser(currentuser.getUsername());
-                        activityLogsRepository.save(logs);
+                        activityLogService.logAction(
+                                currentuser.getUsername(),                    // username
+                                currentuser.getPosition().toString(),        // position/role
+                                "Table",                                     // module
+                                "Update Status",                             // action
+                                String.format(
+                                        "Changed table %s status from %s to Complete → Available",
+                                        data.getTableNo(),                   // table ID
+                                        currentStatus                           // old table status
+                                        )
+                        );
+
+
                         
                         ReservationTableLogs reservationtablelogs = new ReservationTableLogs(data);
                         RTLR.save(reservationtablelogs);
@@ -1679,14 +1703,20 @@ public class AdministratorUIController implements Initializable, ReservationList
                             return;
                         }
                         manageTablesRepository.deleteById(data.getTableId());
-                        ActivityLogs logs = new ActivityLogs();
-                        logs.setTimestamp(LocalDateTime.now());
-                        logs.setAction("Delete");
-                        logs.setTarget("Table no."+ data.getTableId());
-                        logs.setValue("");
-                        logs.setUser(currentuser.getUsername());
 
-                        activityLogsRepository.save(logs);
+                        activityLogService.logAction(
+                                currentuser.getUsername(),                    // username
+                                currentuser.getPosition().toString(),        // position/role
+                                "Table",                                     // module
+                                "Delete Table",                             // action
+                                String.format(
+                                        "Delete table %s",
+                                        data.getTableNo()                  // table ID
+                                                                  // old table status
+                                )
+                        );
+
+
                         loadTableManager();
                         loadTableView();
                         updateLabels();
@@ -2209,7 +2239,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         ActivityLogsTable.setPlaceholder(new Label("No Account yet "));
     }
     private void loadActivityLogs(){
-        List<ActivityLogs> data = activityLogsRepository.findAll();
+        List<ActivityLog> data = activityLogRepository.findAll();
         activitylogsdata.setAll(data);
 
 
@@ -2732,9 +2762,13 @@ public class AdministratorUIController implements Initializable, ReservationList
     private void setupHoverExpand(BarChart<?, ?> chart, VBox root) {
         chart.setOnMouseEntered(e -> expand(chart,root));
         chart.setOnMouseExited(e -> resetSizes(root));
+
     }
 
 
+    private void loadActivityLog(){
+
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

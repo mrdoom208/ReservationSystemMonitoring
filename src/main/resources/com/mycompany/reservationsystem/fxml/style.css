@@ -77,13 +77,13 @@
     -fx-background-color: transparent;
     -fx-text-fill: white;
     -fx-background-radius: 0.8em;
-    -fx-font-size: 0.95em;  /* was 14px */
+    -fx-font-size: 1em;  /* was 14px */
     -fx-alignment: CENTER;
 }
 
 .navigation-report-btns:hover{
     -fx-background-color: rgba(255, 0, 0, 0.5);
-    -fx-background-radius:0.95em;
+    -fx-background-radius:0.8em;
     -fx-font-weight: normal;
 }
 
@@ -92,13 +92,13 @@
     -fx-text-fill: white;
     -fx-background-radius:0.8em;
     -fx-font-weight: bold;
-    -fx-font-size:.95em;  /* was 14px */
+    -fx-font-size:1em;  /* was 14px */
     -fx-alignment: CENTER;
 }
 .category{
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-font-size:0.9em;  /* was 14px */
+    -fx-font-size:1.1em;  /* was 14px */
     -fx-alignment: CENTER;
 
 }
