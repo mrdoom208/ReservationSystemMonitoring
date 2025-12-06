@@ -84,7 +84,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private LineChart<String, Number> myBarChart;
     @FXML
-    private BarChart<String, Number> totalReservationChart,totalCustomerChart,totalRevenueChart;
+    private BarChart<String, Number> totalReservationChart,totalCustomerChart,totalRevenueChart,totalReservationChartTableUsage,totalCustomerChartTableUsage,totalRevenueChartTableUsage;
     @FXML
     private TextField SearchCL,SearchTM;
     @FXML
@@ -134,7 +134,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableColumn<ManageTablesDTO, Integer> TablePaxColum, TableCapacityColum;
     @FXML
-    private VBox notificationArea, hiddenTable,rootVBox,tableInfopane;
+    private VBox notificationArea, hiddenTable,rootVBox,rootVBoxTableUsage,tableInfopane;
     @FXML
     private TableView<Reservation> CustomerReservationTable;
     @FXML
@@ -222,7 +222,9 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableColumn<ReservationTableLogs,LocalDate>dateRL,dateTH;
     @FXML
-    private HBox ReservationReport,CustomerReport,TableUsageReport,ActivityLogsReport,RevenueReport;
+    private HBox ReservationReport,CustomerReport,ActivityLogsReport,RevenueReport;
+    @FXML
+    private GridPane TableUsageReport;
     @FXML
     private MenuButton tablefilter,reservationfilter,StatusfilterResrep;
     @FXML
@@ -2460,6 +2462,21 @@ public class AdministratorUIController implements Initializable, ReservationList
         ApplyTUrep.setOnAction(e -> {
             loadTableUsageReport(); ;
         });
+        TableUseRep.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                loadTableUsageInfo(newValue.getTableNo());
+                System.out.println("newvalue");
+
+                if(!tableInfopane.isManaged()&& !tableInfopane.isVisible()) {
+                    tableInfopane.setManaged(true);
+                    tableInfopane.setVisible(true);
+
+                }
+
+            }
+        });
+
+
 
     }
 
@@ -2587,6 +2604,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         LocalDate to = dateToTUrep.getValue();
         List<TableUsageReportDTO> results = RTLR.getTableUsageReport(from,to);
         TableUsageReportDTOS.setAll(results);
+        loadTableUsageBarCharts(results);
     }
 
     public void setupTableUsageInfo(){
@@ -2606,17 +2624,6 @@ public class AdministratorUIController implements Initializable, ReservationList
                 col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
             }
         }
-        TableinfoTUrep.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue != null) {
-                loadTableUsageInfo(newValue.getTableNo());
-
-                if(!tableInfopane.isManaged()&& !tableInfopane.isVisible()) {
-                    tableInfopane.setManaged(true);
-                    tableInfopane.setVisible(true);
-                }
-
-            }
-        });
 
     }
 
@@ -2626,8 +2633,47 @@ public class AdministratorUIController implements Initializable, ReservationList
         List<TableUsageInformationDTO> results = RTLR.getTableUsageInfo(from,to,tableno);
         TableUsageInformationDTOS.setAll(results);
 
+
     }
 
+    public void loadTableUsageBarCharts(List<TableUsageReportDTO> data) {
+
+        // Clear previous chart data
+        totalReservationChartTableUsage.getData().clear();
+        totalCustomerChartTableUsage.getData().clear();
+        totalRevenueChartTableUsage.getData().clear();
+
+        if (data == null || data.isEmpty()) {
+            return; // nothing to show
+        }
+
+        // Prepare chart series
+        XYChart.Series<String, Number> totalReservationSeries = new XYChart.Series<>();
+        XYChart.Series<String, Number> totalCustomerSeries = new XYChart.Series<>();
+        XYChart.Series<String, Number> totalRevenueSeries = new XYChart.Series<>();
+
+        for (TableUsageReportDTO r : data) {
+            String tableNo = r.getTableNo(); // X-axis: table number
+
+            totalReservationSeries.getData().add(new XYChart.Data<>(tableNo, r.getTotalReservation()));
+            totalCustomerSeries.getData().add(new XYChart.Data<>(tableNo, r.getTotalCustomer()));
+            totalRevenueSeries.getData().add(new XYChart.Data<>(tableNo, r.getTotalRevenue()));
+        }
+
+
+        totalReservationChartTableUsage.setLegendVisible(false);
+        totalCustomerChartTableUsage.setLegendVisible(false);
+        totalRevenueChartTableUsage.setLegendVisible(false);
+
+        totalReservationChartTableUsage.getData().add(totalReservationSeries);
+        totalCustomerChartTableUsage.getData().add(totalCustomerSeries);
+        totalRevenueChartTableUsage.getData().add(totalRevenueSeries);
+
+        // Optional: rotate X-axis labels for better readability
+        ((javafx.scene.chart.CategoryAxis) totalReservationChart.getXAxis()).setTickLabelRotation(45);
+        ((javafx.scene.chart.CategoryAxis) totalCustomerChart.getXAxis()).setTickLabelRotation(45);
+        ((javafx.scene.chart.CategoryAxis) totalRevenueChart.getXAxis()).setTickLabelRotation(45);
+    }
 
     public void loadReports(){
         Reservationrpts.fire();
@@ -2640,7 +2686,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
 
 
-    private void expand(BarChart<?, ?> target) {
+    private void expand(BarChart<?, ?> target, VBox rootVBox) {
         // Heights and animation duration defined inside the method
         double normalHeight = 200;
         double hoverHeight = 400;
@@ -2663,7 +2709,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         }
     }
 
-    private void resetSizes() {
+    private void resetSizes(VBox rootVBox) {
         // Heights and animation duration defined inside the method
         double normalHeight = 200;
         Duration animationDuration = Duration.millis(300);
@@ -2683,9 +2729,9 @@ public class AdministratorUIController implements Initializable, ReservationList
         }
     }
 
-    private void setupHoverExpand(BarChart<?, ?> chart) {
-        chart.setOnMouseEntered(e -> expand(chart));
-        chart.setOnMouseExited(e -> resetSizes());
+    private void setupHoverExpand(BarChart<?, ?> chart, VBox root) {
+        chart.setOnMouseEntered(e -> expand(chart,root));
+        chart.setOnMouseExited(e -> resetSizes(root));
     }
 
 
@@ -2715,12 +2761,16 @@ public class AdministratorUIController implements Initializable, ReservationList
         setupTableUsageReport();
         setupTableUsageInfo();
         //ActivityLogsTable.setItems(activitylogsdata);
-        setupHoverExpand(totalReservationChart);
-        setupHoverExpand(totalCustomerChart);
-        setupHoverExpand(totalRevenueChart);
+        setupHoverExpand(totalReservationChart,rootVBox);
+        setupHoverExpand(totalCustomerChart,rootVBox);
+        setupHoverExpand(totalRevenueChart,rootVBox);
+        setupHoverExpand(totalReservationChartTableUsage,rootVBoxTableUsage);
+        setupHoverExpand(totalCustomerChartTableUsage,rootVBoxTableUsage);
+        setupHoverExpand(totalRevenueChartTableUsage,rootVBoxTableUsage);
 
 
-        
+
+
 
         handleClick();
 

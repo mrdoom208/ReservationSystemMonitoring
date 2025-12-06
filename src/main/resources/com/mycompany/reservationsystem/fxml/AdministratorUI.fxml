@@ -1240,11 +1240,18 @@
                                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </padding>
                                     </HBox>
-                                    <HBox fx:id="TableUsageReport" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                                    <GridPane fx:id="TableUsageReport" hgap="10.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="55.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
                                        <children>
-                                          <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                                          <VBox spacing="10.0">
                                              <children>
-                                                <VBox prefHeight="614.0" prefWidth="655.0" spacing="10.0" styleClass="Statistics-cell">
+                                                <VBox prefHeight="690.0" prefWidth="361.0" spacing="10.0" styleClass="Statistics-cell" VBox.vgrow="ALWAYS">
                                                    <children>
                                                       <GridPane>
                                                          <columnConstraints>
@@ -1285,25 +1292,8 @@
                                                       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                                                    </padding>
                                                 </VBox>
-                                                <VBox fx:id="tableInfopane" prefHeight="200.0" prefWidth="100.0" spacing="10.0" styleClass="Statistics-cell" VBox.vgrow="ALWAYS">
+                                                <VBox fx:id="tableInfopane" prefHeight="645.0" prefWidth="625.0" spacing="10.0" styleClass="Statistics-cell" VBox.vgrow="ALWAYS">
                                                    <children>
-                                                      <GridPane prefHeight="35.0" prefWidth="595.0">
-                                                        <columnConstraints>
-                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="49.0" />
-                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="223.0" minWidth="10.0" prefWidth="46.0" />
-                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="289.0" minWidth="10.0" prefWidth="174.0" />
-                                                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="225.0" minWidth="10.0" prefWidth="214.0" />
-                                                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                        </columnConstraints>
-                                                        <rowConstraints>
-                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                        </rowConstraints>
-                                                         <children>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="boldreportfilter" text="Filters" />
-                                                            <TextField GridPane.columnIndex="2" />
-                                                            <Label styleClass="reportfilter" text="Search:" GridPane.columnIndex="1" />
-                                                         </children>
-                                                      </GridPane>
                                                       <TableView fx:id="TableinfoTUrep" prefHeight="200.0" prefWidth="200.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
                                                         <columns>
                                                           <TableColumn fx:id="tablenoTableinfo" prefWidth="103.0" text="Table No" />
@@ -1324,9 +1314,9 @@
                                                 </VBox>
                                              </children>
                                           </VBox>
-                                          <VBox fx:id="rootVBox1" prefHeight="594.0" prefWidth="447.0" spacing="10.0">
+                                          <VBox fx:id="rootVBoxTableUsage" prefHeight="1071.0" prefWidth="516.0" spacing="10.0" GridPane.columnIndex="1">
                                              <children>
-                                                <BarChart fx:id="totalReservationChart1" styleClass="BarGraph" title="Total Reservation">
+                                                <BarChart fx:id="totalReservationChartTableUsage" styleClass="BarGraph" title="Total Reservation">
                                                    <xAxis>
                                                       <CategoryAxis side="BOTTOM" />
                                                    </xAxis>
@@ -1334,7 +1324,7 @@
                                                       <NumberAxis side="LEFT" />
                                                    </yAxis>
                                                 </BarChart>
-                                                <BarChart fx:id="totalCustomerChart1" styleClass="BarGraph" title="Total Customer">
+                                                <BarChart fx:id="totalCustomerChartTableUsage" styleClass="BarGraph" title="Total Customer">
                                                    <xAxis>
                                                       <CategoryAxis side="BOTTOM" />
                                                    </xAxis>
@@ -1342,7 +1332,7 @@
                                                       <NumberAxis side="LEFT" />
                                                    </yAxis>
                                                 </BarChart>
-                                                <BarChart fx:id="totalRevenueChart1" styleClass="BarGraph" title="Total Revenue">
+                                                <BarChart fx:id="totalRevenueChartTableUsage" styleClass="BarGraph" title="Total Revenue">
                                                    <xAxis>
                                                       <CategoryAxis side="BOTTOM" />
                                                    </xAxis>
@@ -1353,13 +1343,10 @@
                                              </children>
                                           </VBox>
                                        </children>
-                                       <StackPane.margin>
-                                          <Insets />
-                                       </StackPane.margin>
                                        <padding>
                                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </padding>
-                                    </HBox>
+                                    </GridPane>
                                  </children>
                               </StackPane>
                            </children>
