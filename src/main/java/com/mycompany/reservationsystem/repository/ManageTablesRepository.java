@@ -7,9 +7,12 @@ package com.mycompany.reservationsystem.repository;
 import com.mycompany.reservationsystem.dto.ManageTablesDTO;
 import com.mycompany.reservationsystem.dto.TableUsageReportDTO;
 import com.mycompany.reservationsystem.model.ManageTables;
+
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -50,20 +53,7 @@ SELECT new com.mycompany.reservationsystem.dto.ManageTablesDTO(
     
     long countByStatus(String status);
 
-    @Query("""
-        SELECT new com.mycompany.reservationsystem.dto.TableUsageReportDTO(
-            t.tableNo,
-            COUNT(r.id),
-            SUM(r.pax),
-            COALESCE(SUM(r.revenue), 0)
-        )
-        FROM ManageTables t
-        LEFT JOIN t.reservation r
-        GROUP BY t.tableNo
-        ORDER BY t.tableNo
-    """)
-    List<TableUsageReportDTO> getTableUsageReport();
-}
+    }
 
 
 

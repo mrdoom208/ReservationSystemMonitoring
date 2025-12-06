@@ -7,6 +7,8 @@ import com.mycompany.reservationsystem.model.Reservation;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -59,6 +61,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("from") LocalDate from,
             @Param("to") LocalDate to
     );
+    @Query("SELECT r FROM Reservation r")
+    Stream<Reservation> streamAllReservations();
 
 
 

@@ -29,7 +29,7 @@ public class Reservation {
     private String status;
     private String reference;
     private LocalDate date;
-    private Double revenue;
+    private double revenue;
 
     private LocalTime reservationPendingtime;
     private LocalTime reservationConfirmtime;

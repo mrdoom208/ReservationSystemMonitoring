@@ -59,7 +59,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
-
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -76,7 +76,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
 
     @FXML
-    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,Mergebtn,Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ActivityLogsrpts,ApplyResrep,ApplyCusrep,ApplyRevrep;
+    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,Mergebtn,Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ActivityLogsrpts,ApplyResrep,ApplyCusrep,ApplyRevrep,ApplyTUrep;
     @FXML
     private ScrollPane DashboardPane, ReservationPane, TableManagementPane, ManageStaffAndAccountsPane,ReportsPane;
     @FXML
@@ -134,7 +134,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableColumn<ManageTablesDTO, Integer> TablePaxColum, TableCapacityColum;
     @FXML
-    private VBox notificationArea, hiddenTable,rootVBox;
+    private VBox notificationArea, hiddenTable,rootVBox,tableInfopane;
     @FXML
     private TableView<Reservation> CustomerReservationTable;
     @FXML
@@ -164,7 +164,19 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableColumn<TableUsageReportDTO, Double>totalrevenueTableUseRep;
     @FXML
-    private DatePicker dateFromResrep,dateToResrep,dateFromCusrep,dateToCusrep,dateFromRevrep,dateToRevrep;
+    private TableView<TableUsageInformationDTO>TableinfoTUrep;
+    @FXML
+    private TableColumn<TableUsageInformationDTO,String> tablenoTableinfo,referenceTableinfo;
+    @FXML
+    private TableColumn<TableUsageInformationDTO,Integer> paxTableinfo;
+    @FXML
+    private TableColumn<TableUsageInformationDTO,Double> revenueTableinfo;
+    @FXML
+    private TableColumn<TableUsageInformationDTO,LocalTime> timeTableinfo;
+    @FXML
+    private TableColumn<TableUsageInformationDTO,LocalDate> dateTableinfo;
+    @FXML
+    private DatePicker dateFromResrep,dateToResrep,dateFromCusrep,dateToCusrep,dateFromRevrep,dateToRevrep,dateFromTUrep,dateToTUrep;
 
 
     private Reservation selectedReservation;
@@ -183,6 +195,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     private final ObservableList<ReservationCustomerDTO> reservationCustomerDTOS = FXCollections.observableArrayList();
     private final ObservableList<RevenueReportsDTO> RevenueReportDTOS = FXCollections.observableArrayList();
     private final ObservableList<TableUsageReportDTO> TableUsageReportDTOS = FXCollections.observableArrayList();
+    private final ObservableList<TableUsageInformationDTO> TableUsageInformationDTOS = FXCollections.observableArrayList();
 
     private FilteredList<Reservation> filterReservationReports = new FilteredList<>(reservationreports, p -> true);;
     private FilteredList<CustomerReportDTO> filterCustomerReports = new FilteredList<>(customerreports, p -> true);;
@@ -1596,6 +1609,7 @@ public class AdministratorUIController implements Initializable, ReservationList
                         data.setStatus("Complete");
                         data.setDate(LocalDate.now());
                         data.setReservationCompletetime(LocalTime.now());
+
                         updateButtonsForStatus(data);
 
                         ActivityLogs logs = new ActivityLogs();
@@ -2429,25 +2443,25 @@ public class AdministratorUIController implements Initializable, ReservationList
         TableUseRep.setItems(TableUsageReportDTOS);
         TableColumn<?, ?>[] column = {tablenoTableUseRep,totalreservationTableUseRep,totalcusotmerTableUseRep,totalrevenueTableUseRep};
         double[] widthFactors = {0.25,0.25,0.25,0.25};
-        String[] namecol = {"date", "totalReservation", "totalCustomer", "totalRevenue"};
+        String[] namecol = {"tableNo", "totalReservation", "totalCustomer", "totalRevenue"};
 
         for (int i = 0; i < column.length; i++) {
             TableColumn<?, ?> col = column[i];
             col.setResizable(false);
             col.setReorderable(false);
-            col.setReorderable(true);
-            col.prefWidthProperty().bind(RevRepTable.widthProperty().multiply(widthFactors[i]));
+            col.setSortable(true);
+            col.prefWidthProperty().bind(TableUseRep.widthProperty().multiply(widthFactors[i]));
             if (!namecol[i].isEmpty()) {
                 col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
             }
         }
 
         TableUseRep.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        ApplyTUrep.setOnAction(e -> {
+            loadTableUsageReport(); ;
+        });
+
     }
-
-
-
-
 
     private void loadReservationReports() {
         // Fetch all reservations (or filtered ones if you want)
@@ -2534,7 +2548,7 @@ public class AdministratorUIController implements Initializable, ReservationList
 
         for (int i = 0; i < allDates.size(); i++) {
             LocalDate d = allDates.get(i);
-            RevenueReportsDTO r = dataMap.getOrDefault(d, new RevenueReportsDTO(d, 0, 0, 0.0));
+            RevenueReportsDTO r = dataMap.getOrDefault(d, new RevenueReportsDTO(d, 0L, 0L, 0.0));
 
             // Format date label
             String dateStr = (i % step == 0) ? d.format(formatter) : ""; // only show some labels
@@ -2562,6 +2576,57 @@ public class AdministratorUIController implements Initializable, ReservationList
         ((javafx.scene.chart.CategoryAxis) totalCustomerChart.getXAxis()).setTickLabelRotation(45);
         ((javafx.scene.chart.CategoryAxis) totalRevenueChart.getXAxis()).setTickLabelRotation(45);
     }
+    public void loadTableUsageReport(){
+        if(dateFromTUrep.getValue() == null){
+            dateFromTUrep.setValue(LocalDate.now());
+        }
+        if(dateToTUrep.getValue() == null){
+            dateToTUrep.setValue(LocalDate.now());
+        }
+        LocalDate from = dateFromTUrep.getValue();
+        LocalDate to = dateToTUrep.getValue();
+        List<TableUsageReportDTO> results = RTLR.getTableUsageReport(from,to);
+        TableUsageReportDTOS.setAll(results);
+    }
+
+    public void setupTableUsageInfo(){
+
+        TableinfoTUrep.setItems(TableUsageInformationDTOS);
+        TableColumn<?, ?>[] column = {tablenoTableinfo,referenceTableinfo,paxTableinfo,revenueTableinfo,timeTableinfo,dateTableinfo};
+        double[] widthFactors = {0.10,0.25,0.10,0.15,0.20,0.20};
+        String[] namecol = {"tableNo", "reference", "pax", "revenue","time","date"};
+
+        for (int i = 0; i < column.length; i++) {
+            TableColumn<?, ?> col = column[i];
+            col.setResizable(false);
+            col.setReorderable(false);
+            col.setSortable(true);
+            col.prefWidthProperty().bind(TableinfoTUrep.widthProperty().multiply(widthFactors[i]));
+            if (!namecol[i].isEmpty()) {
+                col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
+            }
+        }
+        TableinfoTUrep.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                loadTableUsageInfo(newValue.getTableNo());
+
+                if(!tableInfopane.isManaged()&& !tableInfopane.isVisible()) {
+                    tableInfopane.setManaged(true);
+                    tableInfopane.setVisible(true);
+                }
+
+            }
+        });
+
+    }
+
+    public void loadTableUsageInfo(String tableno){
+        LocalDate from = dateFromTUrep.getValue();
+        LocalDate to = dateToTUrep.getValue();
+        List<TableUsageInformationDTO> results = RTLR.getTableUsageInfo(from,to,tableno);
+        TableUsageInformationDTOS.setAll(results);
+
+    }
 
 
     public void loadReports(){
@@ -2569,7 +2634,10 @@ public class AdministratorUIController implements Initializable, ReservationList
         loadReservationReports();
         loadCustomerReport();
         loadRevenueReport();
-        }
+        loadTableUsageReport();
+        tableInfopane.setManaged(false);
+        tableInfopane.setVisible(false);
+    }
 
 
     private void expand(BarChart<?, ?> target) {
@@ -2644,6 +2712,8 @@ public class AdministratorUIController implements Initializable, ReservationList
         setupCustomerReports();
         setupReservatioInformation();
         setupRevenueReports();
+        setupTableUsageReport();
+        setupTableUsageInfo();
         //ActivityLogsTable.setItems(activitylogsdata);
         setupHoverExpand(totalReservationChart);
         setupHoverExpand(totalCustomerChart);

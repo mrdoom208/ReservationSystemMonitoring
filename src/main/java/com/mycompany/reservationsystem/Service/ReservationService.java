@@ -8,7 +8,10 @@ import com.mycompany.reservationsystem.model.Reservation;
 import com.mycompany.reservationsystem.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class ReservationService {
@@ -55,5 +58,9 @@ public class ReservationService {
         } else {
             throw new RuntimeException("Reservation not found" + Ref);
         }
+    }
+    @Transactional(readOnly = true)
+    public Stream<Reservation> streamAllReservations() {
+        return reservationRepository.streamAllReservations();
     }
 }

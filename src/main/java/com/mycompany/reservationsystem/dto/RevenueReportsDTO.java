@@ -5,11 +5,11 @@ import java.time.LocalDate;
 public class RevenueReportsDTO {
 
     private LocalDate date;
-    private long totalReservation;
-    private long totalCustomer;
-    private double totalRevenue;
+    private Long totalReservation;
+    private Long totalCustomer;
+    private Double totalRevenue;
 
-    public RevenueReportsDTO(LocalDate date, long totalReservation, long totalCustomer, double totalRevenue) {
+    public RevenueReportsDTO(LocalDate date, Long totalReservation, Long totalCustomer, Double totalRevenue) {
         this.date = date;
         this.totalReservation = totalReservation;
         this.totalCustomer = totalCustomer;
@@ -20,15 +20,15 @@ public class RevenueReportsDTO {
         return date;
     }
 
-    public long getTotalReservation() {
+    public Long getTotalReservation() {
         return totalReservation;
     }
 
-    public long getTotalCustomer() {
+    public Long getTotalCustomer() {
         return totalCustomer;
     }
 
-    public double getTotalRevenue() {
+    public Double getTotalRevenue() {
         return totalRevenue;
     }
 }
