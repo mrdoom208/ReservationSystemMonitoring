@@ -30,7 +30,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<GridPane prefHeight="1200.0" prefWidth="1300.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.reservationsystem.controller.AdministratorUIController">
+<GridPane prefHeight="720.0" prefWidth="1300.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.reservationsystem.controller.AdministratorUIController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="678.0" minWidth="10.0" percentWidth="13.0" prefWidth="165.0" />
       <ColumnConstraints hgrow="ALWAYS" maxWidth="1196.0" minWidth="10.0" percentWidth="87.0" />
@@ -1371,7 +1371,7 @@
                                     <Region prefHeight="48.0" prefWidth="1021.0" />
                                     <VBox alignment="CENTER_LEFT" minHeight="100.0" prefHeight="100.0" prefWidth="1021.0" styleClass="Statistics-cell" VBox.vgrow="ALWAYS">
                                        <children>
-                                          <Label styleClass="BoldText" text="Account Manager">
+                                          <Label styleClass="BoldText" text="Activity Log">
                                              <font>
                                                 <Font size="30.0" />
                                              </font>
@@ -1417,14 +1417,14 @@
                                                 </Button>
                                              </children>
                                           </GridPane>
-                                          <TableView fx:id="AccountTable1" prefHeight="399.0" prefWidth="1025.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
+                                          <TableView fx:id="ActivityLogsTable" prefHeight="399.0" prefWidth="1025.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
                                              <columns>
-                                                <TableColumn fx:id="usernameAT1" prefWidth="75.0" text="Username" />
-                                                <TableColumn fx:id="firstnameAT1" prefWidth="160.0" text="First Name" />
-                                                <TableColumn fx:id="lastnameAT1" prefWidth="181.0" text="Last Name" />
-                                                <TableColumn fx:id="positionAT1" prefWidth="202.0" text="Position" />
-                                                <TableColumn fx:id="statusAT1" prefWidth="75.0" text="Status" />
-                                                <TableColumn fx:id="actionAT1" prefWidth="75.0" text="Action" />
+                                                <TableColumn fx:id="userAL" prefWidth="75.0" text="Username" />
+                                                <TableColumn fx:id="positionAL" prefWidth="160.0" text="Position" />
+                                                <TableColumn fx:id="moduleAL" prefWidth="132.0" text="Module" />
+                                                <TableColumn fx:id="actionAL" prefWidth="206.0" text="Action" />
+                                                <TableColumn fx:id="descriptionAL" prefWidth="236.0" text="Description" />
+                                                <TableColumn fx:id="timestampsAL" prefWidth="120.0" text="Timestamp" />
                                              </columns>
                                              <columnResizePolicy>
                                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

@@ -14,6 +14,8 @@ import com.mycompany.reservationsystem.websocket.ReservationListener;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
 
 import java.net.URL;
+
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.util.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -140,7 +142,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableView<ActivityLog> ActivityLogsTable;
     @FXML
-    private TableColumn<ActivityLog,String> userAL,actionAL,targetAL,valueAL;
+    private TableColumn<ActivityLog,String> userAL,positionAL,moduleAL,actionAL,descriptionAL;
     @FXML
     private TableColumn<ActivityLog,LocalDateTime>timestampsAL;
     @FXML
@@ -346,10 +348,10 @@ public class AdministratorUIController implements Initializable, ReservationList
             case "ActivityLogbtn":
                 ActivityLogPane.setVisible(true);
                 header.setText("Activity Logs");
-                if (!ActivityLogLoaded) {
-                    loadActivityLog();
-                    ActivityLogLoaded = true;
-                }
+                //if (!ActivityLogLoaded) {
+                    loadActivityLogs();
+                 //   ActivityLogLoaded = true;
+                //}
                 break;
             default:
                 break;
@@ -2095,9 +2097,9 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
     public void loadAccountManagement(){
         loadAccountTable();
-        //loadActivityLogs();
-        //setupActivityLogs();
+
     }
+
 
     public void editAccount(User item) {
         // Create UI elements
@@ -2214,9 +2216,44 @@ public class AdministratorUIController implements Initializable, ReservationList
         return tf;
     }
     private void setupActivityLogs(){
-        TableColumn<?, ?>[] column = {timestampsAL,userAL,actionAL,targetAL,valueAL};
-        double[] widthFactors = {0.2, 0.2, 0.2, 0.2, 0.2};
-        String[] namecol = {"timestamp", "user", "action", "target", "value"};
+        timestampsAL.setCellFactory(column -> new TableCell<ActivityLog, LocalDateTime>() {
+
+            private final DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText("");
+                } else {
+                    setText(item.format(formatter));
+                }
+            }
+        });
+        descriptionAL.setCellFactory(column -> new TableCell<ActivityLog, String>() {
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                // Left align the text
+                setStyle("-fx-alignment: CENTER-LEFT;");
+
+                if (empty || item == null) {
+                    setText("");
+                    setGraphic(null);
+                    setStyle(null);
+                } else {
+                    setText(item);
+                }
+            }
+        });
+
+        ActivityLogsTable.setItems(activitylogsdata);
+        TableColumn<?, ?>[] column = {userAL,positionAL,moduleAL,actionAL,descriptionAL,timestampsAL};
+        double[] widthFactors = {0.15, 0.15, 0.1, 0.1, 0.35,0.15};
+        String[] namecol = {"user", "position", "module", "action", "description","timestamp"};
 
         for (int i = 0; i < column.length; i++) {
             TableColumn<?, ?> col = column[i];
@@ -2236,12 +2273,11 @@ public class AdministratorUIController implements Initializable, ReservationList
             }
         }
 
-        ActivityLogsTable.setPlaceholder(new Label("No Account yet "));
+        ActivityLogsTable.setPlaceholder(new Label("No Activity Data "));
     }
     private void loadActivityLogs(){
-        List<ActivityLog> data = activityLogRepository.findAll();
+        List<ActivityLog> data = activityLogRepository.findAllOrderByTimestampDesc();
         activitylogsdata.setAll(data);
-
 
     }
 
@@ -2766,9 +2802,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
 
 
-    private void loadActivityLog(){
 
-    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -2794,6 +2828,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         setupRevenueReports();
         setupTableUsageReport();
         setupTableUsageInfo();
+        setupActivityLogs();
         //ActivityLogsTable.setItems(activitylogsdata);
         setupHoverExpand(totalReservationChart,rootVBox);
         setupHoverExpand(totalCustomerChart,rootVBox);
