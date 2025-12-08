@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     long countByStatus(String Status);
-    List<Reservation> findTop10ByOrderByDateDescReservationPendingtimeDesc(Pageable pageable);
+    List<Reservation> findTop15ByOrderByDateDescReservationPendingtimeDesc(Pageable pageable);
     List<Reservation> findByStatus(String status); List<Reservation> findByStatusIn(List<String> statuses);
     boolean existsByTable_Id(Long tableId); Optional<Reservation>findByReference(String reference);
 

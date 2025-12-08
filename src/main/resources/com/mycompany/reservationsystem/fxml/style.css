@@ -249,11 +249,11 @@
     -fx-alignment: CENTER;
     -fx-background-insets: 0;
     -fx-background-radius: 8;
-    -fx-padding:5 0  5 0;
+    /*-fx-padding: 0   0;*/
     -fx-border-width: 0;
     -fx-border-color: transparent;
     -fx-table-cell-border-color: transparent;
-    -fx-font-size:0.8125em;  /* was 13px */
+    -fx-font-size:0.9em;  /* was 13px */
 }
 
 .DefaultTable .column-header-background {
@@ -271,6 +271,10 @@
     -fx-text-fill: #e0e0e0;
     -fx-font-size:0.875em;  /* was 14px */
 }
+.DefaultTable .corner {
+     -fx-background-color: #2b2b2b; /* same as your header */
+     -fx-border-color: transparent;
+ }
 
 .DefaultTable .table-row-cell:focused {
     -fx-border-width: 0;
@@ -328,7 +332,7 @@
     -fx-background-color: #FAC4D2;
     -fx-text-fill: #4A2A33;
     -fx-font-weight: bold;
-    -fx-font-size:0.7em;  /* was 10px */
+    -fx-font-size:0.9em;  /* was 10px */
     -fx-background-radius: 8px;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
@@ -356,7 +360,7 @@
 
 .delete {
     -fx-font-weight: bold;
-    -fx-font-size:0.7em;  /* was 10px */
+    -fx-font-size:0.9em;  /* was 10px */
     -fx-background-radius: 8px;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;
@@ -371,7 +375,7 @@
 
 .complete {
     -fx-font-weight: bold;
-    -fx-font-size:0.7em;  /* was 10px */
+    -fx-font-size:0.9em;  /* was 10px */
     -fx-background-radius: 8px;
     -fx-padding: 8 16 8 16;
     -fx-cursor: hand;

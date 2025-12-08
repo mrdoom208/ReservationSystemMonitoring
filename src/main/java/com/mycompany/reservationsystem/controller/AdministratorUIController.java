@@ -70,7 +70,10 @@ import org.springframework.stereotype.Component;
  * @author formentera
  */
 @Component
-public class AdministratorUIController implements Initializable, ReservationListener {
+public class
+
+
+AdministratorUIController implements Initializable, ReservationListener {
     private User currentuser;
 
     void  setUser(User user) {
@@ -78,7 +81,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     }
 
     @FXML
-    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,ActivityLogbtn,Mergebtn,Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ActivityLogsrpts,ApplyResrep,ApplyCusrep,ApplyRevrep,ApplyTUrep;
+    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,ActivityLogbtn,Mergebtn,Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ApplyResrep,ApplyCusrep,ApplyRevrep,ApplyTUrep,applyAL;
     @FXML
     private ScrollPane DashboardPane, ReservationPane, TableManagementPane, ManageStaffAndAccountsPane,ReportsPane,ActivityLogPane;
     @FXML
@@ -88,7 +91,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private BarChart<String, Number> totalReservationChart,totalCustomerChart,totalRevenueChart,totalReservationChartTableUsage,totalCustomerChartTableUsage,totalRevenueChartTableUsage;
     @FXML
-    private TextField SearchCL,SearchTM;
+    private TextField SearchCL,SearchTM,searchAL;
     @FXML
     private BorderPane dashpane,reservpane,tablepane,accountpane;
     @FXML
@@ -178,7 +181,7 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private TableColumn<TableUsageInformationDTO,LocalDate> dateTableinfo;
     @FXML
-    private DatePicker dateFromResrep,dateToResrep,dateFromCusrep,dateToCusrep,dateFromRevrep,dateToRevrep,dateFromTUrep,dateToTUrep;
+    private DatePicker dateFromResrep,dateToResrep,dateFromCusrep,dateToCusrep,dateFromRevrep,dateToRevrep,dateFromTUrep,dateToTUrep,fromAL,toAL;
 
 
     private Reservation selectedReservation;
@@ -201,7 +204,7 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     private FilteredList<Reservation> filterReservationReports = new FilteredList<>(reservationreports, p -> true);;
     private FilteredList<CustomerReportDTO> filterCustomerReports = new FilteredList<>(customerreports, p -> true);;
-
+    private FilteredList<ActivityLog> filteredActivityLogs = new FilteredList<>(activitylogsdata, p -> true);
 
     @FXML
     private TableView<ManageTables> AvailableTable;
@@ -427,32 +430,30 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     public void loadRecentReservations() {
 
-        List<Reservation> latest10 = reservationRepository.findTop10ByOrderByDateDescReservationPendingtimeDesc(PageRequest.of(0, 10));
+        List<Reservation> latest10 = reservationRepository.findTop15ByOrderByDateDescReservationPendingtimeDesc(PageRequest.of(0, 15));
         recentReservations.setAll(latest10);
-        System.out.print(RecentReservationTable.getItems().setAll(latest10));
     }
 
     public void loadTableView() {
 
         List<ManageTablesDTO> tables = manageTablesRepository.getManageTablesDTO();
-
         manageTablesData.setAll(tables);
 
     }
 
     public void setupRecentReservation() {
 
+
         RecentReservationTable.setItems(recentReservations);
 
         TableColumn<?, ?>[] column = {CustomerColm, PaxColm, TimeColm};
-        double[] widthFactors = {0.4, 0.2, 0.4};
+        double[] widthFactors = {0.4, 0.05, 0.55};
         String[] namecol = {"name","pax","reservationPendingtime"};
 
         for (int i = 0; i < column.length; i++) {
             TableColumn<?, ?> col = column[i];
             col.setResizable(true);
             col.setReorderable(false);
-            col.prefWidthProperty().bind(RecentReservationTable.widthProperty().multiply(widthFactors[i]));
             if (namecol[i].equals("name")) {
                 ((TableColumn<Reservation, String>) col).setCellValueFactory(cellData ->
                         new SimpleStringProperty(cellData.getValue().getCustomer().getName())
@@ -464,7 +465,6 @@ public class AdministratorUIController implements Initializable, ReservationList
         RecentReservationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         RecentReservationTable.setPlaceholder(new Label("No Customer Reservation yet"));
 
-        
     }
 
     public void setupTableView(){
@@ -2216,6 +2216,20 @@ public class AdministratorUIController implements Initializable, ReservationList
         return tf;
     }
     private void setupActivityLogs(){
+        applyAL.setOnAction(e -> loadActivityLogs());
+        searchAL.textProperty().addListener((obs, oldValue, newValue) -> {
+            String search = (newValue == null) ? "" : newValue.toLowerCase();
+
+            filteredActivityLogs.setPredicate(log -> {
+                if (search.isEmpty()) return true;
+
+                return (log.getUser() != null && log.getUser().toLowerCase().contains(search))
+                        || (log.getPosition() != null && log.getPosition().toLowerCase().contains(search))
+                        || (log.getModule() != null && log.getModule().toLowerCase().contains(search))
+                        || (log.getAction() != null && log.getAction().toLowerCase().contains(search))
+                        || (log.getDescription() != null && log.getDescription().toLowerCase().contains(search));
+            });
+        });
         timestampsAL.setCellFactory(column -> new TableCell<ActivityLog, LocalDateTime>() {
 
             private final DateTimeFormatter formatter =
@@ -2250,7 +2264,7 @@ public class AdministratorUIController implements Initializable, ReservationList
             }
         });
 
-        ActivityLogsTable.setItems(activitylogsdata);
+        ActivityLogsTable.setItems(filteredActivityLogs);
         TableColumn<?, ?>[] column = {userAL,positionAL,moduleAL,actionAL,descriptionAL,timestampsAL};
         double[] widthFactors = {0.15, 0.15, 0.1, 0.1, 0.35,0.15};
         String[] namecol = {"user", "position", "module", "action", "description","timestamp"};
@@ -2276,7 +2290,14 @@ public class AdministratorUIController implements Initializable, ReservationList
         ActivityLogsTable.setPlaceholder(new Label("No Activity Data "));
     }
     private void loadActivityLogs(){
-        List<ActivityLog> data = activityLogRepository.findAllOrderByTimestampDesc();
+        LocalDate from = fromAL.getValue();
+        LocalDateTime startDateTime = (from != null) ? from.atStartOfDay() : null;
+
+        LocalDate to = toAL.getValue();
+        LocalDateTime endDateTime = (to != null) ? to.atTime(23, 59, 59) : null;
+
+
+        List<ActivityLog> data = activityLogRepository.filterByDate(startDateTime,endDateTime);
         activitylogsdata.setAll(data);
 
     }

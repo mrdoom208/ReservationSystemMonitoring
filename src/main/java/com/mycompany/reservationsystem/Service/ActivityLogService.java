@@ -34,9 +34,6 @@ public class ActivityLogService {
     /**
      * Return all logs (newest first)
      */
-    public List<ActivityLog> getAllLogs() {
-        return activityLogRepository.findAllOrderByTimestampDesc();
-    }
 
     /**
      * Optional: clear logs (useful for maintenance)
