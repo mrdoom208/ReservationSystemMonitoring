@@ -25,7 +25,9 @@
     -fx-text-fill: transparent;
 }
 
-
+.plain-pane-secondary{
+    -fx-background-color:#303030;
+}
 
 
 
@@ -697,3 +699,24 @@
 ;
 }
 
+
+/* =============================Settings================================*/
+.plain-pane-primary{
+    -fx-background-color:#1E1E1E;
+}
+
+
+.settings-nav-active{
+    -fx-font-size: 1.2em;
+    -fx-padding: 1em;
+    -fx-background-color: #1E1E1E;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+
+}
+.settings-nav{
+    -fx-font-size: 1.2em;
+    -fx-padding: 1em;
+    -fx-background-color: #1E1E1E;
+
+}

@@ -1343,12 +1343,12 @@
                                        <children>
                                           <VBox spacing="10.0">
                                              <children>
-                                                <VBox prefHeight="690.0" prefWidth="361.0" spacing="10.0" styleClass="Statistics-cell" VBox.vgrow="ALWAYS">
+                                                <VBox prefHeight="690.0" prefWidth="361.0" spacing="5.0" styleClass="Statistics-cell" VBox.vgrow="ALWAYS">
                                                    <children>
                                                       <GridPane>
                                                          <columnConstraints>
                                                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" />
-                                                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="11.0" prefWidth="100.0" />
+                                                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="3.0" prefWidth="100.0" />
                                                             <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
                                                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
                                                             <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
@@ -1361,10 +1361,8 @@
                                                          </rowConstraints>
                                                          <children>
                                                             <Label styleClass="boldreportfilter" text="Filters: " textAlignment="CENTER" />
-                                                            <Label styleClass="reportfilter" text="Date From: " GridPane.columnIndex="1" />
-                                                            <MFXDatePicker fx:id="dateFromTUrep" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="105.0" styleClass="reportfilter" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
-                                                            <Label styleClass="reportfilter" text="Date To: " GridPane.columnIndex="3" />
-                                                            <MFXDatePicker fx:id="dateToTUrep" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="118.0" styleClass="reportfilter" GridPane.columnIndex="4" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+                                                            <MFXDatePicker fx:id="dateFromTUrep" maxWidth="1.7976931348623157E308" prefHeight="4.0" prefWidth="117.0" promptText="Date From" styleClass="reportfilter" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+                                                            <MFXDatePicker fx:id="dateToTUrep" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="122.0" styleClass="reportfilter" GridPane.columnIndex="4" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
                                                             <MFXButton fx:id="ApplyTUrep" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Apply" GridPane.columnIndex="7" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
                                                          </children>
                                                       </GridPane>
