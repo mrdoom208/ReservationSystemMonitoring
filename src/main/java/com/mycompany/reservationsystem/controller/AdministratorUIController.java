@@ -16,6 +16,8 @@ import com.mycompany.reservationsystem.websocket.WebSocketClient;
 import java.net.URL;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.geometry.Bounds;
+import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -228,6 +230,7 @@ AdministratorUIController implements Initializable, ReservationListener {
     private TableColumn<ReservationTableLogs,LocalDate>dateRL,dateTH;
     @FXML
     private HBox ReservationReport,CustomerReport,ActivityLogsReport,RevenueReport;
+
     @FXML
     private GridPane TableUsageReport;
     @FXML
@@ -2825,6 +2828,7 @@ AdministratorUIController implements Initializable, ReservationListener {
 
 
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
@@ -2857,7 +2861,6 @@ AdministratorUIController implements Initializable, ReservationListener {
         setupHoverExpand(totalReservationChartTableUsage,rootVBoxTableUsage);
         setupHoverExpand(totalCustomerChartTableUsage,rootVBoxTableUsage);
         setupHoverExpand(totalRevenueChartTableUsage,rootVBoxTableUsage);
-
 
 
 

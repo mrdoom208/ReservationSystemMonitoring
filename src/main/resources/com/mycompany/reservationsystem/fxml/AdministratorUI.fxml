@@ -91,11 +91,20 @@
       </GridPane>
       <VBox prefHeight="200.0" prefWidth="1112.0" styleClass="DashboardPane" GridPane.columnIndex="1">
          <children>
-             <StackPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+             <StackPane prefHeight="55.0" prefWidth="1131.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
                  <children>
-                  <StackPane>
+                  <GridPane prefHeight="52.0" prefWidth="1131.0" StackPane.alignment="CENTER">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="849.0" minWidth="10.0" prefWidth="785.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="849.0" minWidth="10.0" percentWidth="5.0" prefWidth="28.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="353.0" minWidth="3.0" percentWidth="20.0" prefWidth="220.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
                      <children>
-                             <Label fx:id="header" style="-fx-text-fill: white;" text="Dashboard" StackPane.alignment="TOP_LEFT">
+                             <Label fx:id="header" styleClass="BoldText" text="Dashboard">
                                  <font>
                               <Font size="36.0" />
                            </font>
@@ -103,36 +112,30 @@
                               <Insets left="15.0" />
                            </padding>
                              </Label>
-
-                                   <HBox alignment="TOP_RIGHT" spacing="10" StackPane.alignment="CENTER">
-                                 <children>
-                                     <Label styleClass="static-label" text="Administrator" />
-                                     <ImageView fitHeight="42" fitWidth="46">
-                                         <image>
-                                    <Image url="@../../../../Images/ACCOUNT.png" />
-                                 </image>
-                                     </ImageView>
-                                 </children>
-                                 <padding>
-                              <Insets right="15" />
-                           </padding>
-                             </HBox>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="3">
+                           <children>
+                              <Label alignment="BOTTOM_RIGHT" styleClass="static-label" text="Administrator" HBox.hgrow="ALWAYS" />
+                              <MenuButton alignment="CENTER_RIGHT" mnemonicParsing="false" prefHeight="50.0" prefWidth="0.0" styleClass="profilemenu" textAlignment="JUSTIFY">
+                                <items>
+                                  <MenuItem mnemonicParsing="false" text="Profile" />
+                                  <MenuItem mnemonicParsing="false" text="Settings" />
+                                    <MenuItem mnemonicParsing="false" text="Logout" />
+                                </items>
+                                 <graphic>
+                                           <ImageView fx:id="profile" accessibleRole="BUTTON" fitHeight="50.0" fitWidth="50.0">
+                                               <image>
+                                          <Image url="@../../../../Images/ACCOUNT.png" />
+                                       </image>
+                                           </ImageView>
+                                 </graphic>
+                                 <HBox.margin>
+                                    <Insets right="15.0" />
+                                 </HBox.margin>
+                              </MenuButton>
+                           </children>
+                        </HBox>
                      </children>
-                  </StackPane>
-
-                     <!-- DROPDOWN MENU (Right-Aligned) -->
-                     <VBox fx:id="profileMenu" alignment="TOP_LEFT" maxWidth="150" prefWidth="150" spacing="8" styleClass="Statistics-cell" StackPane.alignment="TOP_RIGHT">
-
-                         <StackPane.margin>
-                             <Insets right="15" top="48" />
-                         </StackPane.margin>
-
-                         <children>
-                             <Label text="Profile" />
-                             <Label text="Settings" />
-                             <Label text="Logout" />
-                         </children>
-                     </VBox>
+                  </GridPane>
 
                  </children>
              </StackPane>

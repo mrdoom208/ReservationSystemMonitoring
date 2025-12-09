@@ -1,6 +1,22 @@
 *{
     -fx-font-family: "Lora";
 }
+.username {
+    -mfx-main: #FFB6C9;            /* Floating border + underline color */
+    -mfx-text-fill: #333;           /* Typed text color */
+
+}
+
+/* apply this to your textfield */
+.pinkMFX {
+    -fx-background-color: #FFB6C9 !important;
+
+    -mfx-main: #FF7A98 ;          /* floating border + line */
+    -mfx-text-fill: #333 !important;        /* typed text color */
+
+    -fx-prompt-text-fill: #333 !important;  /* floating label (idle) */
+}
+
 
 
 .login-button{
@@ -134,6 +150,8 @@
     -fx-fill: blue;
     -fx-font-weight: bold;
 }
+
+
 
 .Section{
     -fx-font-size: 1.5em;   /* was 24px */
@@ -534,4 +552,45 @@
  }
  .BarGraph .axis-label {
      -fx-font-size: 1.5em;
+ }
+ .profilemenu{
+     -fx-background-color: transparent; /* Remove default arrow button background */
+          -fx-padding: 0;
+
+ }
+ .menu-button .arrow-button {
+     -fx-background-color: transparent; /* Remove default arrow button background */
+     -fx-pref-width:0;
+     -fx-padding: 0;
+
+ }
+
+ .menu-button .arrow-button .arrow {
+     -fx-pref-width:0;
+     -fx-padding: 0;
+     -fx-background-color: transparent; /* Change arrow color to white */
+     -fx-shape: ""; /* Example: custom arrow shape */
+ }
+ .menu-item{
+      -fx-alignment: CENTER;
+  }
+
+ .menu-item .label{
+     -fx-padding: 5 10 5 10;
+    /*-fx-text-fill: blue;*/
+    -fx-alignment: CENTER;
+    -fx-font-size:1em;
+ }
+
+ .menu-item:hover {
+     /*-fx-background-color: #e0e0e0;
+     -fx-fill: blue;*/
+ }
+
+ .menu-item:focused {
+     /*-fx-background-color: #cccccc;*/
+ }
+
+ .menu-item .label .text {
+     -fx-text-alignment: center;
  }

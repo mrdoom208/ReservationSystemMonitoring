@@ -91,41 +91,54 @@
       </GridPane>
       <VBox prefHeight="200.0" prefWidth="1112.0" styleClass="DashboardPane" GridPane.columnIndex="1">
          <children>
-            <GridPane prefHeight="48.0" prefWidth="1131.0" VBox.vgrow="SOMETIMES">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="1085.0" minWidth="10.0" percentWidth="77.0" prefWidth="1085.0" />
-                  <ColumnConstraints hgrow="ALWAYS" maxWidth="115.0" minWidth="0.0" percentWidth="23.0" prefWidth="0.0" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-               </rowConstraints>
-               <children>
-                  <Label fx:id="header" maxWidth="1.7976931348623157E308" prefWidth="938.0" style="-fx-text-fill: white;" styleClass="BoldText" text="Dashboard">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                     <padding>
-                        <Insets left="15.0" />
-                     </padding>
-                  </Label>
-                  <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+             <StackPane prefHeight="55.0" prefWidth="1131.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+                 <children>
+                  <GridPane prefHeight="52.0" prefWidth="1131.0" StackPane.alignment="CENTER">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="849.0" minWidth="10.0" prefWidth="785.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="849.0" minWidth="10.0" percentWidth="5.0" prefWidth="28.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="353.0" minWidth="3.0" percentWidth="20.0" prefWidth="220.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
                      <children>
-                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" styleClass="static-label" text="Administrator" HBox.hgrow="ALWAYS" />
-                        <ImageView fitHeight="42.0" fitWidth="46.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
-                           <image>
-                              <Image url="@../../../../Images/ACCOUNT.png" />
-                           </image>
-                        </ImageView>
+                             <Label fx:id="header" styleClass="BoldText" text="Dashboard">
+                                 <font>
+                              <Font size="36.0" />
+                           </font>
+                                 <padding>
+                              <Insets left="15.0" />
+                           </padding>
+                             </Label>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="3">
+                           <children>
+                              <Label alignment="BOTTOM_RIGHT" styleClass="static-label" text="Administrator" HBox.hgrow="ALWAYS" />
+                              <MenuButton alignment="CENTER_RIGHT" mnemonicParsing="false" prefHeight="50.0" prefWidth="0.0" styleClass="profilemenu" textAlignment="JUSTIFY">
+                                <items>
+                                  <MenuItem mnemonicParsing="false" text="Profile" />
+                                  <MenuItem mnemonicParsing="false" text="Settings" />
+                                    <MenuItem mnemonicParsing="false" text="Logout" />
+                                </items>
+                                 <graphic>
+                                           <ImageView fx:id="profile" accessibleRole="BUTTON" fitHeight="50.0" fitWidth="50.0">
+                                               <image>
+                                          <Image url="@../../../../Images/ACCOUNT.png" />
+                                       </image>
+                                           </ImageView>
+                                 </graphic>
+                                 <HBox.margin>
+                                    <Insets right="15.0" />
+                                 </HBox.margin>
+                              </MenuButton>
+                           </children>
+                        </HBox>
                      </children>
-                     <padding>
-                        <Insets right="15.0" />
-                     </padding>
-                  </HBox>
-               </children>
-            </GridPane>
+                  </GridPane>
+
+                 </children>
+             </StackPane>
             <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="150.0" VBox.vgrow="ALWAYS">
                <children>
                   <ScrollPane fx:id="ManageStaffAndAccountsPane" fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" styleClass="Scrollpane">
@@ -401,7 +414,7 @@
                                                 <TableColumn fx:id="dateTH" prefWidth="75.0" text="Date" />
                                             </columns>
                                              
-                                                               <VBox.margin>
+                                                                     <VBox.margin>
                                                 <Insets bottom="25.0" left="25.0" right="25.0" />
                                              </VBox.margin>
                                           </TableView>

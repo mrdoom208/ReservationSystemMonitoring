@@ -82,6 +82,11 @@
             <artifactId>ikonli-javafx</artifactId>
             <version>12.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.palexdev</groupId>
+            <artifactId>materialfx</artifactId>
+            <version>21.18.0-alpha</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

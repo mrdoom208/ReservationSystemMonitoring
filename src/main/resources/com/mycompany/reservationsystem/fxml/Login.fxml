@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.PasswordField?>
@@ -118,6 +119,7 @@
                            <font>
                               <Font size="14.0" />
                            </font></PasswordField>
+                        <MFXTextField floatMode="BORDER" floatingText="USERNAME" layoutX="108.0" layoutY="160.0" prefHeight="51.0" prefWidth="229.0" styleClass="pinkMFX" />
                      </children>
                   </Pane>
                   <StackPane prefHeight="111.0" prefWidth="386.0">
