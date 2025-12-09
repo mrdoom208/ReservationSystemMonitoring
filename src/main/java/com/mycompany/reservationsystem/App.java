@@ -1,5 +1,10 @@
 package com.mycompany.reservationsystem;
 
+import io.github.palexdev.materialfx.MFXResourcesLoader;
+import io.github.palexdev.materialfx.theming.JavaFXThemes;
+import io.github.palexdev.materialfx.theming.MaterialFXStylesheets;
+import io.github.palexdev.materialfx.theming.UserAgentBuilder;
+import io.github.palexdev.materialfx.theming.base.Theme;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,8 +15,8 @@ import org.kordamp.bootstrapfx.BootstrapFX;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
-
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * JavaFX + Spring Boot Integrated App
@@ -30,6 +35,16 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        // Either global for entire app
+
+        UserAgentBuilder.builder()
+
+                .themes(JavaFXThemes.MODENA)                // keep default JavaFX theme too
+                .themes(MaterialFXStylesheets.forAssemble(true)) // add MFX styles
+                .setDeploy(true)     // if you have assets (fonts, images)
+                .setResolveAssets(true)
+                .build()
+                .setGlobal();
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("fxml/Login.fxml"));
 
         // Make controllers managed by Spring
@@ -40,19 +55,16 @@ public class App extends Application {
         Font.loadFont(getClass().getResourceAsStream("/fonts/Lora-Bold.ttf"),14);
 
         scene = new Scene(root);
-
         root.styleProperty().bind(
                 javafx.beans.binding.Bindings.concat(
                         "-fx-font-size: ", scene.widthProperty().divide(100), "px;"
                 )
         );
 
-
         stage.setScene(scene);
         stage.setTitle("Reservation System");
         stage.show();
     }
-
     @Override
     public void stop() {
         // Close Spring context when JavaFX stops

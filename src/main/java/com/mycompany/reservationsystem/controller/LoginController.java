@@ -44,6 +44,8 @@ public class LoginController {
     private MFXTextField usernamefield;
     @FXML
     private MFXPasswordField passwordfield;
+    @FXML
+    private Label messageLabel;
     
     @Autowired
     private UserRepository userRepository;
@@ -87,6 +89,7 @@ public class LoginController {
         }
             
     }
+
     
     @FXML
     private void initialize() {
@@ -116,7 +119,7 @@ public class LoginController {
         if (found != null) {
             
             try {
-                
+                showSuccess("Login Successfully, Welcome Back!");
                 System.out.println("Login Successfully");
                     found.setStatus("Active");
                     userRepository.save(found);
@@ -138,39 +141,25 @@ public class LoginController {
                                 found.getLastname()                 // old table status
                         )
                 );
-
-
-
-
                     Stage stage = new Stage();
-         
-
                     Scene scene = new Scene(root);
-
-                root.styleProperty().bind(
+                    root.styleProperty().bind(
                         Bindings.createStringBinding(() -> {
                             double referenceWidth = 1600;   // base width
                             double referenceHeight = 900;  // base height
+                        double scale = Math.min(scene.getWidth() / referenceWidth, scene.getHeight() / referenceHeight);
 
-                            // Scale factor based on BOTH width and height
-                            double scale = Math.min(scene.getWidth() / referenceWidth, scene.getHeight() / referenceHeight);
-
-                            // Apply scaling to a base font size
                             double fontSize = Math.min(32, Math.max(14, 16 * scale)); // 16 is base font size
-
-                            return "-fx-font-size: " + fontSize + "px;";
+                           return "-fx-font-size: " + fontSize + "px;";
                         }, scene.widthProperty(), scene.heightProperty())
-                );
+                    );
                     stage.setScene(scene);
                     stage.initStyle(StageStyle.UNDECORATED);
                     stage.setMaximized(true);
-
                     stage.setResizable(true);
                     stage.setMinWidth(1300);
                     stage.setMinHeight(720);
                     stage.centerOnScreen();
-                   
-
                     stage.show();
                      ((Node) event.getSource()).getScene().getWindow().hide();
 
@@ -178,15 +167,32 @@ public class LoginController {
                     e.printStackTrace();
                 }    
                 }else{
+                    showError("Wrong Username or Password");
                     System.out.println("Wrong Username or Password");
                     User user = new User();
                     user.setUsername(userf);
                     user.setPassword(passf);
+                    user.setPosition(User.Position.MANAGER);
                     userRepository.save(user);
                 }
-
             }
-        }
+    private void showError(String message) {
+        messageLabel.getStyleClass().removeAll("login-success", "login-message-hidden");
+        messageLabel.getStyleClass().add("login-error");
+        messageLabel.setText(message);
+    }
+
+    private void showSuccess(String message) {
+        messageLabel.getStyleClass().removeAll("login-error", "login-message-hidden");
+        messageLabel.getStyleClass().add("login-success");
+        messageLabel.setText(message);
+    }
+
+    private void hideMessage() {
+        messageLabel.getStyleClass().add("login-message-hidden");
+        messageLabel.setText("");
+    }
+}
     
     
     

@@ -15,6 +15,7 @@ import com.mycompany.reservationsystem.websocket.WebSocketClient;
 
 import java.net.URL;
 
+import io.github.palexdev.materialfx.controls.MFXDatePicker;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Bounds;
 import javafx.scene.image.ImageView;
@@ -183,7 +184,7 @@ AdministratorUIController implements Initializable, ReservationListener {
     @FXML
     private TableColumn<TableUsageInformationDTO,LocalDate> dateTableinfo;
     @FXML
-    private DatePicker dateFromResrep,dateToResrep,dateFromCusrep,dateToCusrep,dateFromRevrep,dateToRevrep,dateFromTUrep,dateToTUrep,fromAL,toAL;
+    private MFXDatePicker dateFromResrep,dateToResrep,dateFromCusrep,dateToCusrep,dateFromRevrep,dateToRevrep,dateFromTUrep,dateToTUrep,fromAL,toAL;
 
 
     private Reservation selectedReservation;
@@ -446,11 +447,12 @@ AdministratorUIController implements Initializable, ReservationListener {
 
     public void setupRecentReservation() {
 
+        RecentReservationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         RecentReservationTable.setItems(recentReservations);
 
         TableColumn<?, ?>[] column = {CustomerColm, PaxColm, TimeColm};
-        double[] widthFactors = {0.4, 0.05, 0.55};
+        double[] widthFactors = {0.4, 0.10, 0.55};
         String[] namecol = {"name","pax","reservationPendingtime"};
 
         for (int i = 0; i < column.length; i++) {
@@ -465,7 +467,6 @@ AdministratorUIController implements Initializable, ReservationListener {
                 col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
             }
             }
-        RecentReservationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         RecentReservationTable.setPlaceholder(new Label("No Customer Reservation yet"));
 
     }
