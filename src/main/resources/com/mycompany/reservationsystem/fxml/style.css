@@ -1,30 +1,43 @@
 *{
     -fx-font-family: "Lora";
 }
-.username {
-    -mfx-main: #FFB6C9;            /* Floating border + underline color */
-    -mfx-text-fill: #333;           /* Typed text color */
-
+.root{
+    -fx-background-color:E10600;
 }
 
+
+.login-container{
+    -fx-background-color:#1E1E1E;
+    -fx-background-radius:30;
+}
 /* apply this to your textfield */
-.pinkMFX {
-    -fx-background-color: #FFB6C9 !important;
+/*.username {
+    -fx-background-color:  #1E1E1E !important;
+    -fx-background-radius: 10;
+    -mfx-main: #E53935 !important;
+    -mfx-text-fill: white !important;
+    -fx-font-size: 14px;
+}*/
 
-    -mfx-main: #FF7A98 ;          /* floating border + line */
-    -mfx-text-fill: #333 !important;        /* typed text color */
 
-    -fx-prompt-text-fill: #333 !important;  /* floating label (idle) */
-}
+/*.username .floating-text,
+.username .floating-text-container{
+    -fx-padding: 0 5 0 5;
+    -fx-background-color:  #1E1E1E !important;
+    -fx-text-fill: #FFFFFF !important;
+}*/
+
+
 
 
 
 .login-button{
     -fx-font-family: "Lora", serif;
-    -fx-background-radius: 50;
+    -fx-background-radius: 10
+    ;
     -fx-font-weight: bold;
     -fx-text-fill: black;
-    -fx-font-size: 1.50em;   /* was 20px */
+    -fx-font-size: 1.50em;   /* was 20px*/
 }
 
 .login-button:hover {
@@ -33,10 +46,10 @@
 }
 
 .login-button-active{
-    -fx-background-radius: 50;
+    -fx-background-radius: 10;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-font-size: 1.50em;  /* was 20px */
+    -fx-font-size: 1.50em;  /* was 20px*/
     -fx-background-color: #FF0000;
 }
 
@@ -49,7 +62,7 @@
     -fx-background-radius: 10;
     -fx-font-size: 1.25em;  /* was 20px */
     -fx-font-weight: bold;
-    -fx-background-color: linear-gradient(to bottom, #FF0000, #FF3333);
+    -fx-background-color: #E10600;
     -fx-background-insets: 0;
     -fx-text-fill: white;
 }

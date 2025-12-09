@@ -11,6 +11,8 @@ import com.mycompany.reservationsystem.repository.UserRepository;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import io.github.palexdev.materialfx.controls.MFXPasswordField;
+import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -39,11 +41,9 @@ public class LoginController {
     @FXML
     private Button Staff,Admin,Submit,activeButton;
     @FXML
-    private Text Username;
+    private MFXTextField usernamefield;
     @FXML
-    private TextField usernamefield;
-    @FXML
-    private PasswordField passwordfield;
+    private MFXPasswordField passwordfield;
     
     @Autowired
     private UserRepository userRepository;
@@ -76,12 +76,12 @@ public class LoginController {
         }
         
         if(clicked == Staff){
-            Username.setText("USERNAME");
+
             manager = false;
             
             
         }else{
-            Username.setText("ADMINISTRATOR");
+
             manager = true;
             
         }
