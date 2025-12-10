@@ -2834,7 +2834,7 @@ AdministratorUIController implements Initializable, ReservationListener {
     public void initialize(URL location, ResourceBundle resources) {
 
 
-        //dashpane.minHeightProperty().bind(dashpane.widthProperty().multiply(0.965));
+        dashpane.minHeightProperty().bind(dashpane.widthProperty().multiply(0.965));
         reservpane.minHeightProperty().bind(reservpane.widthProperty().multiply(1.456));
         tablepane.minHeightProperty().bind(tablepane.widthProperty().multiply(0.939));
         //accountpane.minHeightProperty().bind(accountpane.widthProperty().multiply());

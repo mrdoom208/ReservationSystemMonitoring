@@ -25,7 +25,9 @@
     -fx-text-fill: transparent;
 }
 
-
+.plain-pane-secondary{
+    -fx-background-color:#303030;
+}
 
 
 
@@ -165,7 +167,7 @@
 
 }
 
-.Scrollpane{
+.Scrollpane,.Scrollpane .viewport{
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-background-insets: 0;
@@ -656,6 +658,7 @@
     -fx-font-size: 1em;
     -mfx-main: #E53935;            /* same accent color */
     -fx-text-fill: #E0E0E0;        /* displayed date */
+    -fx-prompt-text-fill: #A0A0A0;
 }
 
 .filter-date .floating-text {
@@ -674,6 +677,23 @@
 
 .mfx-date-picker .date-cell:hover {
     -fx-background-color: #3E7BFA22;
+}
+
+.mfx-date-picker .date-cell:hover {
+    -fx-background-color: #3E7BFA22; /* hover effect */
+}
+
+.mfx-date-picker .date-cell:selected {
+    -fx-background-color: #3E7BFA;   /* selected date */
+    -fx-text-fill: #FFFFFF;          /* selected text */
+}
+
+
+
+
+.mfx-date-picker .mfx-icon-wrapper .mfx-font-icon {
+    -fx-background-color: transparent; /* remove default background */
+    -fx-fill: #E53935;       /* change icon color */
 }
 
 /* ===========================
@@ -697,3 +717,24 @@
 ;
 }
 
+
+/* =============================Settings================================*/
+.plain-pane-primary{
+    -fx-background-color:#1E1E1E;
+}
+
+
+.settings-nav-active{
+    -fx-font-size: 1.2em;
+    -fx-padding: 1em;
+    -fx-background-color: #1E1E1E;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+
+}
+.settings-nav{
+    -fx-font-size: 1.2em;
+    -fx-padding: 1em;
+    -fx-background-color: #1E1E1E;
+
+}
