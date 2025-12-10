@@ -15,6 +15,8 @@ import com.mycompany.reservationsystem.websocket.WebSocketClient;
 
 import java.net.URL;
 
+import io.github.palexdev.materialfx.controls.MFXCheckbox;
+import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXDatePicker;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Bounds;
@@ -25,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javafx.animation.KeyFrame;
@@ -235,9 +238,7 @@ AdministratorUIController implements Initializable, ReservationListener {
     @FXML
     private GridPane TableUsageReport;
     @FXML
-    private MenuButton tablefilter,reservationfilter,StatusfilterResrep;
-    @FXML
-    private MenuItem Availabletable,Occupiedtable,Reservedtable,ShowAlltable,pendingreservation,confirmreservation,allreservation;
+    private MFXComboBox tablefilter,reservationfilter,StatusfilterResrep;
     @FXML
     private PieChart reservationPieChart;
 
@@ -579,39 +580,53 @@ AdministratorUIController implements Initializable, ReservationListener {
 
         myBarChart.getData().add(series);
     }
+    private <T> void addItemsToCombo(
+            MFXComboBox<String> combo,
+            FilteredList<T> filteredData,
+            Function<T, String> propertyExtractor,
+            String... statuses) {
+
+        combo.getItems().addAll(statuses);
+
+        combo.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
+            int i = newIndex.intValue();
+
+            if (i >= 0 && i < statuses.length) {
+                String selectedStatus = statuses[i];
+
+                if (selectedStatus.equalsIgnoreCase("Show All")) {
+                    filteredData.setPredicate(item -> true); // no filter
+                } else {
+                    filteredData.setPredicate(item ->
+                            propertyExtractor.apply(item) != null &&
+                                    propertyExtractor.apply(item).equalsIgnoreCase(selectedStatus)
+                    );
+                }
+
+                combo.setText(selectedStatus);
+            }
+        });
+    }
+
+
+
+
+
+
+
+
     FilteredList<ManageTablesDTO> tablesfilteredData;
     FilteredList<Reservation> filteredData;
     private int currentpax;
     FilteredList<ManageTables> filteredtable;
 
 
+
     public void setupCustomerReservationTable() {
         filteredData = new FilteredList<>(pendingReservations, p -> true);
         CustomerReservationTable.setItems(filteredData);
-
-
-        confirmreservation.setOnAction(e -> {
-            filteredData.setPredicate(item ->
-                    item.getStatus() != null &&
-                            item.getStatus().equalsIgnoreCase("Confirm")
-            );
-            reservationfilter.setText("Confirm");
-        });
-
-        pendingreservation.setOnAction(e -> {
-            filteredData.setPredicate(item ->
-                    item.getStatus() != null &&
-                            item.getStatus().equalsIgnoreCase("Pending")
-            );
-            reservationfilter.setText("Pending");
-        });
-
-        allreservation.setOnAction(e -> {
-            filteredData.setPredicate(item -> true); // remove filter
-            reservationfilter.setText("Show All");
-        });
-
-
+        String[] statuses = {"Confirm", "Pending", "Show All"};
+        addItemsToCombo(reservationfilter,filteredData,Reservation::getStatus,statuses);
 
 
 
@@ -777,7 +792,7 @@ AdministratorUIController implements Initializable, ReservationListener {
         );
 
     }
-    
+
     public void loadCustomerReservationTable() {
         List<String> statuses = List.of("Pending", "Confirm");
         List<Reservation> Data = reservationRepository.findByStatusIn(statuses);
@@ -1231,6 +1246,7 @@ AdministratorUIController implements Initializable, ReservationListener {
     dialog.showAndWait().ifPresent(response -> {
         if (response == ButtonType.OK) {
             ManageTables row = new ManageTables();
+            row.setId(Long.parseLong(tableNoField.getText()));
             row.setTableNo(tableNoField.getText());
             row.setCapacity(Integer.parseInt(capacityField.getText()));
             row.setLocation(LocationField.getText());
@@ -1243,7 +1259,7 @@ AdministratorUIController implements Initializable, ReservationListener {
                     "Table",                                     // module
                     "Add Table",                             // action
                     String.format(
-                            "Add Table #%d Capacity %d Location %s",
+                            "Add Table #%s Capacity %d Location %s",
                             row.getTableNo(),                   // table ID
                             row.getCapacity(),                           // old table status
                             row.getLocation()                        // reservation reference
@@ -1472,36 +1488,8 @@ AdministratorUIController implements Initializable, ReservationListener {
                 return false; // no match
             });
         });
-
-        Availabletable.setOnAction(e -> {
-            tablesfilteredData.setPredicate(item ->
-                    item.getStatus() != null &&
-                            item.getStatus().equalsIgnoreCase("Available")
-
-            );
-            tablefilter.setText("Available");
-        });
-
-        Reservedtable.setOnAction(e -> {
-            tablesfilteredData.setPredicate(item ->
-                    item.getStatus() != null &&
-                            item.getStatus().equalsIgnoreCase("Reserved")
-            );
-            tablefilter.setText("Reserved");
-        });
-
-        Occupiedtable.setOnAction(e -> {
-            tablesfilteredData.setPredicate(item ->
-                    item.getStatus() != null &&
-                            item.getStatus().equalsIgnoreCase("Occupied")
-            );
-            tablefilter.setText("Occupied");
-        });
-
-        ShowAlltable.setOnAction(e -> {
-            tablesfilteredData.setPredicate(item -> true); // remove filter
-            tablefilter.setText("Show All");
-        });
+        String[] statuses = {"Available","Reserved","Occupied","Show All"};
+        addItemsToCombo(tablefilter,tablesfilteredData,ManageTablesDTO::getStatus,statuses);
 
 
         StatusTM.setCellFactory(tv -> new TableCell<ManageTablesDTO, String>() {
@@ -2372,15 +2360,14 @@ AdministratorUIController implements Initializable, ReservationListener {
         });
 
     }
-
+    public void addItems(MFXComboBox<String> combo, String... items) {
+        combo.getItems().addAll(items);
+    }
 
     public void setupreservationreports() {
-        for (MenuItem item : StatusfilterResrep.getItems()) {
-            item.setOnAction(e -> {
-                StatusfilterResrep.setText(item.getText());
-            });
-        }
-        StatusfilterResrep.setText("All");
+       addItems(StatusfilterResrep,"Reserved","Complete","Cancelled","Pending","No Show","Seated");
+
+        StatusfilterResrep.setText("Show All");
 
         referenceResrep.setCellValueFactory(new PropertyValueFactory<>("reference"));
         paxResrep.setCellValueFactory(new PropertyValueFactory<>("pax"));
@@ -2407,7 +2394,7 @@ AdministratorUIController implements Initializable, ReservationListener {
                     return false;
 
                 // Status filtering
-                if (!"All".equals(selectedStatus)) {
+                if (!"Show All".equals(selectedStatus)) {
                     if (item.getStatus() == null ||
                             !item.getStatus().equalsIgnoreCase(selectedStatus))
                         return false;
@@ -2685,12 +2672,12 @@ AdministratorUIController implements Initializable, ReservationListener {
         ((javafx.scene.chart.CategoryAxis) totalRevenueChart.getXAxis()).setTickLabelRotation(45);
     }
     public void loadTableUsageReport(){
-        if(dateFromTUrep.getValue() == null){
+        /*if(dateFromTUrep.getValue() == null){
             dateFromTUrep.setValue(LocalDate.now());
         }
         if(dateToTUrep.getValue() == null){
             dateToTUrep.setValue(LocalDate.now());
-        }
+        }*/
         LocalDate from = dateFromTUrep.getValue();
         LocalDate to = dateToTUrep.getValue();
         List<TableUsageReportDTO> results = RTLR.getTableUsageReport(from,to);
@@ -2836,7 +2823,7 @@ AdministratorUIController implements Initializable, ReservationListener {
 
         dashpane.minHeightProperty().bind(dashpane.widthProperty().multiply(0.965));
         reservpane.minHeightProperty().bind(reservpane.widthProperty().multiply(1.456));
-        tablepane.minHeightProperty().bind(tablepane.widthProperty().multiply(0.939));
+        tablepane.minHeightProperty().bind(tablepane.widthProperty().multiply(0.95));
         //accountpane.minHeightProperty().bind(accountpane.widthProperty().multiply());
         Dashboardbtn.fire();
 

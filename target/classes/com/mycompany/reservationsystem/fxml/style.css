@@ -717,6 +717,22 @@
 ;
 }
 
+.custom-btn {
+    -fx-background-color: #FFB6C9;       /* main button color */
+    -fx-text-fill: #333333;               /* text color */
+    -fx-font-size: 1em;                 /* font size */
+    -fx-background-radius: 8;           /* rounded corners */
+    -fx-font-weight: bold;              /* bold text */
+}
+
+.custom-btn:hover {
+    -fx-background-color: #FFC2D9;      /* slightly lighter on hover */
+}
+
+.custom-btn:armed {
+    -fx-background-color: #E699B3;      /* darker when pressed */
+}
+
 
 /* =============================Settings================================*/
 .plain-pane-primary{
