@@ -1,5 +1,6 @@
 package com.mycompany.reservationsystem.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -7,12 +8,12 @@ public class TableUsageInformationDTO {
     private String tableNo;
     private String reference;
     private Integer pax;
-    private Double revenue;
+    private BigDecimal revenue;
     private LocalTime time;
     private LocalDate date;
 
     public TableUsageInformationDTO(String tableNo, String reference, Integer pax,
-                                    Double revenue, LocalTime time, LocalDate date) {
+                                    BigDecimal revenue, LocalTime time, LocalDate date) {
         this.tableNo = tableNo;
         this.reference = reference;
         this.pax = pax;
@@ -33,7 +34,7 @@ public class TableUsageInformationDTO {
         return pax;
     }
 
-    public Double getRevenue() {
+    public BigDecimal getRevenue() {
         return revenue;
     }
 

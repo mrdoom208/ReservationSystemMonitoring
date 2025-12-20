@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -39,7 +40,7 @@ import org.springframework.stereotype.Component;
 public class LoginController {
     
     @FXML
-    private Button Staff,Admin,Submit,activeButton;
+    private Button Staff,Admin,Submit,activeButton,closebtn;
     @FXML
     private MFXTextField usernamefield;
     @FXML
@@ -96,10 +97,17 @@ public class LoginController {
         // Set default active button
         activeButton = Admin;
         Admin.fire();
-        
         Submit.setDefaultButton(true);
+
+
+
+
         
         
+    }
+    public void closeApp(ActionEvent event) {
+        Platform.exit();     // cleanly shuts down JavaFX
+        System.exit(0);      // ensures JVM exits
     }
     
     @FXML
@@ -177,7 +185,7 @@ public class LoginController {
                 }
             }
     private void showError(String message) {
-        messageLabel.getStyleClass().removeAll("login-success", "login-message-hidden");
+        messageLabel.getStyleClass().removeAll("login-success", "login-message");
         messageLabel.getStyleClass().add("login-error");
         messageLabel.setText(message);
     }

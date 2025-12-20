@@ -1,21 +1,27 @@
 package com.mycompany.reservationsystem.dto;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class CustomerReportDTO {
 
     private String phone;
     private Long totalReservation;  // wrapper
-    private Double totalRevenue;     // wrapper
+    private BigDecimal totalRevenue;     // wrapper
     private Double averageRevenue;   // wrapper
 
-    public CustomerReportDTO(String phone, Long totalReservation, Double totalRevenue, Double averageRevenue) {
+    public CustomerReportDTO(String phone, Long totalReservation, BigDecimal totalRevenue, Double averageRevenue) {
         this.phone = phone;
         this.totalReservation = totalReservation != null ? totalReservation : 0L;
-        this.totalRevenue = totalRevenue != null ? Math.round(totalRevenue * 100.0) / 100.0 : 0.00;
-        this.averageRevenue = averageRevenue != null ? Math.round(averageRevenue * 100.0) / 100.0 : 0.00;
-    }
+        this.totalRevenue = totalRevenue != null
+                ? new BigDecimal(totalRevenue.toString()).setScale(2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
+        this.averageRevenue = averageRevenue != null
+                ? Math.round(averageRevenue.doubleValue() * 100.0) / 100.0
+                : 0.00;}
 
     public String getPhone() { return phone; }
     public Long getTotalReservation() { return totalReservation; }
-    public Double getTotalRevenue() { return totalRevenue; }
+    public BigDecimal getTotalRevenue() { return totalRevenue; }
     public Double getAverageRevenue() { return averageRevenue; }
 }

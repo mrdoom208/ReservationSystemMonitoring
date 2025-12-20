@@ -1,13 +1,15 @@
 package com.mycompany.reservationsystem.dto;
 
+import java.math.BigDecimal;
+
 public class TableUsageReportDTO {
 
     private String tableNo;
     private Long totalReservation;
     private Long totalCustomer;
-    private Double totalRevenue;
+    private BigDecimal totalRevenue;
 
-    public TableUsageReportDTO(String tableNo, Long totalReservation, Long totalCustomer, Double totalRevenue) {
+    public TableUsageReportDTO(String tableNo, Long totalReservation, Long totalCustomer, BigDecimal totalRevenue) {
         this.tableNo = tableNo;
         this.totalReservation = totalReservation;
         this.totalCustomer = totalCustomer;
@@ -39,11 +41,11 @@ public class TableUsageReportDTO {
         this.totalCustomer = totalCustomer;
     }
 
-    public Double getTotalRevenue() {
+    public BigDecimal getTotalRevenue() {
         return totalRevenue;
     }
 
-    public void setTotalRevenue(Double totalRevenue) {
+    public void setTotalRevenue(BigDecimal totalRevenue) {
         this.totalRevenue = totalRevenue;
     }
 }

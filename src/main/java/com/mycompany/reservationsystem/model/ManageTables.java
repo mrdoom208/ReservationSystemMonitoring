@@ -21,7 +21,6 @@ import java.util.List;
 public class ManageTables {
     
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)        
     Long id;
     
     

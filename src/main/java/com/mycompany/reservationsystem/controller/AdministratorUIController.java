@@ -4,6 +4,7 @@
  */
 package com.mycompany.reservationsystem.controller;
 
+import com.mycompany.reservationsystem.App;
 import com.mycompany.reservationsystem.Service.ActivityLogService;
 import com.mycompany.reservationsystem.Service.ReservationService;
 import com.mycompany.reservationsystem.Service.TablesService;
@@ -13,11 +14,14 @@ import com.mycompany.reservationsystem.repository.*;
 import com.mycompany.reservationsystem.websocket.ReservationListener;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 
 import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXDatePicker;
+import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Bounds;
 import javafx.scene.image.ImageView;
@@ -66,6 +70,7 @@ import javafx.stage.StageStyle;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
@@ -87,7 +92,7 @@ AdministratorUIController implements Initializable, ReservationListener {
     }
 
     @FXML
-    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,ActivityLogbtn,Mergebtn,Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ApplyResrep,ApplyCusrep,ApplyRevrep,ApplyTUrep,applyAL;
+    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,ActivityLogbtn,Mergebtn,Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ApplyResrep,ApplyCusrep,ApplyRevrep,ApplyTUrep,applyAL,AddTablebtn;
     @FXML
     private ScrollPane DashboardPane, ReservationPane, TableManagementPane, ManageStaffAndAccountsPane,ReportsPane,ActivityLogPane;
     @FXML
@@ -107,7 +112,9 @@ AdministratorUIController implements Initializable, ReservationListener {
     @FXML
     private TableColumn<CustomerReportDTO, Integer>totalreservationCusrep;
     @FXML
-    private TableColumn<CustomerReportDTO, Double> averageCusrep,totalrevenueCusrep;
+    private TableColumn<CustomerReportDTO, BigDecimal> totalrevenueCusrep;
+    @FXML
+    private TableColumn<CustomerReportDTO, Double> averageCusrep;
     @FXML
     private TableColumn<CustomerReportDTO, String> phoneCusrep;
     @FXML
@@ -117,7 +124,7 @@ AdministratorUIController implements Initializable, ReservationListener {
     @FXML
     private TableColumn<CustomerReportDTO, LocalDate>dateResInCusRep;
     @FXML
-    private TableColumn<CustomerReportDTO, Double> revenueResInCusRep;
+    private TableColumn<CustomerReportDTO, BigDecimal> revenueResInCusRep;
     @FXML
     private TableColumn<CustomerReportDTO, String> referenceResInCusRep,nameResInCusRep,phoneResInCusRep,statusResInCusRep;
     @FXML
@@ -127,7 +134,7 @@ AdministratorUIController implements Initializable, ReservationListener {
     @FXML
     private TableColumn<RevenueReportsDTO, LocalDate>dateRevrep;
     @FXML
-    private TableColumn<RevenueReportsDTO, Double>totalrevenueRevrep;
+    private TableColumn<RevenueReportsDTO, BigDecimal>totalrevenueRevrep;
     @FXML
     private TableView<ManageTablesDTO> ManageTableView,TableManager;
     @FXML
@@ -173,7 +180,7 @@ AdministratorUIController implements Initializable, ReservationListener {
     @FXML
     private TableColumn<TableUsageReportDTO, Integer>totalreservationTableUseRep,totalcusotmerTableUseRep;
     @FXML
-    private TableColumn<TableUsageReportDTO, Double>totalrevenueTableUseRep;
+    private TableColumn<TableUsageReportDTO, BigDecimal>totalrevenueTableUseRep;
     @FXML
     private TableView<TableUsageInformationDTO>TableinfoTUrep;
     @FXML
@@ -242,6 +249,8 @@ AdministratorUIController implements Initializable, ReservationListener {
     @FXML
     private PieChart reservationPieChart;
 
+    @Autowired
+    private ApplicationContext context;
     @Autowired
     private ManageTablesRepository manageTablesRepository;
 
@@ -414,16 +423,87 @@ AdministratorUIController implements Initializable, ReservationListener {
 
 
     }
+    public void showNotification(VBox container, String title, String message, String type) {
 
-    @FXML
-    private void handleClick() {
-        BorderPane notification = createNotification("New Reservation Added!");
-        if (notificationArea.getChildren().size() >= 3) {
-            notificationArea.getChildren().remove(0);
+        // Build notification UI
+        System.out.println("notificationArea: " + notificationArea);
+        HBox root = new HBox(15);
+        root.getStyleClass().add("notification-root");
+
+        if (type.equals("success"))
+            root.getStyleClass().add("success-border");
+        else
+            root.getStyleClass().add("error-border");
+
+        // Icon circle
+        StackPane iconCircle = new StackPane();
+        iconCircle.getStyleClass().add("icon-circle");
+
+        if (type.equals("success"))
+            iconCircle.getStyleClass().add("success-icon");
+        else
+            iconCircle.getStyleClass().add("error-icon");
+
+        Label icon = new Label(type.equals("success") ? "✓" : "✕");
+        icon.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+        iconCircle.getChildren().add(icon);
+
+        // Texts
+        VBox texts = new VBox(5);
+        Label t = new Label(title);
+        t.getStyleClass().add("notification-title");
+
+        Label m = new Label(message);
+        m.getStyleClass().add("notification-message");
+        texts.getChildren().addAll(t, m);
+
+        root.getChildren().addAll(iconCircle, texts);
+
+        // Add to VBox (NEWEST ON TOP)
+        if (container.getChildren().size() >= 5) {
+            container.getChildren().remove(container.getChildren().size() - 1); // remove last (oldest)
         }
 
-        notificationArea.getChildren().add(notification);
+        container.getChildren().add(0, root);
+        root.setMaxWidth(Double.MAX_VALUE);
+        root.prefWidthProperty().bind(container.widthProperty());
+        // ---- ANIMATION ----
+        root.setOpacity(0);
+        root.setTranslateY(-20);
+
+        Timeline showAnim = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(root.opacityProperty(), 0),
+                        new KeyValue(root.translateYProperty(), -20)
+                ),
+                new KeyFrame(Duration.millis(250),
+                        new KeyValue(root.opacityProperty(), 1),
+                        new KeyValue(root.translateYProperty(), 0)
+                )
+        );
+
+        // Auto close after 3 sec
+        Timeline wait = new Timeline(new KeyFrame(Duration.seconds(60)));
+
+        // Fade out and remove
+        Timeline fadeOut = new Timeline(
+                new KeyFrame(Duration.ZERO),
+                new KeyFrame(Duration.millis(250),
+                        new KeyValue(root.opacityProperty(), 0),
+                        new KeyValue(root.translateYProperty(), -20)
+                )
+        );
+
+        wait.setOnFinished(e -> fadeOut.play());
+
+        fadeOut.setOnFinished(e -> container.getChildren().remove(root));
+
+        showAnim.play();
+        wait.play();
     }
+
+
+
 
     public void updateLabels() {
         activetable.setText(String.valueOf(manageTablesRepository.countByStatus("Occupied"))+"/"+String.valueOf(manageTablesRepository.countByStatus("Reserved"))+"/"+String.valueOf(manageTablesRepository.count()));
@@ -448,18 +528,19 @@ AdministratorUIController implements Initializable, ReservationListener {
 
     public void setupRecentReservation() {
 
-        RecentReservationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
         RecentReservationTable.setItems(recentReservations);
 
         TableColumn<?, ?>[] column = {CustomerColm, PaxColm, TimeColm};
-        double[] widthFactors = {0.4, 0.10, 0.55};
+        double[] widthFactors = {0.4, 0.2, 0.4};
         String[] namecol = {"name","pax","reservationPendingtime"};
 
         for (int i = 0; i < column.length; i++) {
             TableColumn<?, ?> col = column[i];
             col.setResizable(true);
             col.setReorderable(false);
+            col.prefWidthProperty().bind(
+                    RecentReservationTable.widthProperty().multiply(widthFactors[i])
+            );
             if (namecol[i].equals("name")) {
                 ((TableColumn<Reservation, String>) col).setCellValueFactory(cellData ->
                         new SimpleStringProperty(cellData.getValue().getCustomer().getName())
@@ -561,10 +642,10 @@ AdministratorUIController implements Initializable, ReservationListener {
         DateTimeFormatter dateformat = DateTimeFormatter.ofPattern("MM-dd");
         LocalDate today = LocalDate.now();
         List<String> last7Days = new ArrayList<>();
-        for (int i = 6; i >= 0; i--) {
+        for (int i = 30; i >= 0; i--) {
             last7Days.add(today.minusDays(i).format(dateformat));
         }
-        LocalDate SevenDaysAgo = today.minusDays(6);
+        LocalDate SevenDaysAgo = today.minusDays(30);
         List<Reservation> reservations = reservationRepository.findAll()
                 .stream()
                 .filter(r -> r.getDate() !=null)
@@ -810,7 +891,7 @@ AdministratorUIController implements Initializable, ReservationListener {
 
         filteredtable = new FilteredList<>(availableTables);
         AvailableTable.setItems(filteredtable);
-        AvailableTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        setStatusCellFactory(StatusAT);
 
         filteredtable.setPredicate(table -> table.getCapacity() > currentpax);
         AvailableTable.getSelectionModel().selectedItemProperty().addListener(
@@ -876,10 +957,7 @@ AdministratorUIController implements Initializable, ReservationListener {
             hiddenTable.setManaged(true);
         }
         prevRow = CustomerId;
-        if(selectedTable == null){
-            CusToTable.setText("No Available Table");
-        }
-        else if(selectedReservation == null){
+        if(selectedReservation == null){
             CusToTable.setText("No Reservation Selected");
             
         }else if(selectedReservation == null && selectedTable == null){
@@ -1031,253 +1109,77 @@ AdministratorUIController implements Initializable, ReservationListener {
         
     }
     
-    @FXML 
-    private void addCustomerReservation(ActionEvent event){
-        LocalTime currenttime = LocalTime.now();
-        String formatted = currenttime.format(DateTimeFormatter.ofPattern("hh:mm:ss a"));
-        LocalDate currentdate = LocalDate.now();
-        
-        
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("New Customer Reservation");
-        dialog.initModality(Modality.APPLICATION_MODAL);
-    
+    @FXML
+    private void addCustomerReservation(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/addReservation.fxml"));
+            loader.setControllerFactory(context::getBean);
+            Parent root = loader.load();
 
-    // Create fields
-    TextField customerField = new TextField();
-    TextField paxField = new TextField();
-    TextField preferField = new TextField();
-    TextField phoneField = new TextField();
-    TextField emailField = new TextField();
-    Label pendingtimeField = new Label(formatted);
-    
-    makeNumeric(paxField);
-    makeAlphaNumericWithSpace(customerField);
-    makeAlphaNumericWithSpace(preferField);
-    
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(App.primaryStage); // mainStage is your primary stage
+            dialogStage.initStyle(StageStyle.TRANSPARENT);
+            dialogStage.setResizable(false);
+            Scene scn = new Scene(root);
+            scn.setFill(Color.TRANSPARENT);
+            dialogStage.setScene(scn);
 
-    GridPane grid = new GridPane();
-    grid.setHgap(10);
-    grid.setVgap(10);
+            // Link controller with dialog stage
+            addReservationController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
 
-    grid.add(new Label("Customer:"), 0, 0);
-    grid.add(customerField, 1, 0);
-    
-    grid.add(new Label("Pax:"), 0, 1);
-    grid.add(paxField, 1, 1);
-
-    grid.add(new Label("Status:"), 0, 2);
-    grid.add(new Label("Pending"), 1, 2);
-    
-    grid.add(new Label("Prefer:"), 0, 3);
-    grid.add(preferField, 1, 3);
-    
-    
-    grid.add(new Label("Phone:"), 0, 4);
-    grid.add(phoneField, 1, 4);
-    
-    grid.add(new Label("Email:"), 0, 5);
-    grid.add(emailField, 1, 5);
-    
-    grid.add(new Label("Time Registered:"), 0,6);
-    grid.add(pendingtimeField, 1, 6);
-    
-
-    dialog.getDialogPane().setContent(grid);
-    dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-    
-    Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-    okButton.addEventFilter(ActionEvent.ACTION, e -> {
-
-        boolean invalid = false;
-
-        if (customerField.getText().trim().isEmpty()) {
-            customerField.setStyle("-fx-border-color: red; -fx-border-width:0.5");
-            invalid = true;
-        } else { customerField.setStyle(null); }
-
-        if (paxField.getText().trim().isEmpty()) {
-            paxField.setStyle("-fx-border-color: red; -fx-border-width:0.5");
-            invalid = true;
-        } else { paxField.setStyle(null); }
-
-        if (preferField.getText().trim().isEmpty()) {
-            preferField.setStyle("-fx-border-color: red; -fx-border-width:0.5");
-            invalid = true;
-        } else { preferField.setStyle(null); }
-        
-        if (phoneField.getText().trim().isEmpty()) {
-            phoneField.setStyle("-fx-border-color: red; -fx-border-width:0.5");
-            invalid = true;
-        } else { phoneField.setStyle(null); }
-
-        if (emailField.getText().trim().isEmpty()) {
-            emailField.setStyle("-fx-border-color: red; -fx-border-width:0.5");
-            invalid = true;
-        } else { emailField.setStyle(null); }
-
-        
-        if (invalid) {
-            e.consume();
+            dialogStage.showAndWait(); // wait until closed
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    });
-    DialogPane pane = dialog.getDialogPane();
-    pane.setPrefWidth(230);
-    
-
-    dialog.showAndWait().ifPresent(response -> {
-        if (response == ButtonType.OK) {
-
-            // 1. Create CUSTOMER object
-            Customer customer = new Customer();
-            customer.setName(customerField.getText());
-            customer.setPhone(phoneField.getText());
-            customer.setEmail(emailField.getText());
-
-            customerRepository.save(customer);
-
-            // 2. Create RESERVATION object
-            Reservation row = new Reservation();
-            row.setCustomer(customer);   // <-- IMPORTANT
-            row.setPrefer(preferField.getText());
-            row.setPax(Integer.parseInt(paxField.getText()));
-
-            row.setStatus("Pending");
-            row.setDate(currentdate);
-            row.setReference(String.format("RSV-%05d", reservationRepository.count() + 1));
-
-            row.setReservationPendingtime(
-                    LocalTime.parse(pendingtimeField.getText(), DateTimeFormatter.ofPattern("hh:mm:ss a"))
-            );
-
-            // table is optional: row.setTable(selectedTable);
-
-            // 3. Save RESERVATION
-            reservationRepository.save(row);
-
-            // 4. Create Activity Log
-            activityLogService.logAction(
-                    currentuser.getUsername(),                    // username
-                    currentuser.getPosition().toString(),        // position/role
-                    "Reservation",                                     // module
-                    "Add",                             // action
-                    String.format(
-                            "Add Reservation Reference %s",
-                            row.getReference()                // reservation reference
-                    )
-            );
-
 
             // 5. Refresh UI
             loadCustomerReservationTable();
             loadRecentReservations();
+            loadReservationReports();
             barchart();
-        }
-    });
     }
-    
-    @FXML
-    private void onAddTableClicked(ActionEvent event) {
-    Dialog<ButtonType> dialog = new Dialog<>();
-    dialog.setTitle("Add Table");
-    dialog.initModality(Modality.APPLICATION_MODAL);
 
 
 
-        // Create fields
-    TextField tableNoField = new TextField();
-    TextField capacityField = new TextField();
-    TextField LocationField = new TextField();
-    Label StatusField = new Label("Available");
-    
-    makeNumeric(tableNoField);
-    makeNumeric(capacityField);
-    makeAlphaNumericWithSpace(LocationField);
-    
 
-    GridPane grid = new GridPane();
-    grid.setHgap(10);
-    grid.setVgap(10);
 
-    grid.add(new Label("Table No:"), 0, 0);
-    grid.add(tableNoField, 1, 0);
+    private void showAddTableDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/addTableDialog.fxml"));
+            loader.setControllerFactory(context::getBean);
+            Parent root = loader.load();
 
-    grid.add(new Label("Capacity:"), 0, 1);
-    grid.add(capacityField, 1, 1);
-    
-    grid.add(new Label("Location:"), 0, 2);
-    grid.add(LocationField, 1, 2);
-    
-    grid.add(new Label("Status:"), 0, 3);
-    grid.add(StatusField, 1, 3);
-    
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(App.primaryStage); // mainStage is your primary stage
+            dialogStage.initStyle(StageStyle.TRANSPARENT);
+            dialogStage.setResizable(false);
+            Scene scn = new Scene(root);
+            scn.setFill(Color.TRANSPARENT);
+            dialogStage.setScene(scn);
 
-    dialog.getDialogPane().setContent(grid);
-    dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-    
-    Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-    okButton.addEventFilter(ActionEvent.ACTION, e -> {
+            // Link controller with dialog stage
+            addTableDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
 
-        boolean invalid = false;
-
-        if (tableNoField.getText().trim().isEmpty()) {
-            tableNoField.setStyle("-fx-border-color: red; -fx-border-width:0.5");
-            invalid = true;
-        } else { tableNoField.setStyle(null); }
-
-        if (capacityField.getText().trim().isEmpty()) {
-            capacityField.setStyle("-fx-border-color: red; -fx-border-width:0.5");
-            invalid = true;
-        } else { capacityField.setStyle(null); }
-
-        if (LocationField.getText().trim().isEmpty()) {
-            LocationField.setStyle("-fx-border-color: red; -fx-border-width:0.5");
-            invalid = true;
-        } else { LocationField.setStyle(null); }
-
-        
-        if (invalid) {
-            e.consume(); // STOP closing the dialog
+            dialogStage.showAndWait(); // wait until closed
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    });
-    DialogPane pane = dialog.getDialogPane();
-    pane.setPrefSize(280, 210);
+        loadTableManager();
+        loadTableView();
+        updateLabels();
 
-    dialog.showAndWait().ifPresent(response -> {
-        if (response == ButtonType.OK) {
-            ManageTables row = new ManageTables();
-            row.setId(Long.parseLong(tableNoField.getText()));
-            row.setTableNo(tableNoField.getText());
-            row.setCapacity(Integer.parseInt(capacityField.getText()));
-            row.setLocation(LocationField.getText());
-            row.setStatus(StatusField.getText());
-            manageTablesRepository.save(row);
-
-            activityLogService.logAction(
-                    currentuser.getUsername(),                    // username
-                    currentuser.getPosition().toString(),        // position/role
-                    "Table",                                     // module
-                    "Add Table",                             // action
-                    String.format(
-                            "Add Table #%s Capacity %d Location %s",
-                            row.getTableNo(),                   // table ID
-                            row.getCapacity(),                           // old table status
-                            row.getLocation()                        // reservation reference
-                    )
-            );
-
-
-            loadTableManager();
-            loadTableView();
-            updateLabels();
-
-            loadTableManager();
-            loadAvailableTable();
-            loadTableView();
-        }
-    });
+        loadTableManager();
+        loadAvailableTable();
+        loadTableView();
     }
-    
+
+
+
+
     private void makeNumeric(TextField field) {
     field.textProperty().addListener((obs, oldValue, newValue) -> {
         if (!newValue.matches("\\d*")) {
@@ -1419,7 +1321,6 @@ AdministratorUIController implements Initializable, ReservationListener {
             }
 
         }
-        SCNReservations.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
 
         
@@ -1449,6 +1350,7 @@ AdministratorUIController implements Initializable, ReservationListener {
     
     
     public void setupTableManager() {
+        AddTablebtn.setOnAction(e -> showAddTableDialog());
         tablesfilteredData = new FilteredList<>(manageTablesData, p -> true);
         TableManager.setItems(tablesfilteredData);
         SearchTM.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -1589,6 +1491,7 @@ AdministratorUIController implements Initializable, ReservationListener {
                         data.setStatus("Occupied");
                         updateButtonsForStatus(data);
 
+
                         tablesService.updateStatus(data.getTableId(), data.getStatus());
                         reservationService.updateSeatedtime(data.getReference(), LocalTime.now());
                         reservationService.updateStatus(data.getReference(),"Seated");
@@ -1612,56 +1515,89 @@ AdministratorUIController implements Initializable, ReservationListener {
                                         data.getReference()                        // reservation reference
                                 )
                         );
-
-
+                        loadReservationReports();
                     }
                 });
                 btnComplete.setOnAction(event -> {
                     ManageTablesDTO data = getCurrentItem();
                     String currentStatus = data.getStatus();
-                    if (data != null) {
-                        data.setStatus("Complete");
-                        data.setDate(LocalDate.now());
-                        data.setReservationCompletetime(LocalTime.now());
+                    BigDecimal Amount = BigDecimal.ZERO;
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/setAmountPaid.fxml"));
+                        loader.setControllerFactory(context::getBean);
+                        Parent root = loader.load();
 
-                        updateButtonsForStatus(data);
+                        Stage dialogStage = new Stage();
+                        dialogStage.initModality(Modality.APPLICATION_MODAL);
+                        dialogStage.initOwner(App.primaryStage); // mainStage is your primary stage
+                        dialogStage.initStyle(StageStyle.TRANSPARENT);
+                        dialogStage.setResizable(false);
+                        Scene scn = new Scene(root);
+                        scn.setFill(Color.TRANSPARENT);
+                        dialogStage.setScene(scn);
 
-                        activityLogService.logAction(
-                                currentuser.getUsername(),                    // username
-                                currentuser.getPosition().toString(),        // position/role
-                                "Table",                                     // module
-                                "Update Status",                             // action
-                                String.format(
-                                        "Changed table %s status from %s to Complete → Available",
-                                        data.getTableNo(),                   // table ID
-                                        currentStatus                           // old table status
-                                        )
-                        );
+                        // Link controller with dialog stage
+                        setAmountPaidController controller = loader.getController();
+                        controller.setDialogStage(dialogStage);
+                        controller.setReference(data.getReference());
+                        dialogStage.showAndWait(); // wait until closed
 
+                        Amount = controller.getAmount();
 
-                        
-                        ReservationTableLogs reservationtablelogs = new ReservationTableLogs(data);
-                        RTLR.save(reservationtablelogs);
-                        reservationService.updateStatus(data.getReference(),data.getStatus());
-                        reservationService.updateTableId(data.getReference(),null);
-
-                       
-                        data.setCustomer("");
-                        data.setPax(null);
-                        data.setStatus("Available");
-                        tablesService.updateStatus(data.getTableId(),data.getStatus());
+                        if (controller.isCancelled()) {
+                            return; // Do nothing
+                        }
 
 
+                            data.setStatus("Complete");
+                            data.setDate(LocalDate.now());
+                            data.setReservationCompletetime(LocalTime.now());
+                            data.setRevenue(Amount);
+                            reservationService.updateCompletetime(data.getReference(), LocalTime.now());
+                            updateButtonsForStatus(data);
+                            activityLogService.logAction(
+                                    currentuser.getUsername(),                    // username
+                                    currentuser.getPosition().toString(),        // position/role
+                                    "Table",                                     // module
+                                    "Update Status",                             // action
+                                    String.format(
+                                            "Changed table %s status from %s to Complete → Available",
+                                            data.getTableNo(),                   // table ID
+                                            currentStatus                           // old table status
+                                    )
+                            );
+                            ReservationTableLogs reservationtablelogs = new ReservationTableLogs(data);
+                            RTLR.save(reservationtablelogs);
+                            reservationService.updateStatus(data.getReference(),data.getStatus());
+                            reservationService.updateTableId(data.getReference(),null);
 
+                            data.setCustomer("");
+                            data.setPax(null);
+                            data.setStatus("Available");
+                            tablesService.updateStatus(data.getTableId(),data.getStatus());
 
-                        System.out.println("Service started for: " + data.getStatus());
+                            System.out.println("Service started for: " + data.getStatus());
+
+                        System.out.println("TableView size before loadTableView: " + ManageTableView.getItems().size());
+                        loadTableView();
+
+                        System.out.println("CustomerReservationTable size before loadCustomerReservationTable: " + CustomerReservationTable.getItems().size());
+                        loadCustomerReservationTable();
+
+                        System.out.println("ReservationLogs size before loadReservationLogs: " + ReservationLogs.getItems().size());
+                        loadReservationLogs();
+
+                        System.out.println("TableManager size before loadTableManager: " + TableManager.getItems().size());
+                        loadTableManager();
+
+                        updateLabels();
+                        getTableView().refresh();
+                        loadReports();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    loadTableView();
-                    loadCustomerReservationTable();
-                    loadReservationLogs();
-                    loadTableManager();
-                    updateLabels();
-                    getTableView().refresh();
+
 
                 });
 
@@ -1678,58 +1614,58 @@ AdministratorUIController implements Initializable, ReservationListener {
                             
                             
                             editTablerow(String.valueOf(data.getTableId()),customer,pax,data.getStatus(),data.getCapacity(),data.getLocation());
-                            
+                            loadReports();
                          }
                     });
 
                     btnDelete.setOnAction(event -> {
                         ManageTablesDTO data = getCurrentItem();
                         if (data != null) {
-                                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/deleteTableDialog.fxml"));
-                    Parent root = loader.load();
+                            try {
+                                FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/deleteTableDialog.fxml"));
+                                Parent root = loader.load();
 
-                    // Get controller to handle callback
-                    DeleteTableDialogController controller = loader.getController();
-                    controller.setOnDelete(() -> {
-                        if(reservationRepository.existsByTable_Id(data.getTableId())) {
-                            showAlert("Cannot delete: this table has active reservations");
-                            return;
+                                // Get controller to handle callback
+                                DeleteTableDialogController controller = loader.getController();
+                                controller.setOnDelete(() -> {
+                                    if (reservationRepository.existsByTable_Id(data.getTableId())) {
+                                        showAlert("Cannot delete: this table has active reservations");
+                                        return;
+                                    }
+                                    manageTablesRepository.deleteById(data.getTableId());
+
+                                    activityLogService.logAction(
+                                            currentuser.getUsername(),                    // username
+                                            currentuser.getPosition().toString(),        // position/role
+                                            "Table",                                     // module
+                                            "Delete Table",                             // action
+                                            String.format(
+                                                    "Delete table %s",
+                                                    data.getTableNo()                  // table ID
+                                                    // old table status
+                                            )
+                                    );
+                                    loadActivityLogs();
+                                    loadTableManager();
+                                    loadTableView();
+                                    updateLabels();
+                                });
+
+                                // Create & show dialog
+                                Stage dialog = new Stage(StageStyle.UNDECORATED);
+                                dialog.initModality(Modality.APPLICATION_MODAL);
+                                dialog.initStyle(StageStyle.TRANSPARENT);
+                                dialog.setResizable(false);
+                                Scene scn = new Scene(root);
+                                scn.setFill(Color.TRANSPARENT);
+                                dialog.setScene(scn);
+                                dialog.showAndWait();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
-                        manageTablesRepository.deleteById(data.getTableId());
-
-                        activityLogService.logAction(
-                                currentuser.getUsername(),                    // username
-                                currentuser.getPosition().toString(),        // position/role
-                                "Table",                                     // module
-                                "Delete Table",                             // action
-                                String.format(
-                                        "Delete table %s",
-                                        data.getTableNo()                  // table ID
-                                                                  // old table status
-                                )
-                        );
-
-
-                        loadTableManager();
-                        loadTableView();
-                        updateLabels();
-                    });
-
-                    // Create & show dialog
-                    Stage dialog = new Stage(StageStyle.UNDECORATED);
-                    dialog.initModality(Modality.APPLICATION_MODAL);
-                    dialog.initStyle(StageStyle.TRANSPARENT);
-                    dialog.setResizable(false);
-                    Scene scn = new Scene(root);
-                    scn.setFill(Color.TRANSPARENT);
-                    dialog.setScene(scn);
-                    dialog.showAndWait();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                    }
+                        loadReports();
                 });
             }
 
@@ -1776,7 +1712,7 @@ AdministratorUIController implements Initializable, ReservationListener {
         // --- Setup Other Columns ---
         TableColumn<?, ?>[] column = {TablenoTM, CustomerTM, PaxTM, StatusTM, CapacityTM, LocationTM, TimeUsedTM, ActionTM};
         double[] widthFactors = {0.08, 0.18, 0.06, 0.11, 0.08, 0.12, 0.10, 0.27};
-        String[] namecol = {"tableId", "customer", "pax", "status", "capacity", "location", "tablestarttime", ""};
+        String[] namecol = {"tableNo", "customer", "pax", "status", "capacity", "location", "tablestarttime", ""};
 
         for (int i = 0; i < column.length; i++) {
             TableColumn<?, ?> col = column[i];
@@ -1795,7 +1731,6 @@ AdministratorUIController implements Initializable, ReservationListener {
                 col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
             }
         }
-        TableManager.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         TableManager.setPlaceholder(new Label("No Table set yet"));
 
     }
@@ -1858,7 +1793,6 @@ AdministratorUIController implements Initializable, ReservationListener {
                 }
             }
         });
-        TableHistory.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         TableHistory.setPlaceholder(new Label("No Table set yet"));
 
     }
@@ -1936,7 +1870,6 @@ AdministratorUIController implements Initializable, ReservationListener {
                 col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
             }
         }
-        ReservationLogs.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
 
         ReservationLogs.setPlaceholder(new Label("No Complete Reservation yet "));
@@ -2264,13 +2197,6 @@ AdministratorUIController implements Initializable, ReservationListener {
         for (int i = 0; i < column.length; i++) {
             TableColumn<?, ?> col = column[i];
 
-            if (col == null) {
-                System.out.println("❌ NULL COLUMN at index " + i + " (expected: " + namecol[i] + ")");
-                continue;
-            } else {
-                System.out.println("✔ Column OK: index " + i + " = " + col.getText());
-            }
-
             col.setResizable(false);
             col.setReorderable(false);
             col.prefWidthProperty().bind(ActivityLogsTable.widthProperty().multiply(widthFactors[i]));
@@ -2301,12 +2227,14 @@ AdministratorUIController implements Initializable, ReservationListener {
         long total = statusCounts.values().stream().mapToLong(Long::longValue).sum();
 
         Map<String, String> statusColors = Map.of(
-                "Pending", "#3498db",    // blue
-                "Confirmed", "#2ecc71",  // green
-                "Cancelled", "#e74c3c",  // red
-                "Seated", "#f1c40f",     // yellow
-                "Completed", "#9b59b6"   // purple
+                "Pending", "#455A64",
+                "Confirm", "#2196F3",
+                "Cancelled", "#D32F2F",
+                "Seated", "#2E7D32",
+                "Complete", "#4CAF50",
+                "No Show","#9C27B0"
         );
+
 
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
 
@@ -2365,15 +2293,24 @@ AdministratorUIController implements Initializable, ReservationListener {
     }
 
     public void setupreservationreports() {
-       addItems(StatusfilterResrep,"Reserved","Complete","Cancelled","Pending","No Show","Seated");
+       addItems(StatusfilterResrep,"Complete","Cancelled","Pending","No Show","Seated","Show All");
 
         StatusfilterResrep.setText("Show All");
+        setStatusCellFactory(statusResrep);
+        TableColumn<?, ?>[] column = {referenceResrep,paxResrep,statusResrep,timeResrep,dateResrep};
+        double[] widthFactors = {0.2,0.2,0.2,0.2,0.21};
+        String[] namecol = {"reference", "pax", "status", "reservationPendingtime","date"};
 
-        referenceResrep.setCellValueFactory(new PropertyValueFactory<>("reference"));
-        paxResrep.setCellValueFactory(new PropertyValueFactory<>("pax"));
-        statusResrep.setCellValueFactory(new PropertyValueFactory<>("status"));
-        timeResrep.setCellValueFactory(new PropertyValueFactory<>("reservationPendingtime"));
-        dateResrep.setCellValueFactory(new PropertyValueFactory<>("date"));
+        for (int i = 0; i < column.length; i++) {
+            TableColumn<?, ?> col = column[i];
+            col.setResizable(false);
+            col.setReorderable(false);
+            col.setSortable(true);
+            col.prefWidthProperty().bind(CusRepTable.widthProperty().multiply(widthFactors[i]));
+            if (!namecol[i].isEmpty()) {
+                col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
+            }
+        }
 
         // Wrap list in FilteredList
         filterReservationReports = new FilteredList<>(reservationreports, p -> true);
@@ -2381,6 +2318,7 @@ AdministratorUIController implements Initializable, ReservationListener {
 
         // Apply button filters
         ApplyResrep.setOnAction(e -> {
+            loadReservationReports();
             LocalDate from = dateFromResrep.getValue();
             LocalDate to = dateToResrep.getValue();
             String selectedStatus = StatusfilterResrep.getText();
@@ -2410,9 +2348,9 @@ AdministratorUIController implements Initializable, ReservationListener {
 
     public void setupCustomerReports() {
 
-        totalrevenueCusrep.setCellFactory(col -> new TableCell<CustomerReportDTO, Double>() {
+        totalrevenueCusrep.setCellFactory(col -> new TableCell<CustomerReportDTO, BigDecimal>() {
             @Override
-            protected void updateItem(Double item, boolean empty) {
+            protected void updateItem(BigDecimal item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : String.format("%.2f", item));
             }
@@ -2462,10 +2400,10 @@ AdministratorUIController implements Initializable, ReservationListener {
     }
 
     public void setupReservatioInformation(){
-
-        revenueResInCusRep.setCellFactory(col -> new TableCell<CustomerReportDTO, Double>() {
+        setStatusCellFactory(statusResInCusRep);
+        revenueResInCusRep.setCellFactory(col -> new TableCell<CustomerReportDTO, BigDecimal>() {
             @Override
-            protected void updateItem(Double item, boolean empty) {
+            protected void updateItem(BigDecimal item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : String.format("%.2f", item));
             }
@@ -2473,7 +2411,7 @@ AdministratorUIController implements Initializable, ReservationListener {
 
         ResInCusRep.setItems(reservationCustomerDTOS);
         TableColumn<?, ?>[] column = {referenceResInCusRep,nameResInCusRep,phoneResInCusRep,statusResInCusRep,revenueResInCusRep,timeResInCusRep,dateResInCusRep};
-        double[] widthFactors = {0.2,0.25,0.2,0.15,0.15,0.2,0.2};
+        double[] widthFactors = {0.2,0.25,0.2,0.18,0.15,0.2,0.2};
         String[] namecol = {"reference", "customerName", "customerPhone", "status", "revenue", "reservationPendingtime","date"};
 
         for (int i = 0; i < column.length; i++) {
@@ -2490,9 +2428,9 @@ AdministratorUIController implements Initializable, ReservationListener {
     }
 
     public void setupRevenueReports(){
-       totalrevenueRevrep.setCellFactory(col -> new TableCell<RevenueReportsDTO, Double>() {
+       totalrevenueRevrep.setCellFactory(col -> new TableCell<RevenueReportsDTO, BigDecimal>() {
             @Override
-            protected void updateItem(Double item, boolean empty) {
+            protected void updateItem(BigDecimal item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : String.format("%.2f", item));
             }
@@ -2536,7 +2474,6 @@ AdministratorUIController implements Initializable, ReservationListener {
             }
         }
 
-        TableUseRep.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         ApplyTUrep.setOnAction(e -> {
             loadTableUsageReport(); ;
         });
@@ -2636,24 +2573,21 @@ AdministratorUIController implements Initializable, ReservationListener {
         int maxTicks = 20;
         int step = Math.max(1, allDates.size() / maxTicks);
 
-        // Prepare chart series
         XYChart.Series<String, Number> totalReservationSeries = new XYChart.Series<>();
         XYChart.Series<String, Number> totalCustomerSeries = new XYChart.Series<>();
         XYChart.Series<String, Number> totalRevenueSeries = new XYChart.Series<>();
 
         for (int i = 0; i < allDates.size(); i++) {
             LocalDate d = allDates.get(i);
-            RevenueReportsDTO r = dataMap.getOrDefault(d, new RevenueReportsDTO(d, 0L, 0L, 0.0));
+            RevenueReportsDTO r = dataMap.getOrDefault(d, new RevenueReportsDTO(d, 0L, 0L, BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)));
 
-            // Format date label
-            String dateStr = (i % step == 0) ? d.format(formatter) : ""; // only show some labels
+            String dateStr = (i % step == 0) ? d.format(formatter) : "";
 
             totalReservationSeries.getData().add(new XYChart.Data<>(dateStr, r.getTotalReservation()));
             totalCustomerSeries.getData().add(new XYChart.Data<>(dateStr, r.getTotalCustomer()));
             totalRevenueSeries.getData().add(new XYChart.Data<>(dateStr, r.getTotalRevenue()));
         }
 
-        // Add series to charts
         totalReservationChart.getData().clear();
         totalCustomerChart.getData().forEach(series -> series.getData().clear());
         totalRevenueChart.getData().clear();
@@ -2812,6 +2746,42 @@ AdministratorUIController implements Initializable, ReservationListener {
         chart.setOnMouseExited(e -> resetSizes(root));
 
     }
+    public static <T> void setStatusCellFactory(TableColumn<T, String> column) {
+        column.setCellFactory(tv -> new TableCell<T, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setText("");
+                    setGraphic(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+
+                    String bgColor;
+                    switch (item) {
+                        case "Available" -> bgColor = "#2a4d2a";
+                        case "Occupied" -> bgColor = "#5a1e1e";
+                        case "Reserved" -> bgColor = "#7A5A00";
+                        case "Confirm" -> bgColor = "#2196F3";
+                        case "Pending" -> bgColor = "#455A64";
+                        case "Seated" -> bgColor = "#2E7D32";
+                        case "Cancelled" -> bgColor = "#D32F2F";
+                        case "No Show" -> bgColor = "#9C27B0";
+                        case "Complete" -> bgColor = "#4CAF50";
+
+
+
+                        default -> bgColor = "white";
+                    }
+
+                    setStyle("-fx-background-color: " + bgColor + "; -fx-padding: 5;");
+                }
+            }
+        });
+    }
+
 
 
 
@@ -2851,10 +2821,15 @@ AdministratorUIController implements Initializable, ReservationListener {
         setupHoverExpand(totalCustomerChartTableUsage,rootVBoxTableUsage);
         setupHoverExpand(totalRevenueChartTableUsage,rootVBoxTableUsage);
 
+        showNotification(notificationArea,"New Reservation Added","A new Reservation has been successfully added.","success");
 
+        showNotification(
+                notificationArea,
+                "Reservation Cancelled",
+                "The reservation has been cancelled.",
+                "error"
+        );
 
-
-        handleClick();
 
         WebSocketClient wsClient = new WebSocketClient();
         wsClient.addListener(this);
@@ -2872,9 +2847,10 @@ AdministratorUIController implements Initializable, ReservationListener {
     public void onNewReservation(WebupdateDTO reservation) {
         Platform.runLater(() -> {
             updateLabels();
-            handleClick();
             loadRecentReservations();
             loadCustomerReservationTable();
+            showNotification(notificationArea,"New Reservation Added","A new Reservation has been successfully added.","success");
+
         });
     }
 

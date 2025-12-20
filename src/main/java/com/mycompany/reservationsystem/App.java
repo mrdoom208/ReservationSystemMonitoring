@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.kordamp.bootstrapfx.BootstrapFX;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -23,7 +24,7 @@ import java.util.Set;
  */
 @SpringBootApplication
 public class App extends Application {
-
+    public static Stage primaryStage;
     private static Scene scene;
     private ConfigurableApplicationContext springContext;
 
@@ -36,6 +37,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         // Either global for entire app
+        App.primaryStage = stage;
 
         UserAgentBuilder.builder()
 
@@ -61,6 +63,7 @@ public class App extends Application {
                 )
         );
 
+        stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(scene);
         stage.setTitle("Reservation System");
         stage.show();

@@ -1,5 +1,6 @@
 package com.mycompany.reservationsystem.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -12,7 +13,7 @@ public class ReservationCustomerDTO {
     private String status;
     private String reference;
     private LocalDate date;
-    private Double revenue;
+    private BigDecimal revenue;
     private LocalTime reservationPendingtime;
     private LocalTime reservationConfirmtime;
     private LocalTime reservationCancelledtime;
@@ -27,7 +28,7 @@ public class ReservationCustomerDTO {
 
     // Constructor
     public ReservationCustomerDTO(Long reservationId, int pax, String prefer, String status, String reference,
-                                  LocalDate date, Double revenue, LocalTime reservationPendingtime,
+                                  LocalDate date, BigDecimal revenue, LocalTime reservationPendingtime,
                                   LocalTime reservationConfirmtime, LocalTime reservationCancelledtime,
                                   LocalTime reservationSeatedtime, LocalTime reservationCompletetime,
                                   Long customerId, String customerName, String customerPhone, String customerEmail) {
@@ -60,7 +61,7 @@ public class ReservationCustomerDTO {
     public String getStatus() { return status; }
     public String getReference() { return reference; }
     public LocalDate getDate() { return date; }
-    public Double getRevenue() { return revenue; }
+    public BigDecimal getRevenue() { return revenue; }
     public LocalTime getReservationPendingtime() { return reservationPendingtime; }
     public LocalTime getReservationConfirmtime() { return reservationConfirmtime; }
     public LocalTime getReservationCancelledtime() { return reservationCancelledtime; }

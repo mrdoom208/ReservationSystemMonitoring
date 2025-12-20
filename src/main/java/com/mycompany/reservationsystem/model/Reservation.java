@@ -4,12 +4,9 @@
  */
 package com.mycompany.reservationsystem.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -29,7 +26,9 @@ public class Reservation {
     private String status;
     private String reference;
     private LocalDate date;
-    private double revenue;
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal revenue;
 
     private LocalTime reservationPendingtime;
     private LocalTime reservationConfirmtime;
@@ -81,8 +80,8 @@ public class Reservation {
         this.status = status;
     }
 
-    public double getRevenue(){ return revenue;}
-    public void setRevenue(double revenue){this.revenue = revenue;}
+    public BigDecimal getRevenue(){ return revenue;}
+    public void setRevenue(BigDecimal revenue){this.revenue = revenue;}
 
     public String getReference() {
         return reference;

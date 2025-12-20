@@ -1,5 +1,6 @@
 package com.mycompany.reservationsystem.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -18,7 +19,7 @@ public class ManageTablesDTO {
     private String email;                // <-- added
     
     private String reference;
-    private Double revenue;
+    private BigDecimal revenue;
     private LocalTime reservationPendingtime;
     private LocalTime reservationConfirmtime;
     private LocalTime reservationSeatedtime;
@@ -35,7 +36,7 @@ public class ManageTablesDTO {
             Integer capacity,
             String customer,
             Integer pax,
-            Double revenue,
+            BigDecimal revenue,
             
             String location,
             String prefer,
@@ -84,7 +85,7 @@ public class ManageTablesDTO {
     public String getCustomer() { return customer; }
     public Integer getPax() { return pax; }
     public String getLocation(){ return location; }
-    public Double getRevenue(){return revenue;}
+    public BigDecimal getRevenue(){return revenue;}
     public String getPrefer() { return prefer; }
     public String getCustomerStatus() { return customerStatus; } // <-- added
     public String getPhone() { return phone; }
@@ -106,7 +107,7 @@ public class ManageTablesDTO {
     public void setCustomer(String customer) { this.customer = customer; }
     public void setPax(Integer pax) { this.pax = pax; }
     public void setLocation(String location) { this.location = location; }
-    public void setRevenue(Double revenue){this.revenue = revenue;}
+    public void setRevenue(BigDecimal revenue){this.revenue = revenue;}
     public void setPrefer(String prefer) { this.prefer = prefer; }
     public void setCustomerStatus(String customerStatus) { this.customerStatus = customerStatus; } // <-- added
     public void setPhone(String phone) { this.phone = phone; }

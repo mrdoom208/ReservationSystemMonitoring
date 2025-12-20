@@ -2,6 +2,7 @@ package com.mycompany.reservationsystem.Service;
 
 import com.mycompany.reservationsystem.model.ManageTables;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
 import com.mycompany.reservationsystem.model.Reservation;
@@ -59,8 +60,14 @@ public class ReservationService {
             throw new RuntimeException("Reservation not found" + Ref);
         }
     }
+
+    public boolean setRevenueForReference(String reference, BigDecimal revenue) {
+        int updatedRows = reservationRepository.updateRevenueByReference(reference, revenue);
+        return updatedRows > 0; // returns true if at least one row was updated
+    }
     @Transactional(readOnly = true)
     public Stream<Reservation> streamAllReservations() {
         return reservationRepository.streamAllReservations();
     }
+
 }

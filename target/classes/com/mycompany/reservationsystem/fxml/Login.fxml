@@ -67,7 +67,7 @@
                   </StackPane>
                   <StackPane prefHeight="119.0" prefWidth="202.0">
                      <children>
-                        <MFXButton fx:id="Admin" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#Colorchange" prefHeight="48.0" styleClass="login-button" />
+                        <MFXButton fx:id="Admin" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#Colorchange" prefHeight="48.0" styleClass="login-button" text="Admin" />
                      </children>
                      <HBox.margin>
                         <Insets />
@@ -80,9 +80,6 @@
             </HBox>
          </children></VBox>
       <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="512.0">
-         <top>
-            <Region prefHeight="50.0" prefWidth="578.0" BorderPane.alignment="CENTER" />
-         </top>
          <bottom>
             <Region prefHeight="50.0" prefWidth="578.0" BorderPane.alignment="CENTER" />
          </bottom>
@@ -109,7 +106,7 @@
                   </StackPane>
                   <VBox alignment="CENTER" prefHeight="284.0" prefWidth="412.0" spacing="35.0">
                      <children>
-                        <Label fx:id="messageLabel" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="282.0" styleClass="login-message-hidden" />
+                        <Label fx:id="messageLabel" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="282.0" styleClass="login-message-hidden" text="Insert Username Password" />
                         <MFXTextField fx:id="usernamefield" floatMode="BORDER" floatingText="USERNAME" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="50.0" prefWidth="282.0" styleClass="username">
                            <font>
                               <Font size="14.0" />
@@ -149,6 +146,13 @@
                </padding>
             </VBox>
          </center>
+         <top>
+            <StackPane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <MFXButton fx:id="closebtn" alignment="CENTER" onAction="#closeApp" styleClass="close-button" text="X" StackPane.alignment="TOP_RIGHT" />
+               </children>
+            </StackPane>
+         </top>
       </BorderPane>
    </children>
 </HBox>

@@ -4,16 +4,22 @@ import com.mycompany.reservationsystem.dto.CustomerReportDTO;
 import com.mycompany.reservationsystem.dto.ReservationCustomerDTO;
 import com.mycompany.reservationsystem.dto.RevenueReportsDTO;
 import com.mycompany.reservationsystem.model.Reservation;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
 /** * * @author formentera */
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -34,8 +40,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     SELECT new com.mycompany.reservationsystem.dto.CustomerReportDTO(
         c.phone, 
         COUNT(r.id),
-        COALESCE(SUM(r.revenue), 0.0), 
-        COALESCE(AVG(r.revenue), 0.0)
+        COALESCE(SUM(r.revenue), 0),
+        COALESCE(AVG(r.revenue), 0)
     ) 
     FROM Reservation r JOIN r.customer c 
     WHERE (:from IS NULL OR r.date >= :from) 
@@ -48,7 +54,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     SELECT new com.mycompany.reservationsystem.dto.RevenueReportsDTO(
         r.date,
         COUNT(r.id),
-        COUNT(DISTINCT r.customer.id),
+        COALESCE(SUM(r.pax), 0),
         SUM(r.revenue)
     )
     FROM Reservation r
@@ -61,9 +67,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("from") LocalDate from,
             @Param("to") LocalDate to
     );
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Reservation r SET r.revenue = :revenue WHERE r.reference = :reference")
+    int updateRevenueByReference(@Param("reference") String reference,
+                                 @Param("revenue") BigDecimal revenue);
+
+
     @Query("SELECT r FROM Reservation r")
     Stream<Reservation> streamAllReservations();
-
 
 
 }

@@ -5,11 +5,9 @@
 package com.mycompany.reservationsystem.model;
 
 import com.mycompany.reservationsystem.dto.ManageTablesDTO;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -40,13 +38,17 @@ public class ReservationTableLogs {
      LocalTime reservationCompletetime;
      String tableNo;
      int tablecapacity;
-     Double Revenue;
+
+     @Column(precision = 19, scale = 2)
+     BigDecimal Revenue;
      String tablelocation;
      LocalTime tablestarttime;
      LocalTime tableendtime;
      LocalDate date;
-     
-    public ReservationTableLogs() {} 
+
+    public ReservationTableLogs() {
+    }
+
      
     public ReservationTableLogs(ManageTablesDTO dto) {
     this.customer = dto.getCustomer();
@@ -67,6 +69,7 @@ public class ReservationTableLogs {
     this.tablestarttime = dto.getTablestarttime();
     this.tableendtime = dto.getTableendtime();
     this.date = dto.getDate();
+    this.Revenue = dto.getRevenue();
 }
     
     public String getCustomer() {
