@@ -2,6 +2,7 @@
 .root{
       -fx-font-family: "Lora";
     -fx-background-color:E10600;
+    -fx-text-fill: white;
 }
 .close-button {
     -fx-background-color: transparent;
@@ -288,7 +289,7 @@
 .Statistics-cell{
      -fx-background-color:#303030;
      -fx-background-radius:0.95em;
-     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 15, 0.2, 0, 4);
+     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 12, 0.35, 0, 3);
 }
 
 /*.Statistics-cell:hover{
@@ -914,5 +915,45 @@
 }
 
 .sent-text-button:pressed {
-    -fx-background-color: #121212;
+    -fx-background-color: #121212;}
+
+.message-area {
+    -fx-font-size: 1em;
+    -fx-text-fill: #E0E0E0;
+
+    /* outer container */
+    -fx-background-color: #2C2C2C;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: transparent;
+
+    -fx-padding: 0;
+}
+
+/* inner text content */
+.message-area .content {
+    -fx-background-color: #2C2C2C;
+    -fx-background-radius: 8;
+    -fx-padding: 6 10 6 10;
+}
+
+/* caret color */
+.message-area {
+    -fx-caret-color: #E53935;
+}
+
+/* focus accent */
+.message-area:focused {
+    -fx-border-color: #E53935;
+    -fx-border-width: 1.5;
+}
+
+/* text selection */
+.message-area .content .selection {
+    -fx-fill: #E53935;
+}
+
+/* placeholder text */
+.message-area:empty {
+    -fx-prompt-text-fill: #9E9E9E;
 }

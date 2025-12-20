@@ -18,13 +18,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 
-import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXDatePicker;
-import io.github.palexdev.materialfx.controls.MFXTextField;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.geometry.Bounds;
-import javafx.scene.image.ImageView;
+import javafx.concurrent.Task;
 import javafx.util.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -92,9 +88,9 @@ AdministratorUIController implements Initializable, ReservationListener {
     }
 
     @FXML
-    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,ActivityLogbtn,Mergebtn,Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ApplyResrep,ApplyCusrep,ApplyRevrep,ApplyTUrep,applyAL,AddTablebtn;
+    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, Messagingbtn, ManageStaffAndAccountsbtn,Reportsbtn,ActivityLogbtn,Mergebtn,Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,ApplyResrep,ApplyCusrep,ApplyRevrep,ApplyTUrep,applyAL,AddTablebtn;
     @FXML
-    private ScrollPane DashboardPane, ReservationPane, TableManagementPane, ManageStaffAndAccountsPane,ReportsPane,ActivityLogPane;
+    private ScrollPane DashboardPane, ReservationPane, TableManagementPane, MessagingPane, ManageStaffAndAccountsPane,ReportsPane,ActivityLogPane;
     @FXML
     private Label Total_CustomerDbd, activetable,Total_Cancelled, Total_Pending, CusToTable,totaltables,totalfree,totalbusy,pending,confirm,header,seated,cancelled,noshow;
     @FXML
@@ -293,11 +289,12 @@ AdministratorUIController implements Initializable, ReservationListener {
     @FXML
     private void navigate(ActionEvent event) {
         Button clicked = (Button) event.getSource();
-        Button buttons[] = {Dashboardbtn, ReservationManagementbtn, TableManagementbtn, ManageStaffAndAccountsbtn,Reportsbtn,ActivityLogbtn};
+        Button buttons[] = {Dashboardbtn, ReservationManagementbtn, TableManagementbtn, Messagingbtn, ManageStaffAndAccountsbtn,Reportsbtn,ActivityLogbtn};
 
         DashboardPane.setVisible(false);
         ReservationPane.setVisible(false);
         TableManagementPane.setVisible(false);
+        MessagingPane.setVisible(false);
         ManageStaffAndAccountsPane.setVisible(false);
         ReportsPane.setVisible(false);
         ActivityLogPane.setVisible(false);
@@ -343,6 +340,12 @@ AdministratorUIController implements Initializable, ReservationListener {
                     loadTableManagement();
                    TableDataLoaded = true;
                 }
+
+                break;
+            case "Messagingbtn":
+                MessagingPane.setVisible(true);
+                header.setText("Message Management");
+
 
                 break;
             case "ManageStaffAndAccountsbtn":
@@ -2306,7 +2309,7 @@ AdministratorUIController implements Initializable, ReservationListener {
             col.setResizable(false);
             col.setReorderable(false);
             col.setSortable(true);
-            col.prefWidthProperty().bind(CusRepTable.widthProperty().multiply(widthFactors[i]));
+            col.prefWidthProperty().bind(ResRepTable.widthProperty().multiply(widthFactors[i]));
             if (!namecol[i].isEmpty()) {
                 col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
             }
@@ -2505,15 +2508,76 @@ AdministratorUIController implements Initializable, ReservationListener {
 
     }
 
+
+    private int customerReportPage = 0;
+    private int pageSize = 100;
+    private boolean allDataLoaded = false;
+
     private void loadCustomerReport() {
         LocalDate from = dateFromCusrep.getValue();
         LocalDate to = dateToCusrep.getValue();
 
-        List<CustomerReportDTO> results = reservationRepository.getCustomerReport(from, to);
+        if (from == null && to == null) {
+            // Pageable mode → reset ONCE
+            customerReportPage = 0;
+            allDataLoaded = false;
+            customerreports.clear();
+            CusRepTable.setItems(filterCustomerReports);
 
-        filterCustomerReports.setPredicate(null);
-        customerreports.setAll(results);
+            loadCustomerReportPage();   // 👈 call page loader
+        } else {
+            loadCustomerReportFiltered(from, to);
+        }
     }
+
+    private void loadCustomerReportPage() {
+        if (allDataLoaded) return;
+        Task<List<CustomerReportDTO>> task = new Task<>() {
+            @Override
+            protected List<CustomerReportDTO> call() {
+                return reservationService.loadPage(customerReportPage, pageSize);
+            }
+        };
+        task.setOnSucceeded(e -> {
+            List<CustomerReportDTO> results = task.getValue();
+
+            if (results.isEmpty()) {
+                allDataLoaded = true;
+                return;
+            }
+
+            customerreports.addAll(results);
+            customerReportPage++; // move to next page
+        });
+
+        task.setOnFailed(e -> task.getException().printStackTrace());
+
+        new Thread(task).start();
+    }
+
+    private void loadCustomerReportFiltered(LocalDate from, LocalDate to) {
+
+        Task<List<CustomerReportDTO>> task = new Task<>() {
+            @Override
+            protected List<CustomerReportDTO> call() {
+                return reservationService.loadByDate(from, to);
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            CusRepTable.setItems(
+                    FXCollections.observableArrayList(task.getValue())
+            );
+            allDataLoaded = true; // disable paging
+        });
+
+        task.setOnFailed(e -> task.getException().printStackTrace());
+
+        new Thread(task).start();
+    }
+
+
+
     private void loadReservationInformation(String phone){
         LocalDate from = dateFromCusrep.getValue();
         LocalDate to = dateToCusrep.getValue();
@@ -2787,6 +2851,7 @@ AdministratorUIController implements Initializable, ReservationListener {
 
 
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
@@ -2794,7 +2859,6 @@ AdministratorUIController implements Initializable, ReservationListener {
         dashpane.minHeightProperty().bind(dashpane.widthProperty().multiply(0.965));
         reservpane.minHeightProperty().bind(reservpane.widthProperty().multiply(1.456));
         tablepane.minHeightProperty().bind(tablepane.widthProperty().multiply(0.95));
-        //accountpane.minHeightProperty().bind(accountpane.widthProperty().multiply());
         Dashboardbtn.fire();
 
         setupRecentReservation();

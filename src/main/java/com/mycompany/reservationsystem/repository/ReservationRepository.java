@@ -7,7 +7,6 @@ import com.mycompany.reservationsystem.model.Reservation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -35,6 +34,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             + "AND (:to IS NULL OR r.date <= :to)")
     List<ReservationCustomerDTO> getReservationCustomerDTOByPhoneAndDate(
             @Param("phone") String phone, @Param("from") LocalDate from, @Param("to") LocalDate to );
+///  /////////////////////////////////////////////////////////////////
+@Query("""
+    SELECT new com.mycompany.reservationsystem.dto.CustomerReportDTO(
+        c.phone,
+        COUNT(r.id),
+        COALESCE(SUM(r.revenue), 0),
+        COALESCE(AVG(r.revenue), 0)
+    )
+    FROM Reservation r
+    JOIN r.customer c
+    GROUP BY c.phone
+""")
+List<CustomerReportDTO> getAllCustomerReport(Pageable pageable);
 
     @Query("""
     SELECT new com.mycompany.reservationsystem.dto.CustomerReportDTO(
@@ -48,7 +60,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
       AND (:to IS NULL OR r.date <= :to) 
     GROUP BY c.phone
 """)
-    List<CustomerReportDTO> getCustomerReport(@Param("from") LocalDate from, @Param("to") LocalDate to);
+    List<CustomerReportDTO> getFilteredCustomerReport(@Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    @Query("SELECT DISTINCT c.phone FROM Customer c")
+    List<String> findAllCustomerPhones(); // for Select All by phone
+    //////////////////////////////////////////////////////////////////////
 
     @Query("""
     SELECT new com.mycompany.reservationsystem.dto.RevenueReportsDTO(

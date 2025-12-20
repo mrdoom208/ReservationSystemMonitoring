@@ -1,16 +1,20 @@
 package com.mycompany.reservationsystem.Service;
 
+import com.mycompany.reservationsystem.dto.CustomerReportDTO;
 import com.mycompany.reservationsystem.model.ManageTables;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 import com.mycompany.reservationsystem.model.Reservation;
 import com.mycompany.reservationsystem.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -69,5 +73,17 @@ public class ReservationService {
     public Stream<Reservation> streamAllReservations() {
         return reservationRepository.streamAllReservations();
     }
+
+    public List<CustomerReportDTO> loadPage(int page, int pageSize) {
+        return reservationRepository.getAllCustomerReport(PageRequest.of(page, pageSize));
+    }
+
+    public List<CustomerReportDTO> loadByDate(LocalDate from, LocalDate to) {
+        return reservationRepository.getFilteredCustomerReport(from, to);
+    }
+    public List<String> getAllCustomerPhones() {
+        return reservationRepository.findAllCustomerPhones();
+    }
+
 
 }
