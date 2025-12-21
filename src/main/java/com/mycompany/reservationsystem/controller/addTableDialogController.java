@@ -1,7 +1,7 @@
 package com.mycompany.reservationsystem.controller;
 
-import com.mycompany.reservationsystem.constraint.FieldRestrictions;
-import com.mycompany.reservationsystem.constraint.FieldValidators;
+import com.mycompany.reservationsystem.util.FieldRestrictions;
+import com.mycompany.reservationsystem.util.FieldValidators;
 import com.mycompany.reservationsystem.model.ManageTables;
 import com.mycompany.reservationsystem.repository.ManageTablesRepository;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -10,9 +10,6 @@ import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import io.github.palexdev.materialfx.validation.Constraint;
-import io.github.palexdev.materialfx.validation.Validated;
-import io.github.palexdev.materialfx.validation.MFXValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

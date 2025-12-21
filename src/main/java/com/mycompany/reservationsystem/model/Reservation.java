@@ -35,6 +35,7 @@ public class Reservation {
     private LocalTime reservationCancelledtime;
     private LocalTime reservationSeatedtime;
     private LocalTime reservationCompletetime;
+    private LocalTime reservationNoshowtime;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
@@ -121,6 +122,13 @@ public class Reservation {
 
     public void setReservationCancelledtime(LocalTime reservationCancelledtime) {
         this.reservationCancelledtime = reservationCancelledtime;
+    }
+    public LocalTime getReservationNoshowtime() {
+        return reservationNoshowtime;
+    }
+
+    public void setReservationNoshowtime(LocalTime reservationnoshowtime) {
+        this.reservationNoshowtime = reservationnoshowtime;
     }
 
     public LocalTime getReservationSeatedtime() {

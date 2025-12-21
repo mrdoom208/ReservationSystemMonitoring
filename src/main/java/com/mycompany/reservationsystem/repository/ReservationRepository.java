@@ -26,6 +26,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findTop15ByOrderByDateDescReservationPendingtimeDesc(Pageable pageable);
     List<Reservation> findByStatus(String status); List<Reservation> findByStatusIn(List<String> statuses);
     boolean existsByTable_Id(Long tableId); Optional<Reservation>findByReference(String reference);
+    List<Reservation> findByDateBetween(LocalDate start, LocalDate end);
+
 
     @Query("SELECT new com.mycompany.reservationsystem.dto.ReservationCustomerDTO(" + "r.id, r.pax, r.prefer, r.status, r.reference, r.date, r.revenue, "
             + "r.reservationPendingtime, r.reservationConfirmtime, r.reservationCancelledtime, " + "r.reservationSeatedtime, r.reservationCompletetime, "
@@ -89,6 +91,13 @@ List<CustomerReportDTO> getAllCustomerReport(Pageable pageable);
     @Query("UPDATE Reservation r SET r.revenue = :revenue WHERE r.reference = :reference")
     int updateRevenueByReference(@Param("reference") String reference,
                                  @Param("revenue") BigDecimal revenue);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Reservation r SET r.status = :status WHERE r.reference = :reference")
+    int updateStatusByReference(@Param("reference") String reference,
+                                 @Param("status") String status);
+
 
 
     @Query("SELECT r FROM Reservation r")

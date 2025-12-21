@@ -47,7 +47,7 @@ public class App extends Application {
                 .setResolveAssets(true)
                 .build()
                 .setGlobal();
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("fxml/Login.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/Login.fxml"));
 
         // Make controllers managed by Spring
         fxmlLoader.setControllerFactory(springContext::getBean);

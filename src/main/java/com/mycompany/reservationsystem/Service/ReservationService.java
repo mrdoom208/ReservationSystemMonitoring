@@ -69,6 +69,10 @@ public class ReservationService {
         int updatedRows = reservationRepository.updateRevenueByReference(reference, revenue);
         return updatedRows > 0; // returns true if at least one row was updated
     }
+    public boolean setStatusForReference(String reference, String status) {
+        int updatedRows = reservationRepository.updateStatusByReference(reference, status);
+        return updatedRows > 0; // returns true if at least one row was updated
+    }
     @Transactional(readOnly = true)
     public Stream<Reservation> streamAllReservations() {
         return reservationRepository.streamAllReservations();

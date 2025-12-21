@@ -1,9 +1,8 @@
 package com.mycompany.reservationsystem.controller;
 
 import com.mycompany.reservationsystem.Service.ReservationService;
-import com.mycompany.reservationsystem.constraint.FieldRestrictions;
-import com.mycompany.reservationsystem.constraint.FieldValidators;
-import com.mycompany.reservationsystem.dto.ManageTablesDTO;
+import com.mycompany.reservationsystem.util.FieldRestrictions;
+import com.mycompany.reservationsystem.util.FieldValidators;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
@@ -92,6 +91,9 @@ public class setAmountPaidController {
                 // Optionally, overwrite the field with formatted value
                 AmountPaid.setText(formatted);
                 reservationService.setRevenueForReference(reference.getText(),amount);
+                reservationService.setStatusForReference(reference.getText(),"Complete");
+                reservationService.updateTableId(reference.getText(),null);
+
 
                 showSuccess("Amount Paid Inserted Successfully");
                 cancelled = false;

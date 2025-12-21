@@ -20,6 +20,10 @@ import java.util.List;
  * @author formentera
  */
 public interface ReservationTableLogsRepository extends JpaRepository<ReservationTableLogs,Long>{
+
+    List<ReservationTableLogs> findByDateBetween(LocalDate start, LocalDate end);
+
+
     @Query("""
     SELECT new com.mycompany.reservationsystem.dto.TableUsageReportDTO(
         r.tableNo,
