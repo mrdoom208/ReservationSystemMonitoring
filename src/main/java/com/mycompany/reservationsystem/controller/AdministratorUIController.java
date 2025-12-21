@@ -1,44 +1,35 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package com.mycompany.reservationsystem.controller;
 
 import com.mycompany.reservationsystem.dto.*;
 import com.mycompany.reservationsystem.model.*;
-import com.mycompany.reservationsystem.repository.*;
+import com.mycompany.reservationsystem.util.BackgroundViewLoader;
 import com.mycompany.reservationsystem.websocket.ReservationListener;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
-
+import java.util.concurrent.CompletableFuture;
 
 /**
- * FXML Controller class
+ * FXML Controller class for Administrator UI
+ * Manages navigation and view loading with background processing
  *
  * @author formentera
  */
 @Component
-public class
+public class AdministratorUIController implements Initializable, ReservationListener {
 
-
-AdministratorUIController implements Initializable, ReservationListener {
     private User currentuser;
+    private BackgroundViewLoader viewLoader;
 
     void setUser(User user) {
         this.currentuser = user;
@@ -49,52 +40,56 @@ AdministratorUIController implements Initializable, ReservationListener {
     }
 
     @FXML
-    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn, Messagingbtn, ManageStaffAndAccountsbtn, Reportsbtn, ActivityLogbtn, Mergebtn, Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts, ApplyResrep, ApplyCusrep, ApplyRevrep, ApplyTUrep, applyAL, AddTablebtn;
+    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn,
+            Messagingbtn, ManageStaffAndAccountsbtn, Reportsbtn, ActivityLogbtn,
+            Mergebtn, Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,
+            ApplyResrep, ApplyCusrep, ApplyRevrep, ApplyTUrep, applyAL, AddTablebtn;
     @FXML
-    private ScrollPane  MessagingPane;
+    private ScrollPane MessagingPane;
     @FXML
     private Label header;
     @FXML
     private StackPane content;
 
-
     @Autowired
     private ConfigurableApplicationContext springContext;
+
     private Reservation selectedReservation;
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Initialize background loader
+        viewLoader = new BackgroundViewLoader(springContext);
 
+        // Preload commonly used views on startup (happens in background)
+        viewLoader.preloadViews(
+                "/fxml/Dashboard.fxml",
+                "/fxml/Reservation.fxml",
+                "/fxml/Table.fxml"
+        );
 
-    private final Map<String, Object> controllerCache = new HashMap<>();
-    private final Map<String, Node> viewCache = new HashMap<>();
+        // Load dashboard initially
+        Dashboardbtn.fire();
 
-    private void loadView(String fxmlFile) {
-        try {
-            Node view = viewCache.get(fxmlFile);
-
-            if (view == null) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
-                loader.setControllerFactory(springContext::getBean);
-
-                view = loader.load();
-
-                viewCache.put(fxmlFile, view);
-                controllerCache.put(fxmlFile, loader.getController());
+        // Setup WebSocket in separate thread
+        WebSocketClient wsClient = new WebSocketClient();
+        wsClient.addListener(this);
+        new Thread(() -> {
+            try {
+                wsClient.connect();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            content.getChildren().setAll(view);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
-
 
     @FXML
     private void navigate(ActionEvent event) {
         Button clicked = (Button) event.getSource();
-        Button[] buttons = {Dashboardbtn, ReservationManagementbtn, TableManagementbtn, Messagingbtn, ManageStaffAndAccountsbtn, Reportsbtn, ActivityLogbtn};
+        Button[] buttons = {Dashboardbtn, ReservationManagementbtn, TableManagementbtn,
+                Messagingbtn, ManageStaffAndAccountsbtn, Reportsbtn, ActivityLogbtn};
 
-
+        // Update button styles
         for (Button btn : buttons) {
             if (btn == null) {
                 continue;
@@ -109,6 +104,7 @@ AdministratorUIController implements Initializable, ReservationListener {
         if (!clicked.getStyleClass().contains("navigation-btns-active")) {
             clicked.getStyleClass().add("navigation-btns-active");
         }
+
         System.out.println(clicked.getId());
 
         String fxmlFile = null;
@@ -131,7 +127,7 @@ AdministratorUIController implements Initializable, ReservationListener {
             case "Messagingbtn":
                 MessagingPane.setVisible(true);
                 header.setText("Message Management");
-                break;
+                return; // No view to load
 
             case "ManageStaffAndAccountsbtn":
                 header.setText("Account Management");
@@ -150,98 +146,87 @@ AdministratorUIController implements Initializable, ReservationListener {
 
             default:
                 break;
-
         }
 
-        loadView(fxmlFile);
+        if (fxmlFile != null) {
+            final String viewToLoad = fxmlFile;
+            // Load view asynchronously with loading indicator
+            viewLoader.loadViewAsync(viewToLoad, content, () -> {
+                // After view loads, preload adjacent views for faster navigation
+                preloadAdjacentViews(clicked.getId());
+            });
+        }
     }
 
-
-    public DashboardController getDashboardController() {
-        String key = "/fxml/Dashboard.fxml";
-
-        if (!controllerCache.containsKey(key)) {
-            loadView(key); // forces loading & caching
+    /**
+     * Preload views the user is likely to navigate to next
+     * This improves perceived performance by loading views before they're needed
+     */
+    private void preloadAdjacentViews(String currentViewId) {
+        switch (currentViewId) {
+            case "Dashboardbtn":
+                viewLoader.preloadView("/fxml/Reservation.fxml");
+                break;
+            case "ReservationManagementbtn":
+                viewLoader.preloadView("/fxml/Table.fxml");
+                break;
+            case "TableManagementbtn":
+                viewLoader.preloadView("/fxml/Account.fxml");
+                break;
+            case "ManageStaffAndAccountsbtn":
+                viewLoader.preloadView("/fxml/Reports.fxml");
+                break;
+            case "Reportsbtn":
+                viewLoader.preloadView("/fxml/ActivityLogs.fxml");
+                break;
         }
+    }
 
-        return (DashboardController) controllerCache.get(key);
+    // Controller getters - now using cached controllers from background loader
+    public DashboardController getDashboardController() {
+        return (DashboardController) viewLoader.getCachedController("/fxml/Dashboard.fxml");
     }
 
     public ReservationController getReservationController() {
-        String key = "/fxml/Reservation.fxml";
-
-        if (!controllerCache.containsKey(key)) {
-            loadView(key); // forces loading & caching
-        }
-
-        return (ReservationController) controllerCache.get(key);
+        return (ReservationController) viewLoader.getCachedController("/fxml/Reservation.fxml");
     }
 
     public TableController getTableController() {
-        String key = "/fxml/Table.fxml";
-
-        if (!controllerCache.containsKey(key)) {
-            loadView(key);
-        }
-        return (TableController) controllerCache.get(key);
+        return (TableController) viewLoader.getCachedController("/fxml/Table.fxml");
     }
 
     public AccountController getAccountController() {
-        String key = "/fxml/Account.fxml";
-
-        if (!controllerCache.containsKey(key)) {
-            loadView(key);
-        }
-        return (AccountController) controllerCache.get(key);
+        return (AccountController) viewLoader.getCachedController("/fxml/Account.fxml");
     }
 
     public ActivityLogsController getActivityLogsController() {
-        String key = "/fxml/ActivityLogs.fxml";
-
-        if (!controllerCache.containsKey(key)) {
-            loadView(key);
-        }
-        return (ActivityLogsController) controllerCache.get(key);
+        return (ActivityLogsController) viewLoader.getCachedController("/fxml/ActivityLogs.fxml");
     }
 
     public ReportsController getReportsController() {
-        String key = "/fxml/Reports.fxml";
-
-        if (!controllerCache.containsKey(key)) {
-            loadView(key);
-        }
-        return (ReportsController) controllerCache.get(key);
-    }
-
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
-
-        Dashboardbtn.fire();
-
-
-        WebSocketClient wsClient = new WebSocketClient();
-        wsClient.addListener(this);
-        new Thread(() -> {
-            try {
-                wsClient.connect();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-
+        return (ReportsController) viewLoader.getCachedController("/fxml/Reports.fxml");
     }
 
     @Override
     public void onNewReservation(WebupdateDTO reservation) {
-        Platform.runLater(() -> {
-            getDashboardController().updateLabels();
-            //loadRecentReservations();
-            //loadCustomerReservationTable();
-            //getDashboardController().showNotification(notificationArea, "New Reservation Added", "A new Reservation has been successfully added.", "success");
-
-        });
+        // Only update if Dashboard controller is already loaded (not forced loading)
+        DashboardController controller = getDashboardController();
+        if (controller != null) {
+            // Update in background to avoid blocking the UI thread
+            CompletableFuture.runAsync(() -> {
+                Platform.runLater(() -> {
+                    controller.updateLabels();
+                });
+            });
+        }
     }
 
+    /**
+     * Clean shutdown - call this when closing the application
+     */
+    public void shutdown() {
+        if (viewLoader != null) {
+            viewLoader.shutdown();
+        }
+    }
 }
