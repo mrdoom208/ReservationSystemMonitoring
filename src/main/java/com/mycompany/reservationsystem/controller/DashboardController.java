@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -24,7 +23,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
@@ -197,31 +195,7 @@ public class DashboardController {
 
     }
 
-    private BorderPane createNotification(String message) {
-        BorderPane pane = new BorderPane();
-        pane.getStyleClass().add("notification-pane");
 
-        StackPane holder = new StackPane();
-
-        Label title = new Label("Notication");
-        title.getStyleClass().add("notification-title");
-        Label Message = new Label(message);
-        Message.getStyleClass().add("notification-message");
-
-        Button closeBtn = new Button("X");
-        closeBtn.getStyleClass().add("close-notif-btn");
-        closeBtn.setOnAction(e -> notificationArea.getChildren().remove(pane));
-
-        holder.getChildren().add(title);
-        holder.setAlignment(title, Pos.TOP_CENTER);
-        holder.getChildren().add(Message);
-        holder.setAlignment(Message, Pos.CENTER);
-
-        pane.setCenter(holder);
-        pane.setRight(closeBtn);
-
-        return pane;
-    }
     public void loadRecentReservations() {
 
         List<Reservation> latest10 = reservationRepository.findTop15ByOrderByDateDescReservationPendingtimeDesc(PageRequest.of(0, 15));
@@ -233,7 +207,8 @@ public class DashboardController {
         manageTablesData.setAll(tables);
 
     }
-    public void showNotification(VBox container, String title, String message, String type) {
+    public void showNotification(String title, String message, String type) {
+        VBox container = notificationArea;
 
         // Build notification UI
         System.out.println("notificationArea: " + notificationArea);
@@ -322,10 +297,9 @@ public class DashboardController {
         setupRecentReservation();
         setupTableView();
 
-        showNotification(notificationArea,"New Reservation Added","A new Reservation has been successfully added.","success");
+        showNotification("New Reservation Added","A new Reservation has been successfully added.","success");
 
         showNotification(
-                notificationArea,
                 "Reservation Cancelled",
                 "The reservation has been cancelled.",
                 "error"

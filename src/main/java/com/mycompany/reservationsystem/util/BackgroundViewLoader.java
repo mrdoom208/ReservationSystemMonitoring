@@ -47,7 +47,7 @@ public class BackgroundViewLoader {
 
         // Show loading indicator
         ProgressIndicator loading = new ProgressIndicator();
-        loading.setMaxSize(50, 50);
+        loading.setMaxSize(70, 70);
         content.getChildren().setAll(loading);
 
         // Load in background

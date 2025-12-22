@@ -124,7 +124,7 @@
                                  <items>
                                     <MenuItem mnemonicParsing="false" text="Profile" />
                                     <MenuItem mnemonicParsing="false" text="Settings" />
-                                    <MenuItem mnemonicParsing="false" text="Logout" />
+                                    <MenuItem mnemonicParsing="false" text="Logout" fx:id="logoutBtn" onAction="#logout"/>
                                  </items>
                               </MenuButton>
                            </children>

@@ -8,13 +8,20 @@ import com.mycompany.reservationsystem.websocket.WebSocketClient;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
@@ -41,9 +48,9 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     @FXML
     private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn,
-            Messagingbtn, ManageStaffAndAccountsbtn, Reportsbtn, ActivityLogbtn,
-            Mergebtn, Reservationrpts, Customerrpts, Revenuerpts, TableUsagerpts,
-            ApplyResrep, ApplyCusrep, ApplyRevrep, ApplyTUrep, applyAL, AddTablebtn;
+            Messagingbtn, ManageStaffAndAccountsbtn, Reportsbtn, ActivityLogbtn;
+    @FXML
+    private MenuItem logoutBtn;
     @FXML
     private ScrollPane MessagingPane;
     @FXML
@@ -56,6 +63,8 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     private Reservation selectedReservation;
 
+    WebSocketClient wsClient;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Initialize background loader
@@ -63,7 +72,6 @@ public class AdministratorUIController implements Initializable, ReservationList
 
         // Preload commonly used views on startup (happens in background)
         viewLoader.preloadViews(
-                "/fxml/Dashboard.fxml",
                 "/fxml/Reservation.fxml",
                 "/fxml/Table.fxml"
         );
@@ -219,6 +227,46 @@ public class AdministratorUIController implements Initializable, ReservationList
                 });
             });
         }
+    }
+    @FXML
+    private void logout(ActionEvent event) {
+        // 1. Stop background tasks
+        shutdown();
+
+        if (wsClient != null) {
+            wsClient.disconnect();
+        }
+
+        // 2. Clear user session
+        this.currentuser = null;
+
+        // 3. Close current stage or remove current scene
+        Platform.runLater(() -> {
+            try {
+                // Load login scene
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+                loader.setControllerFactory(springContext::getBean);
+                Parent loginRoot = loader.load();
+
+                // Replace the scene content
+                Stage loginStage = new Stage();
+                loginStage.initStyle(StageStyle.UNDECORATED);
+                loginStage.setScene(new Scene(loginRoot));
+                loginStage.setTitle("Login");
+                loginStage.setResizable(false); // optional
+                loginStage.show();
+                loginStage.centerOnScreen();
+
+                // Close current Stage (Administrator UI)
+                Stage currentStage = (Stage) logoutBtn.getParentPopup().getOwnerWindow();
+                currentStage.close();
+
+                // Optionally center window
+                ;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**

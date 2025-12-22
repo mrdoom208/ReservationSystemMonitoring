@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.applyStatusStyle;
+import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.applyTimeFormat;
 
 @Component
 public class ReportsController {
@@ -107,17 +109,21 @@ public class ReportsController {
 
     // --- Reservation Report ---
     @FXML
-    private TableColumn<?, ?> dateResrep, timeResrep, paxResrep,
+    private TableColumn<?, ?> dateResrep, paxResrep,
             referenceResrep, totalreservationRevrep;
     @FXML
     private TableColumn<?, String> statusResrep;
+    @FXML
+    private TableColumn<?, LocalTime> timeResrep;
 
     // --- Reservation in Customer Report ---
     @FXML
     private TableColumn<?, ?> nameResInCusRep, phoneResInCusRep,
-            referenceResInCusRep, dateResInCusRep, timeResInCusRep;
+            referenceResInCusRep, dateResInCusRep;
     @FXML
     private TableColumn<?, String> statusResInCusRep;
+    @FXML
+    private TableColumn<?, LocalTime>timeResInCusRep;
 
     // --- Revenue Report ---
     @FXML
@@ -135,7 +141,9 @@ public class ReportsController {
     // --- Table Usage Info ---
     @FXML
     private TableColumn<?, ?> tablenoTableinfo, paxTableinfo, dateTableinfo,
-            timeTableinfo, referenceTableinfo, revenueTableinfo;
+             referenceTableinfo, revenueTableinfo;
+    @FXML
+    private TableColumn<?, LocalTime>timeTableinfo;
 
 // ====================== Spring Dependencies ======================
 
@@ -320,6 +328,7 @@ public class ReportsController {
 
         StatusfilterResrep.setText("Show All");
         applyStatusStyle(statusResrep);
+        applyTimeFormat(timeResrep);
         TableColumn<?, ?>[] column = {referenceResrep,paxResrep,statusResrep,timeResrep,dateResrep};
         double[] widthFactors = {0.2,0.2,0.2,0.2,0.21};
         String[] namecol = {"reference", "pax", "status", "reservationPendingtime","date"};
@@ -419,6 +428,7 @@ public class ReportsController {
 
     public void setupReservatioInformation(){
         applyStatusStyle(statusResInCusRep);
+        applyTimeFormat(timeResInCusRep);
         revenueResInCusRep.setCellFactory(col -> new TableCell<CustomerReportDTO, BigDecimal>() {
             @Override
             protected void updateItem(BigDecimal item, boolean empty) {
@@ -700,6 +710,7 @@ public class ReportsController {
 
     public void setupTableUsageInfo(){
 
+        applyTimeFormat(timeTableinfo);
         TableinfoTUrep.setItems(TableUsageInformationDTOS);
         TableColumn<?, ?>[] column = {tablenoTableinfo,referenceTableinfo,paxTableinfo,revenueTableinfo,timeTableinfo,dateTableinfo};
         double[] widthFactors = {0.10,0.25,0.10,0.15,0.20,0.20};

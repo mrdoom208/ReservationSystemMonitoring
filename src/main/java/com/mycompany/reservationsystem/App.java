@@ -6,6 +6,7 @@ import io.github.palexdev.materialfx.theming.MaterialFXStylesheets;
 import io.github.palexdev.materialfx.theming.UserAgentBuilder;
 import io.github.palexdev.materialfx.theming.base.Theme;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -58,9 +59,14 @@ public class App extends Application {
 
         scene = new Scene(root);
         root.styleProperty().bind(
-                javafx.beans.binding.Bindings.concat(
-                        "-fx-font-size: ", scene.widthProperty().divide(100), "px;"
-                )
+                Bindings.createStringBinding(() -> {
+                    double referenceWidth = 1600;   // base width
+                    double referenceHeight = 900;  // base height
+                    double scale = Math.min(scene.getWidth() / referenceWidth, scene.getHeight() / referenceHeight);
+
+                    double fontSize = Math.min(32, Math.max(14, 16 * scale)); // 16 is base font size
+                    return "-fx-font-size: " + fontSize + "px;";
+                }, scene.widthProperty(), scene.heightProperty())
         );
 
         stage.initStyle(StageStyle.UNDECORATED);
