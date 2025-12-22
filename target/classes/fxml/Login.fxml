@@ -147,7 +147,7 @@
             </VBox>
          </center>
          <top>
-            <StackPane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <StackPane fx:id="dragArea" prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <children>
                   <MFXButton fx:id="closebtn" alignment="CENTER" onAction="#closeApp" styleClass="close-button" text="X" StackPane.alignment="TOP_RIGHT" />
                </children>

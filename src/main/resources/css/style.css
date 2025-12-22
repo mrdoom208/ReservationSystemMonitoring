@@ -173,6 +173,7 @@
     -fx-background-radius: 12;
     -fx-font-size: 0.875em;  /* was 14px */
     -fx-alignment: CENTER_LEFT;
+    -mfx-ripple-radius: 12;
 }
 
 .navigation-btns:hover{
@@ -188,6 +189,8 @@
     -fx-font-weight: bold;
     -fx-font-size:0.875em;  /* was 14px */
     -fx-alignment: CENTER_LEFT;
+    -mfx-ripple-radius: 12;
+    -mfx-ripple-overlay-radius: 12;
 }
 .navigation-report-btns{
     -fx-background-color: transparent;
@@ -289,7 +292,7 @@
 .Statistics-cell{
      -fx-background-color:#303030;
      -fx-background-radius:0.95em;
-     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 12, 0.35, 0, 3);
+     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 12, 0.35, -3, -3);
 }
 
 /*.Statistics-cell:hover{
@@ -918,42 +921,78 @@
     -fx-background-color: #121212;}
 
 .message-area {
-    -fx-font-size: 1em;
-    -fx-text-fill: #E0E0E0;
-
-    /* outer container */
-    -fx-background-color: #2C2C2C;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    -fx-border-color: transparent;
-
-    -fx-padding: 0;
+    -fx-background-color: #3a3a3a;        /* slightly lighter than parent for contrast */
+    -fx-text-fill: #e0e0e0;               /* soft light text for readability */
+    -fx-font-size: 1.5em;
+    -fx-background-radius: 1em;           /* slightly more rounded than parent */
+    -fx-border-radius: 1em;
+    -fx-border-color: #606060;            /* subtle border to define edges */
+    -fx-border-width: 1px;
+    -fx-padding: 0.6em;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0.25, 0, 2); /* lighter, softer shadow */
+    -fx-highlight-fill: #505050;          /* selection background */
+    -fx-highlight-text-fill: #ffffff;     /* selection text color */
+    -fx-prompt-text-fill: #b0b0b0;        /* hint text */
+    -fx-focus-color: #ff9800;             /* accent color on focus */
 }
-
-/* inner text content */
 .message-area .content {
-    -fx-background-color: #2C2C2C;
-    -fx-background-radius: 8;
-    -fx-padding: 6 10 6 10;
+    -fx-background-color: transparent;   /* keep the background inherited */
+    -fx-text-fill: #e0e0e0;              /* light text for readability */
+    -fx-font-size: 1.5em;                 /* font size inside the textarea */
+    -fx-padding: 0.5em;                  /* inner padding inside content */
+    -fx-highlight-fill: #505050;         /* selection background */
+    -fx-highlight-text-fill: #ffffff;    /* selection text color */
 }
 
-/* caret color */
-.message-area {
-    -fx-caret-color: #E53935;
-}
+/* --- Inner Content --- */
 
-/* focus accent */
+
+/* --- Focus State --- */
 .message-area:focused {
-    -fx-border-color: #E53935;
+    -fx-border-color: #FF5252;
     -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(255,82,82,0.25), 10, 0.25, 0, 2);
 }
 
-/* text selection */
+/* --- Text Selection --- */
 .message-area .content .selection {
-    -fx-fill: #E53935;
+    -fx-fill: #FF5252;
 }
 
-/* placeholder text */
+/* --- Placeholder / Prompt Text --- */
 .message-area:empty {
-    -fx-prompt-text-fill: #9E9E9E;
+    -fx-prompt-text-fill: #B0B0B0; /* subtle gray */
+}
+
+/* --- Scrollbar Modernization (Optional) --- */
+.message-area .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.message-area .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.message-area .thumb {
+    -fx-background-color: #555555;
+    -fx-background-radius: 6;
+}
+
+.message-area .thumb:hover {
+    -fx-background-color: #FF5252;
+}
+.selectAll {
+    -fx-text-fill: white; /* text color */
+}
+
+/* When selected (checked) */
+.selectAll .box {
+    -fx-background-color: rgba(255, 0, 0, 1); /* fill color */
+}
+
+/* Optional: border color when not selected */
+.selectAll .box {
+    -fx-border-color: #ffffff;  /* white border for contrast */
+    -fx-border-width: 1.5px;
+    -fx-background-color: transparent; /* default background */
 }

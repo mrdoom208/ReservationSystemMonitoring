@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.mycompany.reservationsystem.controller;
+import com.mycompany.reservationsystem.App;
 import com.mycompany.reservationsystem.Service.ActivityLogService;
 import com.mycompany.reservationsystem.model.ActivityLog;
 import com.mycompany.reservationsystem.model.User;
@@ -18,6 +19,7 @@ import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.*;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -47,7 +49,8 @@ public class LoginController {
     private MFXPasswordField passwordfield;
     @FXML
     private Label messageLabel;
-    
+    @FXML
+    private StackPane dragArea;
     @Autowired
     private UserRepository userRepository;
     
@@ -58,6 +61,8 @@ public class LoginController {
     @Autowired
     private ActivityLogService activityLogService;
     private boolean manager = false;
+    private double xOffset = 0;
+    private double yOffset = 0;
     
     
     @FXML
@@ -98,6 +103,16 @@ public class LoginController {
         activeButton = Admin;
         Admin.fire();
         Submit.setDefaultButton(true);
+
+        dragArea.setOnMousePressed(event -> {
+            xOffset = event.getSceneX();
+            yOffset = event.getSceneY();
+        });
+
+        dragArea.setOnMouseDragged(event -> {
+            App.primaryStage.setX(event.getScreenX() - xOffset);
+            App.primaryStage.setY(event.getScreenY() - yOffset);
+        });
 
 
 

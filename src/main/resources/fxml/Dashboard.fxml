@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fx:id="DashboardPane" fitToHeight="true" fitToWidth="true" minViewportWidth="1100.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent;" styleClass="Scrollpane" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.reservationsystem.controller.DashboardController">
+<ScrollPane fx:id="DashboardPane" fitToHeight="true" fitToWidth="true" minViewportWidth="1100.0" prefHeight="900.0" prefWidth="200.0" style="-fx-background-color: transparent;" styleClass="Scrollpane" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.reservationsystem.controller.DashboardController">
    <content>
       <BorderPane fx:id="dashpane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="1100.0" prefWidth="1140.0" styleClass="DashboardPane">
          <right>
@@ -157,15 +157,11 @@
                                           </StackPane>
                                        </left>
                                        <bottom>
-                                          <StackPane maxHeight="1.7976931348623157E308" prefWidth="689.0" BorderPane.alignment="CENTER">
-                                             <children>
-                                                <Label prefHeight="29.0" prefWidth="52.0" styleClass="LineGraph-Label" text="DAYS" textAlignment="JUSTIFY">
-                                                   <font>
-                                                      <Font size="20.0" />
-                                                   </font>
-                                                </Label>
-                                             </children>
-                                          </StackPane>
+                                          <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="LineGraph-Label" text="DAYS" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                             <font>
+                                                <Font size="20.0" />
+                                             </font>
+                                          </Label>
                                        </bottom>
                                        <top>
                                           <StackPane maxHeight="42.0" prefHeight="0.0" prefWidth="679.0" BorderPane.alignment="CENTER">

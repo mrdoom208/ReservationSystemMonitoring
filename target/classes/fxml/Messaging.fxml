@@ -28,16 +28,17 @@
                                         <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="BoldText" text="Message" />
                                         <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
                                             <children>
-                                                <MFXComboBox fx:id="MessageLabel" allowEdit="true" floatingText="Message Label" maxWidth="1.7976931348623157E308" styleClass="filter-date" HBox.hgrow="ALWAYS" />
-                                                <MFXButton fx:id="deleteMessage" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" styleClass="delete" text="Delete" />
-                                                <MFXButton buttonType="RAISED" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" styleClass="complete" text="New Message" />
+                                    <MFXTextField fx:id="newMessageLabel" floatMode="BORDER" floatingText="Message Label" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="200.0" styleClass="filter-search" />
+                                                <MFXComboBox fx:id="MessageLabel" floatingText="Existing Messages" maxWidth="1.7976931348623157E308" styleClass="filter-date" HBox.hgrow="ALWAYS" />
+                                                <MFXButton fx:id="deleteMessage" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#handleDeleteMessage" styleClass="delete" text="Delete" />
+                                                <MFXButton fx:id="newMessage" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#handleNewMessage" styleClass="complete" text="New Message" />
                                             </children>
                                         </HBox>
                                         <TextArea fx:id="MessageDetails" promptText="Write a message" styleClass="message-area" wrapText="true" VBox.vgrow="ALWAYS" />
                                         <HBox alignment="CENTER_RIGHT" prefWidth="505.0">
                                             <children>
-                                                <MFXComboBox styleClass="filter-date" visible="false" />
-                                                <MFXButton fx:id="saveMessage" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" styleClass="filter-btn" text="Save Message" />
+                                    <Label fx:id="UIresponse" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Response" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
+                                                <MFXButton fx:id="saveMessage" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" onAction="#handleSaveMessage" styleClass="filter-btn" text="Save Message" />
                                             </children>
                                         </HBox>
                                     </children>
@@ -50,10 +51,10 @@
                                         <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="BoldText" text="Customer Information" />
                                         <HBox prefHeight="0.0" prefWidth="504.0" spacing="10.0">
                                             <children>
-                                                <MFXCheckbox fx:id="selectAllCustomerInfo" maxHeight="1.7976931348623157E308" text="Select All" />
+                                                <MFXCheckbox fx:id="selectAllCustomerInfo" maxHeight="1.7976931348623157E308" styleClass="selectAll" text="Select All" />
                                                 <MFXTextField fx:id="SearchCustomerInfo" floatMode="BORDER" floatingText="Search" maxWidth="1.7976931348623157E308" styleClass="filter-search" HBox.hgrow="ALWAYS" />
                                                 <MFXButton fx:id="deleteCustomerinfo" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" styleClass="delete" text="Delete" />
-                                                <MFXButton buttonType="RAISED" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" styleClass="complete" text="New Customer" />
+                                                <MFXButton maxHeight="1.7976931348623157E308" maxWidth="-Infinity" styleClass="complete" text="New Customer" />
                                             </children>
                                         </HBox>
                                         <TableView fx:id="CustomerInfo" maxWidth="1.7976931348623157E308" prefHeight="200.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
@@ -70,7 +71,7 @@
                                         </TableView>
                                         <HBox prefWidth="200.0" spacing="10.0">
                                             <children>
-                                                <MFXComboBox floatingText="Message Label" maxWidth="1.7976931348623157E308" styleClass="filter-date" HBox.hgrow="ALWAYS" />
+                                                <MFXComboBox fx:id="MessageLabels" floatingText="Message Label" maxWidth="1.7976931348623157E308" styleClass="filter-date" HBox.hgrow="ALWAYS" />
                                                 <MFXButton fx:id="sendMessage" maxHeight="1.7976931348623157E308" styleClass="filter-btn" text="Send Message" />
                                             </children>
                                         </HBox>

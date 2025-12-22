@@ -1,5 +1,6 @@
 package com.mycompany.reservationsystem;
 
+import com.mycompany.reservationsystem.util.BackgroundViewLoader;
 import io.github.palexdev.materialfx.MFXResourcesLoader;
 import io.github.palexdev.materialfx.theming.JavaFXThemes;
 import io.github.palexdev.materialfx.theming.MaterialFXStylesheets;
@@ -28,6 +29,8 @@ public class App extends Application {
     public static Stage primaryStage;
     private static Scene scene;
     private ConfigurableApplicationContext springContext;
+    public static BackgroundViewLoader backgroundLoader;
+
 
     @Override
     public void init() {
@@ -78,6 +81,10 @@ public class App extends Application {
     public void stop() {
         // Close Spring context when JavaFX stops
         springContext.close();
+        if(backgroundLoader != null){
+        backgroundLoader.shutdown();
+        }
+
     }
 
     public static void main(String[] args) {

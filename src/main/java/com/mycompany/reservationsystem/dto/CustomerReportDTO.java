@@ -27,6 +27,13 @@ public class CustomerReportDTO {
     public BooleanProperty selectedProperty() {
         return selected;
     }
+    public boolean isSelected() {
+        return selected.get();
+    }
+
+    public void setSelected(boolean value) {
+        selected.set(value);
+    }
     public String getPhone() { return phone; }
     public Long getTotalReservation() { return totalReservation; }
     public BigDecimal getTotalRevenue() { return totalRevenue; }
