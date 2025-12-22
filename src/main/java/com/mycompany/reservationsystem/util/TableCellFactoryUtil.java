@@ -1,5 +1,6 @@
 package com.mycompany.reservationsystem.util;
 
+import com.mycompany.reservationsystem.dto.CustomerReportDTO;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.TableCell;
@@ -14,6 +15,7 @@ public final class TableCellFactoryUtil {
     private TableCellFactoryUtil() {
         // Prevent instantiation
     }
+
     public static <T> void addItemsToCombo(
             MFXComboBox<String> combo,
             FilteredList<T> filteredData,
@@ -40,7 +42,7 @@ public final class TableCellFactoryUtil {
                         return false;
                     }); // no filter
                 } else {
-                         filteredData.setPredicate(item ->
+                    filteredData.setPredicate(item ->
                             propertyExtractor.apply(item) != null &&
                                     propertyExtractor.apply(item).equalsIgnoreCase(selectedStatus)
                     );
@@ -83,9 +85,10 @@ public final class TableCellFactoryUtil {
             }
         });
     }
+
     public static <T> void applyTimeFormat(TableColumn<T, LocalTime> column) {
         DateTimeFormatter TIME_FORMATTER =
-                DateTimeFormatter.ofPattern("hh:mm:ss a");
+                DateTimeFormatter.ofPattern("hh:mm a");
         column.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(LocalTime item, boolean empty) {
@@ -98,5 +101,24 @@ public final class TableCellFactoryUtil {
                 }
             }
         });
+    }
+
+    public static <T, N extends Number> void applyDecimalFormat(
+            TableColumn<T, N> column,
+            int decimalPlaces
+    ) {
+        String format = "%." + decimalPlaces + "f";
+
+        column.setCellFactory(col -> new TableCell<T, N>() {
+            @Override
+            protected void updateItem(N item, boolean empty) {
+                super.updateItem(item, empty);
+
+                setText(empty || item == null
+                        ? null
+                        : String.format(format, item.doubleValue()));
+            }
+        });
+
     }
 }

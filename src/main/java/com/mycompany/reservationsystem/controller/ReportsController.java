@@ -42,8 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.applyStatusStyle;
-import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.applyTimeFormat;
+import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.*;
 
 @Component
 public class ReportsController {
@@ -105,7 +104,7 @@ public class ReportsController {
     @FXML
     private TableColumn<CustomerReportDTO, BigDecimal> totalrevenueCusrep, revenueResInCusRep;
     @FXML
-    private TableColumn<?, ?> phoneCusrep, totalreservationCusrep;
+    private TableColumn<CustomerReportDTO, ?> phoneCusrep, totalreservationCusrep;
 
     // --- Reservation Report ---
     @FXML
@@ -380,20 +379,8 @@ public class ReportsController {
 
     public void setupCustomerReports() {
 
-        totalrevenueCusrep.setCellFactory(col -> new TableCell<CustomerReportDTO, BigDecimal>() {
-            @Override
-            protected void updateItem(BigDecimal item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : String.format("%.2f", item));
-            }
-        });
-        averageCusrep.setCellFactory(col -> new TableCell<CustomerReportDTO, Double>() {
-            @Override
-            protected void updateItem(Double item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : String.format("%.2f", item));
-            }
-        });
+        applyDecimalFormat(totalrevenueCusrep,2);
+        applyDecimalFormat(averageCusrep,2);
 
 
 

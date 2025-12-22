@@ -133,9 +133,9 @@ public class AdministratorUIController implements Initializable, ReservationList
                 break;
 
             case "Messagingbtn":
-                MessagingPane.setVisible(true);
                 header.setText("Message Management");
-                return; // No view to load
+                fxmlFile = "/fxml/Messaging.fxml";
+                break;
 
             case "ManageStaffAndAccountsbtn":
                 header.setText("Account Management");
@@ -179,8 +179,10 @@ public class AdministratorUIController implements Initializable, ReservationList
                 viewLoader.preloadView("/fxml/Table.fxml");
                 break;
             case "TableManagementbtn":
-                viewLoader.preloadView("/fxml/Account.fxml");
+                viewLoader.preloadView("/fxml/Messaging.fxml");
                 break;
+            case "Messagingbtn":
+                viewLoader.preloadView("/fxml/Account.fxml");
             case "ManageStaffAndAccountsbtn":
                 viewLoader.preloadView("/fxml/Reports.fxml");
                 break;
@@ -201,6 +203,9 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     public TableController getTableController() {
         return (TableController) viewLoader.getCachedController("/fxml/Table.fxml");
+    }
+    public MessagingController getMessagingController(){
+        return (MessagingController) viewLoader.getCachedController("/fxml/Message.fxml");
     }
 
     public AccountController getAccountController() {

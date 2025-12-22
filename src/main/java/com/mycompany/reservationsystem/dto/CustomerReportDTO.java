@@ -1,10 +1,14 @@
 package com.mycompany.reservationsystem.dto;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class CustomerReportDTO {
 
+    private final BooleanProperty selected = new SimpleBooleanProperty(false);
     private String phone;
     private Long totalReservation;  // wrapper
     private BigDecimal totalRevenue;     // wrapper
@@ -20,6 +24,9 @@ public class CustomerReportDTO {
                 ? Math.round(averageRevenue.doubleValue() * 100.0) / 100.0
                 : 0.00;}
 
+    public BooleanProperty selectedProperty() {
+        return selected;
+    }
     public String getPhone() { return phone; }
     public Long getTotalReservation() { return totalReservation; }
     public BigDecimal getTotalRevenue() { return totalRevenue; }

@@ -7,7 +7,7 @@
 .close-button {
     -fx-background-color: transparent;
     -fx-text-fill: #FFFFFF;
-    -fx-font-size: 1.5em;
+    -fx-font-size: 1em;
     -fx-font-weight: bold;
     -fx-min-width: 2em;
     -fx-min-height: 2em;
@@ -44,7 +44,7 @@
 .login-error {
     -fx-text-fill: #e74c3c; /* Red */
     -fx-fill:#e74c3c;
-    -fx-font-size: 1.6em;
+    -fx-font-size: 1.3em;
     -fx-font-weight: 600;
 }
 
@@ -52,14 +52,14 @@
 .login-success {
     -fx-text-fill: #27ae60; /* Green */
     -fx-fill:#27ae60;
-    -fx-font-size: 1.6em;
+    -fx-font-size: 1.3em;
     -fx-font-weight: 600;
 }
 
 /* Hidden state */
 .login-message-hidden {
     -fx-opacity: 1;
-    -fx-font-size: 1.6em;
+    -fx-font-size: 1.3em;
     -fx-text-fill:white;
     }
 
@@ -107,7 +107,7 @@
     -fx-background-radius: 10;
     -mfx-main: #E53935 ;
     -fx-text-fill: white ;
-    -fx-font-size: 1.5em;
+    -fx-font-size: 1.1em;
    }
 .text-field{
       -fx-highlight-fill: #FFB6C9;     /* selection background */
