@@ -1,0 +1,363 @@
+package com.mycompany.reservationsystem.controller.main;
+
+import com.mycompany.reservationsystem.App;
+import com.mycompany.reservationsystem.dto.*;
+import com.mycompany.reservationsystem.model.*;
+import com.mycompany.reservationsystem.service.PermissionService;
+import com.mycompany.reservationsystem.util.BackgroundViewLoader;
+import com.mycompany.reservationsystem.websocket.ReservationListener;
+import com.mycompany.reservationsystem.websocket.WebSocketClient;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
+
+import static com.mycompany.reservationsystem.transition.ButtonTransition.setupButtonAnimation;
+
+/**
+ * FXML Controller class for Administrator UI
+ * Manages navigation and view loading with background processing
+ *
+ * @author formentera
+ */
+@Component
+public class AdministratorUIController implements Initializable, ReservationListener {
+
+    public User currentuser;
+    private BackgroundViewLoader viewLoader;
+
+    public void setUser(User user) {
+        this.currentuser = user;
+        applyPermissions();
+        System.out.println(currentuser.getPosition());
+    }
+
+    public User getCurrentUser() {
+        return currentuser;
+    }
+
+    @FXML
+    private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn,
+            Messagingbtn, ManageStaffAndAccountsbtn, Reportsbtn, ActivityLogbtn;
+    @FXML
+    private MenuItem logoutBtn;
+    @FXML
+    private ScrollPane MessagingPane;
+    @FXML
+    private Label header;
+    @FXML
+    private StackPane content;
+
+    @Autowired
+    private ConfigurableApplicationContext springContext;
+
+    @Autowired
+    private PermissionService permissionService;
+
+    private Reservation selectedReservation;
+
+    WebSocketClient wsClient;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Initialize background loader
+
+        viewLoader = new BackgroundViewLoader(springContext);
+
+        // Preload commonly used views on startup (happens in background)
+        viewLoader.preloadViews(
+                "/fxml/main/Reservation.fxml",
+                "/fxml/main/Table.fxml"
+        );
+
+        setupButtonAnimation(Dashboardbtn);
+        setupButtonAnimation(ReservationManagementbtn);
+        setupButtonAnimation(TableManagementbtn);
+        setupButtonAnimation(Messagingbtn);
+        setupButtonAnimation(Reportsbtn);
+        setupButtonAnimation(ReservationManagementbtn);
+        setupButtonAnimation(ManageStaffAndAccountsbtn);
+        setupButtonAnimation(ActivityLogbtn);
+
+        // Load dashboard initially
+        Dashboardbtn.fire();
+
+        // Setup WebSocket in separate thread
+        WebSocketClient wsClient = new WebSocketClient();
+        wsClient.addListener(this);
+        new Thread(() -> {
+            try {
+                wsClient.connect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    @FXML
+    private void navigate(ActionEvent event) {
+        Button clicked = (Button) event.getSource();
+        Button[] buttons = {Dashboardbtn, ReservationManagementbtn, TableManagementbtn,
+                Messagingbtn, ManageStaffAndAccountsbtn, Reportsbtn, ActivityLogbtn};
+
+        // Update button styles
+        for (Button btn : buttons) {
+            if (btn == null) {
+                continue;
+            }
+            btn.getStyleClass().remove("navigation-btns-active");
+            if (!btn.getStyleClass().contains("navigation-btns")) {
+                btn.getStyleClass().add("navigation-btns");
+            }
+        }
+
+        clicked.getStyleClass().remove("navigation-btns");
+        if (!clicked.getStyleClass().contains("navigation-btns-active")) {
+            clicked.getStyleClass().add("navigation-btns-active");
+        }
+
+        System.out.println(clicked.getId());
+
+        String fxmlFile = null;
+        switch (clicked.getId()) {
+            case "Dashboardbtn":
+                header.setText("Dashboard");
+                fxmlFile = "/fxml/main/Dashboard.fxml";
+                break;
+
+            case "ReservationManagementbtn":
+                header.setText("Reservation Management");
+                fxmlFile = "/fxml/main/Reservation.fxml";
+                break;
+
+            case "TableManagementbtn":
+                header.setText("Table Management");
+                fxmlFile = "/fxml/main/Table.fxml";
+                break;
+
+            case "Messagingbtn":
+                header.setText("Message Management");
+                fxmlFile = "/fxml/main/Messaging.fxml";
+                break;
+
+            case "ManageStaffAndAccountsbtn":
+                header.setText("Account Management");
+                fxmlFile = "/fxml/main/Account.fxml";
+                break;
+
+            case "Reportsbtn":
+                header.setText("Reports");
+                fxmlFile = "/fxml/main/Reports.fxml";
+                break;
+
+            case "ActivityLogbtn":
+                header.setText("Activity Logs");
+                fxmlFile = "/fxml/main/ActivityLogs.fxml";
+                break;
+
+            default:
+                break;
+        }
+
+        if (fxmlFile != null) {
+            final String viewToLoad = fxmlFile;
+            // Load view asynchronously with loading indicator
+            viewLoader.loadViewAsync(viewToLoad, content, () -> {
+                // After view loads, preload adjacent views for faster navigation
+                preloadAdjacentViews(clicked.getId());
+            });
+        }
+    }
+    @FXML
+    private void Settings(ActionEvent event) {
+        Platform.runLater(() -> {
+            try {
+                // Load login scene
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main/Settings.fxml"));
+                loader.setControllerFactory(springContext::getBean);
+                Parent settingsRoot = loader.load();
+
+                // Replace the scene content
+                Stage settingsStage = new Stage();
+                settingsStage.initStyle(StageStyle.UNDECORATED);
+                settingsStage.setScene(new Scene(settingsRoot));
+                settingsStage.setTitle("Settings");
+                settingsStage.initModality(Modality.APPLICATION_MODAL);
+                settingsStage.initOwner(App.primaryStage);
+                settingsStage.setResizable(false); // optional
+                settingsStage.centerOnScreen();
+                settingsStage.showAndWait();
+
+
+
+
+
+                // Optionally center window
+                ;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+
+
+
+    /**
+     * Preload views the user is likely to navigate to next
+     * This improves perceived performance by loading views before they're needed
+     */
+    private void preloadAdjacentViews(String currentViewId) {
+        switch (currentViewId) {
+            case "Dashboardbtn":
+                viewLoader.preloadView("/fxml/main/Reservation.fxml");
+                viewLoader.preloadView("/fxml/main/Settings.fxml");
+                break;
+            case "ReservationManagementbtn":
+                viewLoader.preloadView("/fxml/main/Table.fxml");
+                break;
+            case "TableManagementbtn":
+                viewLoader.preloadView("/fxml/main/Messaging.fxml");
+                break;
+            case "Messagingbtn":
+                viewLoader.preloadView("/fxml/main/Account.fxml");
+                break;
+            case "ManageStaffAndAccountsbtn":
+                viewLoader.preloadView("/fxml/main/Reports.fxml");
+                break;
+            case "Reportsbtn":
+                viewLoader.preloadView("/fxml/main/ActivityLogs.fxml");
+                break;
+        }
+    }
+
+    private void applyPermissions() {
+        if (currentuser == null) return;
+
+        // Map each button to its required permission code
+        Map<Button, String> buttonPermissions = Map.of(
+                Dashboardbtn,"VIEW_DASHBOARD",
+                ReservationManagementbtn, "VIEW_RESERVATION",
+                TableManagementbtn, "VIEW_TABLES",
+                Messagingbtn, "VIEW_MESSAGING",
+                Reportsbtn, "VIEW_REPORTS",
+                ManageStaffAndAccountsbtn, "VIEW_ACCOUNTS",
+                ActivityLogbtn, "VIEW_ACTIVITY_LOGS"
+        );
+
+        // Disable buttons if user doesn't have permission
+        buttonPermissions.forEach((button, code) ->
+                button.setManaged(permissionService.hasPermission(currentuser, code))
+
+
+        );
+    }
+
+    // Controller getters - now using cached controllers from background loader
+    public DashboardController getDashboardController() {
+        return (DashboardController) viewLoader.getCachedController("/fxml/main/Dashboard.fxml");
+    }
+
+    public ReservationController getReservationController() {
+        return (ReservationController) viewLoader.getCachedController("/fxml/main/Reservation.fxml");
+    }
+
+    public TableController getTableController() {
+        return (TableController) viewLoader.getCachedController("/fxml/main/Table.fxml");
+    }
+    public MessagingController getMessagingController(){
+        return (MessagingController) viewLoader.getCachedController("/fxml/Message.fxml");
+    }
+
+    public AccountController getAccountController() {
+        return (AccountController) viewLoader.getCachedController("/fxml/main/Account.fxml");
+    }
+
+    public ActivityLogsController getActivityLogsController() {
+        return (ActivityLogsController) viewLoader.getCachedController("/fxml/main/ActivityLogs.fxml");
+    }
+
+    public ReportsController getReportsController() {
+        return (ReportsController) viewLoader.getCachedController("/fxml/main/Reports.fxml");
+    }
+
+    @Override
+    public void onNewReservation(WebupdateDTO reservation) {
+        // Only update if Dashboard controller is already loaded (not forced loading)
+        DashboardController controller = getDashboardController();
+        if (controller != null) {
+            // Update in background to avoid blocking the UI thread
+            CompletableFuture.runAsync(() -> {
+                Platform.runLater(() -> {
+                    controller.updateLabels();
+                });
+            });
+        }
+    }
+    @FXML
+    private void logout(ActionEvent event) {
+        // 1. Stop background tasks
+        shutdown();
+
+        if (wsClient != null) {
+            wsClient.disconnect();
+        }
+
+        // 2. Clear user session
+        this.currentuser = null;
+
+        // 3. Close current stage or remove current scene
+        Platform.runLater(() -> {
+            try {
+                // Load login scene
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+                loader.setControllerFactory(springContext::getBean);
+                Parent loginRoot = loader.load();
+
+                // Replace the scene content
+                Stage loginStage = new Stage();
+                loginStage.initStyle(StageStyle.UNDECORATED);
+                loginStage.setScene(new Scene(loginRoot));
+                loginStage.setTitle("Login");
+                loginStage.setResizable(false); // optional
+                loginStage.show();
+                loginStage.centerOnScreen();
+
+                // Close current Stage (Administrator UI)
+                Stage currentStage = (Stage) logoutBtn.getParentPopup().getOwnerWindow();
+                currentStage.close();
+
+                // Optionally center window
+                ;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Clean shutdown - call this when closing the application
+     */
+    public void shutdown() {
+        if (viewLoader != null) {
+            viewLoader.shutdown();
+        }
+    }
+}

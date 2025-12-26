@@ -15,27 +15,28 @@
         <version>3.2.1</version>
     </parent>
     <dependencies>
-       <dependency>
-    <groupId>org.springframework</groupId>
-    <artifactId>spring-websocket</artifactId>
-    <version>6.1.16</version> <!-- match your Spring Boot version -->
-    </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se-core</artifactId>
+            <version>5.1.2.Final</version>
+        </dependency>
 
-    <!-- Spring messaging (needed for STOMP support) -->
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-messaging</artifactId>
-        <version>6.1.16</version>
-    </dependency>
 
-    <!-- Jackson for JSON conversion -->
+        <!-- Jackson for JSON conversion -->
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
     </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.janino</groupId>
+                    <artifactId>janino</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -86,6 +87,11 @@
             <groupId>io.github.palexdev</groupId>
             <artifactId>materialfx</artifactId>
             <version>11.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fazecast</groupId>
+            <artifactId>jSerialComm</artifactId>
+            <version>[2.0.0,3.0.0)</version>
         </dependency>
     </dependencies>
     <build>

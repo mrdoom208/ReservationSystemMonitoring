@@ -1,7 +1,6 @@
 
 .root{
       -fx-font-family: "Lora";
-    -fx-background-color:E10600;
     -fx-text-fill: white;
 }
 .close-button {
@@ -91,7 +90,9 @@
 }
 .plain-pane-third{
     -fx-background-color: #2C2C2C;
-    -fx-background-radius:0.95em;
+    -fx-background-radius:1em;
+    -fx-border-radius:1em;
+    -fx-border-color: transparent;
 
 }
 
@@ -640,6 +641,24 @@
     -fx-font-weight: bold;     /* bold text */
     -fx-text-fill: white;      /* text color */
 }
+.basic-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 1em;
+    -fx-background-radius: 8;
+    -fx-border-color:white;
+    -fx-border-radius:8;
+}
+
+.basic-btn:hover {
+    -fx-background-color: #303030;
+
+}
+
+.basic-btn:armed {
+    -fx-background-color: #2C2C2C;
+
+}
 
 
 
@@ -799,12 +818,12 @@
 
 .filter-btn:hover {
     -fx-background-color: #FF4C4C;
-;
+
 }
 
 .filter-btn:armed {
     -fx-background-color: #CC0000
-;
+
 }
 
 .custom-btn {
@@ -986,13 +1005,14 @@
 }
 
 /* When selected (checked) */
-.selectAll .box {
-    -fx-background-color: rgba(255, 0, 0, 1); /* fill color */
-}
 
 /* Optional: border color when not selected */
 .selectAll .box {
     -fx-border-color: #ffffff;  /* white border for contrast */
     -fx-border-width: 1.5px;
     -fx-background-color: transparent; /* default background */
+}
+.selectAll:selected .box {
+    -fx-background-color: rgba(255, 0, 0, 1); /* fill color */
+    -fx-background-color: #FF0000;
 }

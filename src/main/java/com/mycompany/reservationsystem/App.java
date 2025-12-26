@@ -14,6 +14,8 @@ import javafx.scene.Scene;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
 import org.kordamp.bootstrapfx.BootstrapFX;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -36,6 +38,7 @@ public class App extends Application {
     public void init() {
         // Start the Spring Boot context when the app launches
         springContext = new SpringApplicationBuilder(App.class).run();
+
     }
 
     @Override
@@ -79,8 +82,8 @@ public class App extends Application {
     }
     @Override
     public void stop() {
-        // Close Spring context when JavaFX stops
         springContext.close();
+
         if(backgroundLoader != null){
         backgroundLoader.shutdown();
         }

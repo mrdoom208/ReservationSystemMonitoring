@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<GridPane prefHeight="1000.0" prefWidth="1300.0" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.reservationsystem.controller.main.AdministratorUIController">
+   <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="678.0" minWidth="10.0" percentWidth="13.0" prefWidth="165.0" />
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="1196.0" minWidth="10.0" percentWidth="87.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+   </rowConstraints>
+   <children>
+      <GridPane alignment="CENTER" minHeight="720.0" prefHeight="720.0" prefWidth="185.0" styleClass="mainpane">
+         <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="547.0" minHeight="10.0" percentHeight="25.0" prefHeight="176.0" valignment="CENTER" vgrow="NEVER" />
+            <RowConstraints maxHeight="573.0" minHeight="10.0" percentHeight="55.0" prefHeight="573.0" />
+            <RowConstraints maxHeight="547.0" minHeight="10.0" prefHeight="177.0" vgrow="ALWAYS" />
+         </rowConstraints>
+         <children>
+            <VBox alignment="TOP_CENTER" maxHeight="-Infinity" prefWidth="169.0" spacing="10.0" GridPane.rowIndex="1">
+               <children>
+                  <MFXButton fx:id="Dashboardbtn" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#navigate" prefHeight="100.0" styleClass="navigation-btns" text="Dashboard" wrapText="true">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </MFXButton>
+                  <MFXButton fx:id="ReservationManagementbtn" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#navigate" prefHeight="100.0" styleClass="navigation-btns" text="Reservations" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </MFXButton>
+                  <MFXButton fx:id="TableManagementbtn" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#navigate" prefHeight="100.0" styleClass="navigation-btns" text="Tables" textOverrun="CLIP" wrapText="true">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </MFXButton>
+                  <MFXButton fx:id="Messagingbtn" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" onAction="#navigate" prefHeight="100.0" styleClass="navigation-btns" text="Messaging" VBox.vgrow="ALWAYS" />
+                  <MFXButton fx:id="Reportsbtn" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#navigate" prefHeight="100.0" styleClass="navigation-btns" text="Reports" wrapText="true" VBox.vgrow="ALWAYS">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </MFXButton>
+                  <MFXButton fx:id="ManageStaffAndAccountsbtn" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#navigate" prefHeight="100.0" styleClass="navigation-btns" text="Accounts" textAlignment="CENTER" wrapText="true">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </MFXButton>
+                  <MFXButton fx:id="ActivityLogbtn" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#navigate" prefHeight="100.0" styleClass="navigation-btns" text="Activity Logs" VBox.vgrow="ALWAYS" />
+               </children>
+               <padding>
+                  <Insets left="5.0" right="5.0" />
+               </padding>
+            </VBox>
+            <ImageView fitHeight="118.0" fitWidth="112.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+               <image>
+                  <Image url="@../../Images/LogoRound.png" />
+               </image>
+            </ImageView>
+         </children>
+      </GridPane>
+      <VBox prefHeight="200.0" prefWidth="1112.0" styleClass="DashboardPane" GridPane.columnIndex="1">
+         <children>
+             <StackPane prefHeight="55.0" prefWidth="1131.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+                 <children>
+                  <GridPane prefHeight="52.0" prefWidth="1131.0" StackPane.alignment="CENTER">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="849.0" minWidth="10.0" prefWidth="785.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="849.0" minWidth="10.0" percentWidth="5.0" prefWidth="28.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="353.0" minWidth="3.0" percentWidth="20.0" prefWidth="220.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                             <Label fx:id="header" styleClass="BoldText" text="Dashboard">
+                                 <font>
+                              <Font size="36.0" />
+                           </font>
+                                 <padding>
+                              <Insets left="15.0" />
+                           </padding>
+                             </Label>
+                        <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" prefHeight="50.0" prefWidth="200.0" GridPane.columnIndex="3">
+                           <children>
+                              <Label alignment="BOTTOM_RIGHT" prefHeight="21.0" prefWidth="121.0" styleClass="static-label" text="Administrator" HBox.hgrow="ALWAYS" />
+                              <MenuButton fx:id="profile" alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" styleClass="profilemenu" textAlignment="JUSTIFY">
+                                 <HBox.margin>
+                                    <Insets right="15.0" />
+                                 </HBox.margin>
+                                 <graphic>
+                                     <ImageView cache="true" fitHeight="57.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" smooth="true">
+                                         <image>
+                                             <Image preserveRatio="true" requestedHeight="57" requestedWidth="50" smooth="true" url="@../../Images/ACCOUNT.png" />
+                                         </image>
+                                     </ImageView>
+                                 </graphic>
+                                 <items>
+                                    <MenuItem mnemonicParsing="false" text="Profile" />
+                                    <MenuItem mnemonicParsing="false" onAction="#Settings" text="Settings" />
+                                    <MenuItem fx:id="logoutBtn" mnemonicParsing="false" onAction="#logout" text="Logout" />
+                                 </items>
+                              </MenuButton>
+                           </children>
+                        </HBox>
+                     </children>
+                  </GridPane>
+
+                 </children>
+             </StackPane>
+            <StackPane fx:id="content" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="150.0" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+   </children>
+</GridPane>

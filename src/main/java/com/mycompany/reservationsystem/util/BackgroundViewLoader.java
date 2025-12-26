@@ -1,11 +1,13 @@
 package com.mycompany.reservationsystem.util;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.IOException;
@@ -22,9 +24,12 @@ import java.util.concurrent.Executors;
 public class BackgroundViewLoader {
 
     private final ConfigurableApplicationContext springContext;
-    private final Map<String, Object> controllerCache = new HashMap<>();
-    private final Map<String, Node> viewCache = new HashMap<>();
+    private final Map<String, Object> controllerCache =
+            new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<String, Node> viewCache =
+            new java.util.concurrent.ConcurrentHashMap<>();
     private final ExecutorService executor = Executors.newFixedThreadPool(3);
+    private volatile Task<?> activeTask;
 
     public BackgroundViewLoader(ConfigurableApplicationContext springContext) {
         this.springContext = springContext;
@@ -37,7 +42,11 @@ public class BackgroundViewLoader {
      * @param onComplete Optional callback to run after loading completes
      */
     public void loadViewAsync(String fxmlFile, StackPane content, Runnable onComplete) {
-        // Check cache first
+
+        if (activeTask != null && activeTask.isRunning()) {
+            activeTask.cancel();
+        }
+
         Node cachedView = viewCache.get(fxmlFile);
         if (cachedView != null) {
             content.getChildren().setAll(cachedView);
@@ -45,13 +54,13 @@ public class BackgroundViewLoader {
             return;
         }
 
-        // Show loading indicator
         ProgressIndicator loading = new ProgressIndicator();
         loading.setMaxSize(70, 70);
         content.getChildren().setAll(loading);
 
-        // Load in background
-        Task<ViewLoadResult> loadTask = new Task<ViewLoadResult>() {
+        long startTime = System.currentTimeMillis();
+
+        Task<ViewLoadResult> loadTask = new Task<>() {
             @Override
             protected ViewLoadResult call() throws Exception {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
@@ -64,28 +73,36 @@ public class BackgroundViewLoader {
             }
         };
 
-        loadTask.setOnSucceeded(event -> {
-            ViewLoadResult result = loadTask.getValue();
+        activeTask = loadTask; // ✅ FIX
 
-            // Cache the result
+        loadTask.setOnSucceeded(event -> {
+            if (loadTask.isCancelled()) return;
+
+            ViewLoadResult result = loadTask.getValue();
             viewCache.put(fxmlFile, result.view);
             controllerCache.put(fxmlFile, result.controller);
 
-            // Display the view
-            content.getChildren().setAll(result.view);
+            long elapsed = System.currentTimeMillis() - startTime;
+            long delay = Math.max(300 - elapsed, 0);
 
-            if (onComplete != null) onComplete.run();
+            PauseTransition pause = new PauseTransition(Duration.millis(delay));
+            pause.setOnFinished(ev -> {
+                if (loadTask.isCancelled()) return;
+                content.getChildren().setAll(result.view);
+                if (onComplete != null) onComplete.run();
+            });
+            pause.play();
         });
 
         loadTask.setOnFailed(event -> {
-            Throwable error = loadTask.getException();
-            error.printStackTrace();
-            // Show error message to user
+            if (loadTask.isCancelled()) return;
+            loadTask.getException().printStackTrace();
             content.getChildren().clear();
         });
 
         executor.submit(loadTask);
     }
+
 
     /**
      * Preload views in background without displaying them
@@ -165,4 +182,42 @@ public class BackgroundViewLoader {
             this.controller = controller;
         }
     }
+    public static <T> void runAsync(
+            Task<T> task,
+            Runnable onStart,
+            java.util.function.Consumer<T> onSuccess
+    ) {
+        // Run on JavaFX thread
+        if (onStart != null) {
+            Platform.runLater(() -> {
+                onStart.run();   // show loader
+
+                // Start background thread after loader is rendered
+                new Thread(() -> {
+                    task.setOnSucceeded(e ->
+                            Platform.runLater(() -> onSuccess.accept(task.getValue()))
+                    );
+
+                    task.setOnFailed(e -> {
+                        task.getException().printStackTrace();
+                    });
+
+                    task.run(); // execute task in this new thread
+                }).start();
+            });
+        } else {
+            new Thread(() -> {
+                task.setOnSucceeded(e ->
+                        Platform.runLater(() -> onSuccess.accept(task.getValue()))
+                );
+
+                task.setOnFailed(e -> {
+                    task.getException().printStackTrace();
+                });
+
+                task.run();
+            }).start();
+        }
+    }
+
 }

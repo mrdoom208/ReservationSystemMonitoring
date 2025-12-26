@@ -4,13 +4,12 @@
  */
 package com.mycompany.reservationsystem.controller;
 import com.mycompany.reservationsystem.App;
-import com.mycompany.reservationsystem.Service.ActivityLogService;
-import com.mycompany.reservationsystem.model.ActivityLog;
+import com.mycompany.reservationsystem.controller.main.AdministratorUIController;
+import com.mycompany.reservationsystem.service.ActivityLogService;
 import com.mycompany.reservationsystem.model.User;
 import com.mycompany.reservationsystem.repository.ActivityLogRepository;
 import com.mycompany.reservationsystem.repository.UserRepository;
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -20,7 +19,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.*;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import javafx.animation.PauseTransition;
@@ -146,7 +144,7 @@ public class LoginController {
                 System.out.println("Login Successfully");
                     found.setStatus("Active");
                     userRepository.save(found);
-                    String fxmlFile = "/fxml/AdministratorUI.fxml";
+                    String fxmlFile = "/fxml/main/AdministratorUI.fxml";
                     FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
                     loader.setControllerFactory(springContext::getBean);
                     Parent root = loader.load();
