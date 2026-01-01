@@ -1,6 +1,10 @@
 package com.mycompany.reservationsystem.controller.main;
 
+import com.mycompany.reservationsystem.App;
 import com.mycompany.reservationsystem.controller.popup.DeleteTableDialogController;
+import com.mycompany.reservationsystem.controller.popup.addAccountController;
+import com.mycompany.reservationsystem.controller.popup.addTableDialogController;
+import com.mycompany.reservationsystem.controller.popup.editAccountController;
 import com.mycompany.reservationsystem.model.User;
 import com.mycompany.reservationsystem.repository.UserRepository;
 import com.mycompany.reservationsystem.service.PermissionService;
@@ -24,6 +28,7 @@ import javafx.stage.StageStyle;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -38,6 +43,9 @@ public class AccountController {
     public AccountController(AdministratorUIController adminUIController) {
         this.adminUIController = adminUIController;
     }
+    @Autowired
+    private ConfigurableApplicationContext springContext;
+
 
     @FXML
     private TableView<User> AccountTable;
@@ -122,9 +130,31 @@ public class AccountController {
 
                 btnEdit.setOnAction(event -> {
                     User data = getTableView().getItems().get(getIndex());
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup/editAccount.fxml"));
+                        loader.setControllerFactory(springContext::getBean);
+                        Parent root = loader.load();
 
+                        Stage dialogStage = new Stage();
+                        dialogStage.initModality(Modality.APPLICATION_MODAL);
+                        dialogStage.initOwner(App.primaryStage); // mainStage is your primary stage
+                        dialogStage.initStyle(StageStyle.TRANSPARENT);
+                        dialogStage.setResizable(false);
+                        Scene scn = new Scene(root);
+                        scn.setFill(Color.TRANSPARENT);
+                        dialogStage.setScene(scn);
 
-                });
+                        // Link controller with dialog stage
+                        editAccountController controller = loader.getController();
+                        controller.setDialogStage(dialogStage);
+                        controller.setEdituser(data);
+                        dialogStage.showAndWait(); // wait until closed
+                        loadAccountTable();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+            });
 
                 btnDelete.setOnAction(event -> {
                     User data = getTableView().getItems().get(getIndex());
@@ -215,9 +245,34 @@ public class AccountController {
     public void loadAccountTable(){
         List<User> data = userRepository.findAll();
         UserData.setAll(data);
-
     }
 
+    @FXML
+    private void newAccount() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup/addAccount.fxml"));
+            loader.setControllerFactory(springContext::getBean);
+            Parent root = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(App.primaryStage); // mainStage is your primary stage
+            dialogStage.initStyle(StageStyle.TRANSPARENT);
+            dialogStage.setResizable(false);
+            Scene scn = new Scene(root);
+            scn.setFill(Color.TRANSPARENT);
+            dialogStage.setScene(scn);
+
+            // Link controller with dialog stage
+            addAccountController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            dialogStage.showAndWait(); // wait until closed
+            loadAccountTable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
 
     public void initialize(){

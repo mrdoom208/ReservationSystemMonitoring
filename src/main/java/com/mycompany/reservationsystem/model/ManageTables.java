@@ -4,11 +4,8 @@
  */
 package com.mycompany.reservationsystem.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+
 import java.sql.Time;
 import java.time.LocalTime;
 import java.util.List;
@@ -21,9 +18,9 @@ import java.util.List;
 public class ManageTables {
     
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    
-    
+    @Column(unique = true)
     String tableNo;
     int capacity;
     String status;

@@ -1,9 +1,9 @@
 package com.mycompany.reservationsystem.controller.popup;
 
-import com.mycompany.reservationsystem.util.FieldRestrictions;
-import com.mycompany.reservationsystem.util.FieldValidators;
 import com.mycompany.reservationsystem.model.ManageTables;
 import com.mycompany.reservationsystem.repository.ManageTablesRepository;
+import com.mycompany.reservationsystem.util.FieldRestrictions;
+import com.mycompany.reservationsystem.util.FieldValidators;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -14,8 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class addTableDialogController {
+public class editTableDialogController {
+    @FXML
+    private ManageTables targetTable;
 
+    public void setTargetTable(ManageTables TargetTable){
+        this.targetTable = TargetTable;
+        tableNumberField.setText(targetTable.getTableNo());
+        tableCapacityField.setText(String.valueOf(targetTable.getCapacity()));
+        tableLocationField.setText(targetTable.getLocation());
+        statusComboBox.setValue(targetTable.getStatus());
+    }
     @FXML
     private MFXTextField tableCapacityField;
 
@@ -72,8 +81,7 @@ public class addTableDialogController {
         fieldRestrictions.applyNumbersOnly(tableCapacityField);
         fieldRestrictions.applyNumbersOnly(tableNumberField);
 
-
-
+        tableNumberField.setDisable(true);
 
         cancelButton.setOnAction(e -> dialogStage.close());
 
@@ -81,20 +89,15 @@ public class addTableDialogController {
             if (!fieldValidators.validateRequired(tableNumberField)) {showError("Please Insert Table Number"); return;}
             if (!fieldValidators.validateRequired(tableCapacityField)) {showError("Please Insert Table Capacity"); return;}
             if (!fieldValidators.validateRequired(tableLocationField)){showError("Please Insert Table Location"); return;}
-            if(manageTablesRepository.existsByTableNo(tableNumberField.getText())){
-                fieldValidators.markInvalid(tableNumberField);
-                showError("Table Number Already Exist");
-                return;
-            }
-            // handle add table logic here
-            showSuccess("Table Added Successfully");
-            ManageTables newTable=new ManageTables();
-            newTable.setCapacity(Integer.parseInt(tableCapacityField.getText()));
-            newTable.setTableNo(tableNumberField.getText());
-            newTable.setLocation(tableLocationField.getText());
-            newTable.setStatus(statusComboBox.getValue());
-            manageTablesRepository.save(newTable);
 
+            // handle add table logic here
+            showSuccess("Table Changed Successfully");
+
+            targetTable.setCapacity(Integer.parseInt(tableCapacityField.getText()));
+            targetTable.setTableNo(tableNumberField.getText());
+            targetTable.setLocation(tableLocationField.getText());
+            targetTable.setStatus(statusComboBox.getValue());
+            manageTablesRepository.save(targetTable);
             // close dialog after adding
             dialogStage.close();
         });

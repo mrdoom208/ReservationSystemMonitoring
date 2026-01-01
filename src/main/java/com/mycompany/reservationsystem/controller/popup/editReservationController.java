@@ -1,11 +1,9 @@
 package com.mycompany.reservationsystem.controller.popup;
 
-import com.mycompany.reservationsystem.util.FieldRestrictions;
-import com.mycompany.reservationsystem.util.FieldValidators;
 import com.mycompany.reservationsystem.model.Customer;
 import com.mycompany.reservationsystem.model.Reservation;
-import com.mycompany.reservationsystem.repository.CustomerRepository;
 import com.mycompany.reservationsystem.repository.ReservationRepository;
+import com.mycompany.reservationsystem.util.FieldValidators;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -18,8 +16,24 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static com.mycompany.reservationsystem.util.FieldRestrictions.*;
+
 @Component
-public class addReservationController {
+public class editReservationController {
+    private Reservation targetReservation;
+
+    public void setTargetReservation(Reservation targetReservation) {
+        this.targetReservation = targetReservation;
+        CustomerName.setText(targetReservation.getCustomer().getName());
+        Pax.setText(String.valueOf(targetReservation.getPax()));
+        Phone.setText(targetReservation.getCustomer().getPhone());
+        Email.setText(targetReservation.getCustomer().getEmail());
+
+    }
+    private Stage dialogStage;
+    public void setDialogStage(Stage dialogStage){
+        this.dialogStage = dialogStage;
+    }
 
     @FXML
     private MFXTextField CustomerName;
@@ -34,32 +48,22 @@ public class addReservationController {
     private MFXTextField Phone;
 
     @FXML
-    private MFXButton addButton;
+    private MFXButton Submit;
 
     @FXML
     private MFXButton cancelButton;
 
     @FXML
-    private MFXComboBox<String> statusComboBox;
-
-    @FXML
     private Label messageLabel;
 
-    @Autowired
-    CustomerRepository customerRepository;
+    @FXML
+    private MFXComboBox<String> statusComboBox;
 
     @Autowired
-    ReservationRepository reservationRepository;
-
-    private Stage dialogStage;
-
-    private FieldRestrictions fieldRestrictions;
+    private ReservationRepository reservationRepository;
 
     private FieldValidators fieldValidators;
 
-    public void setDialogStage(Stage stage) {
-        this.dialogStage = stage;
-    }
     private void showError(String message) {
         messageLabel.getStyleClass().removeAll("popup-success", "popup-message-hidden");
         messageLabel.getStyleClass().add("popup-error");
@@ -73,19 +77,18 @@ public class addReservationController {
     }
 
     @FXML
-    public void initialize() {
+    private void initialize(){
         statusComboBox.getItems().addAll("Pending", "Confirm");
-        statusComboBox.setValue("Pending");
-
-        fieldRestrictions.applyEmailRestriction(Email);
-        fieldRestrictions.applyNumbersOnly(Pax);
-        fieldRestrictions.applyNumbersOnly(Phone);
-        fieldRestrictions.applyLettersOnly(CustomerName);
+        statusComboBox.setValue(targetReservation.getStatus());
+        statusComboBox.setDisable(true);
+        applyEmailRestriction(Email);
+        applyNumbersOnly(Pax);
+        applyNumbersOnly(Phone);
+        applyLettersOnly(CustomerName);
 
 
         cancelButton.setOnAction(e -> dialogStage.close());
-
-        addButton.setOnAction(e -> {
+        Submit.setOnAction(event -> {
             if (!fieldValidators.validateRequired(CustomerName)) {showError("Please Insert Customer Name"); return;}
             if (!fieldValidators.validateRequired(Pax)) {showError("Please Insert Pax Size"); return;}
             if (!fieldValidators.isNonZeroNumeric(Pax)) {showError("Pax must be greater than zero."); return;}
@@ -93,30 +96,21 @@ public class addReservationController {
             if (!fieldValidators.startsWith09(Phone)) {showError("Please Insert Valid Phone No."); return;}
             if (Email.getText() != null && !Email.getText().trim().isEmpty()) {
                 // Email has text, so validate format
-                if (!fieldRestrictions.isValidEmail(Email)) {
+                if (!isValidEmail(Email)) {
                     showError("Please Insert Valid Email");
-                         return;
+                    return;
                 }
             }
-            showSuccess("Reservation Added Successfully");
-            Customer newCustomer = new Customer();
-            newCustomer.setName(CustomerName.getText());
-            newCustomer.setEmail(Email.getText());
-            newCustomer.setPhone(Phone.getText());
-            customerRepository.save(newCustomer);
-
-            Reservation newReservation = new Reservation();
-            newReservation.setCustomer(newCustomer);
-            newReservation.setPax(Integer.parseInt(Pax.getText()));
-            newReservation.setStatus(statusComboBox.getValue());
-            newReservation.setReservationPendingtime(LocalTime.now());
-            newReservation.setDate(LocalDate.now());
-            newReservation.setReference(String.format("RSV-%05d", reservationRepository.count() + 1));
-            reservationRepository.save(newReservation);
-
+            showSuccess("Reservation Changed Successfully");
+            targetReservation.getCustomer().setName(CustomerName.getText());
+            targetReservation.setPax(Integer.parseInt(Pax.getText()));
+            targetReservation.getCustomer().setPhone(Phone.getText());
+            targetReservation.getCustomer().setEmail(Email.getText());
+            reservationRepository.save(targetReservation);
             // close dialog after adding
             dialogStage.close();
-        });
-    }
 
+        });
+
+    }
 }

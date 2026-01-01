@@ -1,6 +1,7 @@
 
 .root{
-      -fx-font-family: "Lora";
+    -fx-background-color: #FF0000;
+    -fx-font-family: "Lora";
     -fx-text-fill: white;
 }
 .close-button {
@@ -86,7 +87,7 @@
 
 
 .plain-pane-secondary{
-    -fx-background-color:#303030;
+       -fx-background-color: #383838;
 }
 .plain-pane-third{
     -fx-background-color: #2C2C2C;
@@ -95,8 +96,6 @@
     -fx-border-color: transparent;
 
 }
-
-
 
 .login-container{
     -fx-background-color:#1E1E1E;
@@ -1016,3 +1015,15 @@
     -fx-background-color: rgba(255, 0, 0, 1); /* fill color */
     -fx-background-color: #FF0000;
 }
+.progressbar-label{
+    -fx-text-fill: white;
+    -fx-font-size: .9em;
+    -fx-font-weight: normal;
+}
+.mfx-progress-bar {
+    -mfx-progress-color: #4CAF50; /* fill color */
+    -mfx-track-color: #333333;    /* track color */
+    -mfx-border-radius: 5;
+    -mfx-background-radius: 5;
+}
+

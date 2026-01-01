@@ -3,7 +3,9 @@ package com.mycompany.reservationsystem.controller.main;
 import com.mycompany.reservationsystem.App;
 import com.mycompany.reservationsystem.controller.popup.DeleteTableDialogController;
 import com.mycompany.reservationsystem.controller.popup.addTableDialogController;
+import com.mycompany.reservationsystem.controller.popup.editTableDialogController;
 import com.mycompany.reservationsystem.controller.popup.setAmountPaidController;
+import com.mycompany.reservationsystem.model.ManageTables;
 import com.mycompany.reservationsystem.service.ActivityLogService;
 import com.mycompany.reservationsystem.service.PermissionService;
 import com.mycompany.reservationsystem.service.ReservationService;
@@ -45,8 +47,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.addItemsToCombo;
-import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.applyStatusStyle;
+import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.*;
 
 
 @Component
@@ -185,7 +186,7 @@ public class TableController {
         String[] statuses = {"Available","Reserved","Occupied","Show All"};
         addItemsToCombo(tablefilter,tablesfilteredData,ManageTablesDTO::getStatus,statuses);
         applyStatusStyle(StatusTM);
-
+        applyTimeFormat(TimeUsedTM);
 
         // --- Action Column with Buttons ---
         ActionTM.setCellFactory(col -> new TableCell<ManageTablesDTO, Void>() {
@@ -206,10 +207,12 @@ public class TableController {
                 btnEdit.setDisable(!permissionService.hasPermission(currentuser,"EDIT_TABLE"));
                 btnDelete.setDisable(!permissionService.hasPermission(currentuser,"REMOVE_TABLE"));
 
-
                 btnStart.setOnAction(e -> handleStart());
                 btnComplete.setOnAction(e -> handleComplete());
-                btnEdit.setOnAction(e -> handleEdit());
+                btnEdit.setOnAction(e -> {
+                    ManageTablesDTO data = getTableView().getItems().get(getIndex());
+                    handleEdit(data.getTableNo());
+                });
                 btnDelete.setOnAction(e -> handleDelete());
             }
 
@@ -390,22 +393,43 @@ public class TableController {
                 }
             }
 
-            private void handleEdit() {
-                ManageTablesDTO data = getCurrentItem();
-                if (data == null) return;
+            private void handleEdit(String ref) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup/editTableDialog.fxml"));
+                    loader.setControllerFactory(springContext::getBean);
+                    Parent root = loader.load();
 
-                int pax = data.getPax() == null ? 0 : data.getPax();
-                String customer = data.getCustomer() == null ? "No Customer" : data.getCustomer();
+                    Stage dialogStage = new Stage();
+                    dialogStage.initModality(Modality.APPLICATION_MODAL);
+                    dialogStage.initOwner(App.primaryStage); // mainStage is your primary stage
+                    dialogStage.initStyle(StageStyle.TRANSPARENT);
+                    dialogStage.setResizable(false);
+                    Scene scn = new Scene(root);
+                    scn.setFill(Color.TRANSPARENT);
+                    dialogStage.setScene(scn);
 
-                //loadReports();
+                    // Link controller with dialog stage
+                    editTableDialogController controller = loader.getController();
+                    controller.setDialogStage(dialogStage);
+                    controller.setTargetTable(tablesService.findByNo(ref));
+                    dialogStage.showAndWait(); // wait until closed
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                adminUIController.getDashboardController().loadTableView();
+                adminUIController.getDashboardController().updateLabels();
+                loadTableManager();
+                adminUIController.getReservationController().loadAvailableTable();
+
             }
+
 
             private void handleDelete() {
                 ManageTablesDTO data = getCurrentItem();
                 if (data == null) return;
 
                 try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/deleteTableDialog.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup/deleteTableDialog.fxml"));
                     Parent root = loader.load();
                     DeleteTableDialogController controller = loader.getController();
 

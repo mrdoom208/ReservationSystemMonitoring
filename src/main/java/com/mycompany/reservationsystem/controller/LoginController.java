@@ -98,8 +98,6 @@ public class LoginController {
     @FXML
     private void initialize() {
         // Set default active button
-        activeButton = Admin;
-        Admin.fire();
         Submit.setDefaultButton(true);
 
         dragArea.setOnMousePressed(event -> {

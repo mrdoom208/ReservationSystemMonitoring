@@ -35,11 +35,11 @@
                   </ImageView>
                </children>
             </Pane>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox maxHeight="1.7976931348623157E308" prefWidth="100.0" VBox.vgrow="ALWAYS">
                <children>
                   <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text=" Hello," wrappingWidth="348.968017578125" VBox.vgrow="ALWAYS">
                      <font>
-                        <Font size="80.0" />
+                        <Font size="90.0" />
                      </font>
                      <VBox.margin>
                         <Insets left="20.0" />
@@ -47,7 +47,7 @@
                   </Text>
                   <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: Bold;" text=" Welcome!" VBox.vgrow="ALWAYS">
                      <font>
-                        <Font size="80.0" />
+                        <Font size="90.0" />
                      </font>
                      <VBox.margin>
                         <Insets left="20.0" />
@@ -55,29 +55,6 @@
                   </Text>
                </children>
             </VBox>
-            <HBox prefHeight="153.0" prefWidth="512.0" spacing="40.0">
-               <children>
-                  <StackPane prefHeight="127.0" prefWidth="200.0">
-                     <children>
-                        <MFXButton fx:id="Staff" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#Colorchange" prefHeight="48.0" prefWidth="195.0" styleClass="login-button" text="Staff" />
-                     </children>
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </StackPane>
-                  <StackPane prefHeight="119.0" prefWidth="202.0">
-                     <children>
-                        <MFXButton fx:id="Admin" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#Colorchange" prefHeight="48.0" styleClass="login-button" text="Admin" />
-                     </children>
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </StackPane>
-               </children>
-               <padding>
-                  <Insets left="40.0" right="40.0" />
-               </padding>
-            </HBox>
          </children></VBox>
       <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="512.0">
          <bottom>

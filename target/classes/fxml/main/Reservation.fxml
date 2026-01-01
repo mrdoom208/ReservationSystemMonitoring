@@ -61,20 +61,20 @@
                                         </HBox>
                                         <HBox alignment="CENTER_LEFT" prefHeight="0.0" prefWidth="676.0" spacing="10.0" VBox.vgrow="SOMETIMES">
                                             <children>
-                                                <Label alignment="CENTER" maxWidth="-Infinity" prefHeight="31.0" styleClass="static-label" text="Filter" textAlignment="CENTER">
+                                                <Label alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="31.0" styleClass="static-label" text="Filter" textAlignment="CENTER">
                                                     <font>
                                                         <Font size="18.0" />
                                                     </font>
                                                 </Label>
-                                                <MFXTextField fx:id="SearchCL" floatMode="BORDER" floatingText="Search" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="38.0" prefWidth="129.0" styleClass="filter-search" HBox.hgrow="ALWAYS" />
-                                                <MFXComboBox fx:id="reservationfilter" alignment="CENTER" floatMode="BORDER" floatingText="Status" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="39.0" styleClass="filter-date" text="All">
+                                                <MFXTextField fx:id="SearchCL" floatMode="BORDER" floatingText="Search" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="38.0" prefWidth="129.0" styleClass="filter-search" HBox.hgrow="ALWAYS" />
+                                                <MFXComboBox fx:id="reservationfilter" alignment="CENTER" floatMode="BORDER" floatingText="Status" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="39.0" styleClass="filter-date" text="Show All">
                                                     <font>
                                                         <Font size="18.0" />
                                                     </font>
                                                 </MFXComboBox>
-                                                <MFXButton fx:id="reservationrefresh" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" onAction="#loadCustomerReservationTable" styleClass="filter-btn" text="Refresh" />
+                                                <MFXButton fx:id="reservationrefresh" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" onAction="#loadCustomerReservationTable" styleClass="filter-btn" text="Refresh" />
                                                 <Region prefHeight="38.0" prefWidth="198.0" HBox.hgrow="ALWAYS" />
-                                                <MFXButton fx:id="newcustomer" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" mnemonicParsing="false" onAction="#addCustomerReservation" prefHeight="39.0" styleClass="custom-btn" text="New Reservation" />
+                                                <MFXButton fx:id="newcustomer" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#addCustomerReservation" prefHeight="39.0" styleClass="custom-btn" text="New Reservation" />
                                             </children>
                                         </HBox>
                                         <TableView fx:id="CustomerReservationTable" prefHeight="364.0" prefWidth="656.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
@@ -93,35 +93,48 @@
                                                 <Insets />
                                             </VBox.margin>
                                         </TableView>
-                                        <HBox alignment="CENTER" prefHeight="52.0" prefWidth="714.0">
+                                        <HBox alignment="CENTER" prefHeight="52.0" prefWidth="714.0" spacing="10.0">
                                             <children>
-                                                <MFXButton styleClass="sent-text-button" text="Send Text" />
-                                                <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                                    <HBox spacing="5.0">
+                                       <children>
+                                          <MFXComboBox floatMode="BORDER" maxHeight="1.7976931348623157E308" styleClass="filter-date" />
+                                                      <MFXButton maxHeight="1.7976931348623157E308" styleClass="sent-text-button" text="Send Text" />
+                                       </children>
+                                    </HBox>
+                                    <MFXButton maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" styleClass="edit" text="Edit Reservation" />
+                                                <Region prefHeight="200.0" HBox.hgrow="ALWAYS">
                                                     <HBox.margin>
                                                         <Insets />
                                                     </HBox.margin>
                                                 </Region>
-                                                <Label styleClass="static-label" text="Pending: ">
-                                                    <font>
-                                                        <Font size="18.0" />
-                                                    </font>
-                                                </Label>
-                                                <Label fx:id="pending" styleClass="static-label" text="0">
-                                                    <font>
-                                                        <Font size="18.0" />
-                                                    </font>
-                                                </Label>
-                                                <Region prefHeight="44.0" prefWidth="33.0" />
-                                                <Label styleClass="static-label" text="Confirm: ">
-                                                    <font>
-                                                        <Font size="18.0" />
-                                                    </font>
-                                                </Label>
-                                                <Label fx:id="confirm" styleClass="static-label" text="0">
-                                                    <font>
-                                                        <Font size="18.0" />
-                                                    </font>
-                                                </Label>
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                                      <Label styleClass="static-label" text="Pending: ">
+                                                          <font>
+                                                              <Font size="18.0" />
+                                                          </font>
+                                                      </Label>
+                                                      <Label fx:id="pending" styleClass="static-label" text="0">
+                                                          <font>
+                                                              <Font size="18.0" />
+                                                          </font>
+                                                      </Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                                      <Label styleClass="static-label" text="Confirm: ">
+                                                          <font>
+                                                              <Font size="18.0" />
+                                                          </font>
+                                                      </Label>
+                                                      <Label fx:id="confirm" styleClass="static-label" text="0">
+                                                          <font>
+                                                              <Font size="18.0" />
+                                                          </font>
+                                                      </Label>
+                                       </children>
+                                    </HBox>
                                             </children>
                                             <VBox.margin>
                                                 <Insets />
@@ -173,7 +186,7 @@
                                                     <right>
                                                         <StackPane prefHeight="43.0" prefWidth="106.0" BorderPane.alignment="CENTER">
                                                             <children>
-                                                                <MFXButton fx:id="Mergebtn" mnemonicParsing="false" onAction="#merge" prefHeight="26.0" prefWidth="111.0" text="Confirm" />
+                                                                <MFXButton fx:id="Mergebtn" maxHeight="1.7976931348623157E308" mnemonicParsing="false" onAction="#merge" prefHeight="26.0" prefWidth="111.0" text="Confirm" />
                                                             </children>
                                                         </StackPane>
                                                     </right>

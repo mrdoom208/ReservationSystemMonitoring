@@ -19,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +41,8 @@ public class SettingsController {
     @Autowired
     private PermissionService permissionService;
 
+    private DeviceDetectionManager manager;
+
     /* ---------------- NAV BUTTONS ---------------- */
     @FXML private Button GeneralBtn;
     @FXML private Button CustomizeBtn;
@@ -56,11 +59,10 @@ public class SettingsController {
     /* ---------------- HEADER ---------------- */
     @FXML private Label Section;
 
-    /* ---------------- STATE ---------------- */
     private BorderPane currentPane;
 
     /* ---------------- MESSAGING ---------------- */
-    @FXML private MFXComboBox<String> messageDevicePortCombo;
+    @FXML private MFXComboBox<SerialPort> messageDevicePortCombo;
     @FXML private Label ControllerName;
     @FXML private Label ModuleName;
     @FXML private Label PhoneNo;
@@ -70,11 +72,12 @@ public class SettingsController {
     @FXML private ProgressIndicator PhoneNoProgress;
 
     private final Set<String> knownPorts = new HashSet<>();
-    private final ScheduledExecutorService deviceMonitor = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService deviceMonitor =
+            Executors.newSingleThreadScheduledExecutor();
 
     /* ---------------- PERMISSION ---------------- */
     @FXML private TableView<Permission> permissionTable;
-    private Map<Long, Map<User.Position, Boolean>> permissionStates = new HashMap<>();
+    private final Map<Long, Map<User.Position, Boolean>> permissionStates = new HashMap<>();
 
     @FXML private Button cancelBtn;
 
@@ -83,7 +86,6 @@ public class SettingsController {
     public void initialize() {
         currentUser = adminUIController.getCurrentUser();
 
-        // Set nav button visibility based on permissions
         PermissionBtn.setManaged(permissionService.hasPermission(currentUser, "VIEW_PERMISSION"));
         DatabaseBtn.setManaged(permissionService.hasPermission(currentUser, "VIEW_DATABASE"));
 
@@ -95,6 +97,7 @@ public class SettingsController {
         setupButtonAnimation(PermissionBtn);
         setupButtonAnimation(DatabaseBtn);
 
+        setupSerialPortCombo();
         startDeviceMonitoring();
 
         Platform.runLater(() -> {
@@ -103,12 +106,27 @@ public class SettingsController {
         });
     }
 
+    /* ---------------- SERIAL PORT COMBO ---------------- */
+    private void setupSerialPortCombo() {
+        messageDevicePortCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(SerialPort port) {
+                return port == null ? "" : port.getSystemPortName();
+            }
+
+            @Override
+            public SerialPort fromString(String string) {
+                return null;
+            }
+        });
+    }
+
     /* ---------------- NAV ACTIONS ---------------- */
-    @FXML private void showGeneral()   { switchPane(GeneralPane, "GENERAL", GeneralBtn); }
-    @FXML private void showCustomize() { switchPane(null, "CUSTOMIZE", CustomizeBtn); }
-    @FXML private void showMessage()   { switchPane(MessagePane, "MESSAGING", MessageBtn); }
-    @FXML private void showPermission(){ switchPane(PermissionPane, "PERMISSION", PermissionBtn); }
-    @FXML private void showDatabase()  { switchPane(DatabasePane, "DATABASE", DatabaseBtn); }
+    @FXML private void showGeneral()    { switchPane(GeneralPane, "GENERAL", GeneralBtn); }
+    @FXML private void showCustomize()  { switchPane(null, "CUSTOMIZE", CustomizeBtn); }
+    @FXML private void showMessage()    { switchPane(MessagePane, "MESSAGING", MessageBtn); }
+    @FXML private void showPermission() { switchPane(PermissionPane, "PERMISSION", PermissionBtn); }
+    @FXML private void showDatabase()   { switchPane(DatabasePane, "DATABASE", DatabaseBtn); }
 
     private void switchPane(BorderPane targetPane, String title, Button activeBtn) {
         Section.setText(title);
@@ -121,7 +139,9 @@ public class SettingsController {
 
         if (oldPane != null) {
             BorderPaneTransition.animateOut(oldPane, () -> {
-                if (targetPane != null) BorderPaneTransition.animateIn(targetPane);
+                if (targetPane != null) {
+                    BorderPaneTransition.animateIn(targetPane);
+                }
             });
         } else if (targetPane != null) {
             BorderPaneTransition.animateIn(targetPane);
@@ -129,12 +149,13 @@ public class SettingsController {
     }
 
     private void setActiveButton(Button active) {
-        List<Button> buttons = List.of(GeneralBtn, CustomizeBtn, MessageBtn, PermissionBtn, DatabaseBtn);
-        buttons.forEach(btn -> btn.getStyleClass().remove("settings-nav-active"));
-        if (!active.getStyleClass().contains("settings-nav-active")) active.getStyleClass().add("settings-nav-active");
+        List<Button> buttons =
+                List.of(GeneralBtn, CustomizeBtn, MessageBtn, PermissionBtn, DatabaseBtn);
+        buttons.forEach(b -> b.getStyleClass().remove("settings-nav-active"));
+        active.getStyleClass().add("settings-nav-active");
     }
 
-    /* ---------------- MESSAGING DEVICE MONITOR ---------------- */
+    /* ---------------- DEVICE MONITOR ---------------- */
     private void startDeviceMonitoring() {
         deviceMonitor.scheduleAtFixedRate(this::updateMessagingDevices, 0, 1, TimeUnit.SECONDS);
     }
@@ -150,53 +171,51 @@ public class SettingsController {
 
                 if (!knownPorts.contains(name)) {
                     Platform.runLater(() -> {
-                        if (!messageDevicePortCombo.getItems().contains(name)) {
-                            messageDevicePortCombo.getItems().add(name);
-                            System.out.println("Added: " + name);
-                        }
+                        messageDevicePortCombo.getItems().add(port);
+                        System.out.println("Added: " + name);
                     });
                 }
             }
 
-            // Remove disconnected ports
             for (String oldPort : new HashSet<>(knownPorts)) {
                 if (!currentPorts.contains(oldPort)) {
                     Platform.runLater(() -> {
-                        messageDevicePortCombo.getItems().remove(oldPort);
-                        if (messageDevicePortCombo.getItems().isEmpty()) {
-                            messageDevicePortCombo.setValue("No device found");
-                        }
+                        messageDevicePortCombo.getItems()
+                                .removeIf(p -> p.getSystemPortName().equals(oldPort));
                         System.out.println("Removed: " + oldPort);
                     });
                 }
             }
 
-            synchronized (knownPorts) {
-                knownPorts.clear();
-                knownPorts.addAll(currentPorts);
-            }
+            knownPorts.clear();
+            knownPorts.addAll(currentPorts);
 
-            // Set default value if ComboBox has items
-            Platform.runLater(() -> {
-                if (!messageDevicePortCombo.getItems().isEmpty() && messageDevicePortCombo.getValue() == null) {
-                    messageDevicePortCombo.setValue(messageDevicePortCombo.getItems().get(0));
-                }
-            });
-
-        } catch (Exception ex) {
-            System.err.println("Error scanning ports: " + ex.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     /* ---------------- TEST DEVICE ---------------- */
     @FXML
     private void TestDevice(ActionEvent e) {
+        SerialPort selected = messageDevicePortCombo.getValue();
+        if (selected == null) return;
+
         ControllerName.setText("Searching...");
         ModuleName.setText("Searching...");
         PhoneNo.setText("Searching...");
 
-        DeviceDetectionManager manager = new DeviceDetectionManager();
-        Task<DeviceDetectionManager.DeviceResult> task = manager.createDetectionTask();
+        if (manager == null) {
+            manager = new DeviceDetectionManager();
+        }
+
+        Task<DeviceDetectionManager.DeviceResult> task = new Task<>() {
+            @Override
+            protected DeviceDetectionManager.DeviceResult call() throws Exception {
+                manager.openPort(selected, 115200); // or user-selected baud
+                return manager.detectDevice();
+            }
+        };
 
         ControllerProgress.visibleProperty().bind(task.runningProperty());
         ModuleProgress.visibleProperty().bind(task.runningProperty());
@@ -204,17 +223,18 @@ public class SettingsController {
         TestButton.disableProperty().bind(task.runningProperty());
 
         task.setOnSucceeded(ev -> {
-            DeviceDetectionManager.DeviceResult result = task.getValue();
-            ControllerName.setText(result.controller);
-            ModuleName.setText(result.module);
-            PhoneNo.setText(DeviceDetectionManager.cleanPhoneResponse(result.phone));
+            var r = task.getValue();
+            ControllerName.setText(r.controller);
+            ModuleName.setText(r.module);
+            PhoneNo.setText(r.phone);
+            //PhoneNo.setText(DeviceDetectionManager.cleanPhoneResponse(r.phone));
         });
 
         task.setOnFailed(ev -> {
-            Throwable ex = task.getException();
             ControllerName.setText("Error");
             ModuleName.setText("Error");
-            PhoneNo.setText(ex.getMessage() != null ? ex.getMessage() : "Unknown error");
+            PhoneNo.setText("Detection failed");
+            task.getException().printStackTrace();
         });
 
         new Thread(task).start();
@@ -224,41 +244,27 @@ public class SettingsController {
     private void setupPermissionTable() {
         permissionTable.getColumns().clear();
 
-        // ---------------- Permission code column ----------------
         TableColumn<Permission, String> codeCol = new TableColumn<>("Permission");
-        codeCol.setCellValueFactory(data ->
-                new javafx.beans.property.SimpleStringProperty(data.getValue().getCode())
-        );
+        codeCol.setCellValueFactory(d ->
+                new javafx.beans.property.SimpleStringProperty(d.getValue().getCode()));
         codeCol.prefWidthProperty().bind(permissionTable.widthProperty().multiply(0.4));
         permissionTable.getColumns().add(codeCol);
 
-        // ---------------- Role columns dynamically ----------------
-        for (User.Position position : User.Position.values()) {
-            TableColumn<Permission, Boolean> roleCol = new TableColumn<>(position.name());
-            roleCol.prefWidthProperty().bind(permissionTable.widthProperty().multiply(0.2));
+        for (User.Position pos : User.Position.values()) {
+            TableColumn<Permission, Boolean> col = new TableColumn<>(pos.name());
+            col.prefWidthProperty().bind(permissionTable.widthProperty().multiply(0.2));
 
-            // Only read/write from permissionStates, no DB access here
-            roleCol.setCellValueFactory(cellData -> {
-                Permission permission = cellData.getValue();
-                Map<User.Position, Boolean> states = permissionStates.get(permission.getId());
-
-                // Create a BooleanProperty that reads/writes directly to the map
-                BooleanProperty prop = new SimpleBooleanProperty(states.get(position));
-                prop.addListener((obs, oldVal, newVal) -> states.put(position, newVal));
+            col.setCellValueFactory(cd -> {
+                BooleanProperty prop =
+                        new SimpleBooleanProperty(permissionStates
+                                .get(cd.getValue().getId()).get(pos));
+                prop.addListener((o, a, b) ->
+                        permissionStates.get(cd.getValue().getId()).put(pos, b));
                 return prop;
             });
 
-            roleCol.setCellFactory(CheckBoxTableCell.forTableColumn(roleCol));
-            roleCol.setEditable(true);
-
-            // Update only the in-memory map
-            roleCol.setOnEditCommit(event -> {
-                Permission permission = event.getRowValue();
-                Map<User.Position, Boolean> states = permissionStates.get(permission.getId());
-                states.put(position, event.getNewValue());
-            });
-
-            permissionTable.getColumns().add(roleCol);
+            col.setCellFactory(CheckBoxTableCell.forTableColumn(col));
+            permissionTable.getColumns().add(col);
         }
 
         permissionTable.setEditable(true);
@@ -266,9 +272,8 @@ public class SettingsController {
 
     private void loadPermissions() {
         List<Permission> permissions = permissionService.findAllPermissions();
-
-        // ---------------- Populate permissionStates from DB ----------------
         permissionStates.clear();
+
         for (Permission p : permissions) {
             Map<User.Position, Boolean> map = new HashMap<>();
             for (User.Position pos : User.Position.values()) {
@@ -277,26 +282,30 @@ public class SettingsController {
             permissionStates.put(p.getId(), map);
         }
 
-        ObservableList<Permission> rows = FXCollections.observableArrayList(permissions);
-        permissionTable.setItems(rows);
+        permissionTable.setItems(FXCollections.observableArrayList(permissions));
     }
 
+    /* ---------------- APPLY / CANCEL ---------------- */
     @FXML
     private void applyChanges() {
-        // Apply permission changes
-        permissionStates.forEach((permissionId, roleMap) -> roleMap.forEach(
-                (position, enabled) -> permissionService.updatePermission(position, permissionId, enabled)
-        ));
-
+        permissionStates.forEach((id, map) ->
+                map.forEach((pos, enabled) ->
+                        permissionService.updatePermission(pos, id, enabled)));
         loadPermissions();
-
+        if (manager != null && manager.isPortOpen()) {
+            adminUIController.setDeviceDetectionManager(manager);
+        }
     }
 
-    /* ---------------- CANCEL ---------------- */
     @FXML
     private void handleCancel() {
-        Stage stage = (Stage) cancelBtn.getScene().getWindow();
-        stage.close();
+        ((Stage) cancelBtn.getScene().getWindow()).close();
+    }
+
+    @FXML
+    private void handleOK() {
+        applyChanges();
+        handleCancel();
     }
 
     /* ---------------- SHUTDOWN ---------------- */

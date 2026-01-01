@@ -10,6 +10,8 @@ import com.mycompany.reservationsystem.model.ManageTables;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -50,10 +52,12 @@ SELECT new com.mycompany.reservationsystem.dto.ManageTablesDTO(
     """)
     List<ManageTablesDTO> getManageTablesDTO();
     List<ManageTables> findByStatus(String status);
+    Optional<ManageTables> findByTableNo(String TableNo);
     
     long countByStatus(String status);
+    boolean existsByTableNo(String TableNo);
 
-    }
+}
 
 
 

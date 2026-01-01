@@ -113,7 +113,7 @@
                                      </ImageView>
                                  </graphic>
                                  <items>
-                                    <MenuItem mnemonicParsing="false" text="Profile" />
+                                    <MenuItem mnemonicParsing="false" onAction="#Profile" text="Profile" />
                                     <MenuItem mnemonicParsing="false" onAction="#Settings" text="Settings" />
                                     <MenuItem fx:id="logoutBtn" mnemonicParsing="false" onAction="#logout" text="Logout" />
                                  </items>

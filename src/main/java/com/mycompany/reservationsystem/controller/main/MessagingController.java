@@ -1,5 +1,6 @@
 package com.mycompany.reservationsystem.controller.main;
 
+import com.mycompany.reservationsystem.hardware.DeviceDetectionManager;
 import com.mycompany.reservationsystem.model.User;
 import com.mycompany.reservationsystem.service.MessageService;
 import com.mycompany.reservationsystem.service.PermissionService;
@@ -35,6 +36,8 @@ public class MessagingController {
     public MessagingController(AdministratorUIController adminUIController) {
         this.adminUIController = adminUIController;
     }
+    private DeviceDetectionManager deviceDetectionManager;
+
     private User currentuser;
     @FXML
     private TableView<CustomerReportDTO> CustomerInfo;
@@ -192,10 +195,42 @@ public class MessagingController {
         });
 
     }
+    @FXML
+    private void SendMessage(){
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                try {
+                    // Example: hardcoded phone and message
+                    String phone = "+639924713488";
+                    String message = "Hi This is Someone from Type A";
+
+                    // Send message using DeviceDetectionManager
+                    deviceDetectionManager.sendMessage(phone, message);
+
+                    // Update UI on success
+                    javafx.application.Platform.runLater(() ->
+                            messageresponse(true, "Message sent successfully to " + phone)
+                    );
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    // Update UI on failure
+                    javafx.application.Platform.runLater(() ->
+                            messageresponse(false, "Failed to send message: " + ex.getMessage())
+                    );
+                }
+                return null;
+            }
+        };
+        new Thread(task).start();
+
+    }
 
 
 
     public void setupCustomerInformation(){
+
+
         selectAllCustomerInfo.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
             for (CustomerReportDTO customer : CustomerInfo.getItems()) {
                 customer.setSelected(isSelected);
@@ -341,6 +376,7 @@ public class MessagingController {
     @FXML
     private void initialize(){
         currentuser = adminUIController.getCurrentUser();
+        deviceDetectionManager = adminUIController.getDeviceDetectionManager();
         applyPermissions();
         loadMessages();
         loadCustomerInformation();

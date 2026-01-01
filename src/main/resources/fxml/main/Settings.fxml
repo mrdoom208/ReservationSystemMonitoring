@@ -80,7 +80,7 @@
                         </GridPane>
                      </center>
                   </BorderPane>
-                  <BorderPane fx:id="MessagePane" prefHeight="200.0" prefWidth="200.0" visible="false">
+                  <BorderPane fx:id="MessagePane" prefHeight="200.0" prefWidth="200.0">
                      <center>
                         <GridPane vgap="20.0" BorderPane.alignment="CENTER">
                           <columnConstraints>
@@ -178,9 +178,9 @@
                </padding>
                <children>
                   <Label maxHeight="1.7976931348623157E308" maxWidth="-Infinity" styleClass="static-label" text="Label" />
-                  <MFXButton maxHeight="1.7976931348623157E308" prefWidth="80.0" styleClass="filter-btn" text="OK" />
+                  <MFXButton maxHeight="1.7976931348623157E308" onAction="#handleOK" prefWidth="80.0" styleClass="filter-btn" text="OK" />
                   <MFXButton fx:id="cancelBtn" maxHeight="1.7976931348623157E308" onAction="#handleCancel" prefWidth="80.0" styleClass="basic-btn" text="Cancel" />
-                  <MFXButton maxHeight="1.7976931348623157E308" onAction="#applyChanges" prefWidth="80.0" styleClass="basic-btn" text="Apply" />
+                  <MFXButton maxHeight="1.7976931348623157E308" onAction="#applyChanges" prefWidth="80.0" styleClass="custom-btn" text="Apply" />
                </children>
                <BorderPane.margin>
                   <Insets />

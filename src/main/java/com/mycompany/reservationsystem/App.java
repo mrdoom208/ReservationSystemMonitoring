@@ -1,5 +1,6 @@
 package com.mycompany.reservationsystem;
 
+import com.mycompany.reservationsystem.controller.main.AdministratorUIController;
 import com.mycompany.reservationsystem.util.BackgroundViewLoader;
 import io.github.palexdev.materialfx.MFXResourcesLoader;
 import io.github.palexdev.materialfx.theming.JavaFXThemes;
@@ -17,6 +18,7 @@ import javafx.stage.StageStyle;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.kordamp.bootstrapfx.BootstrapFX;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;

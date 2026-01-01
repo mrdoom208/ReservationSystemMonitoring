@@ -1,151 +1,143 @@
 package com.mycompany.reservationsystem.hardware;
 
 import com.fazecast.jSerialComm.SerialPort;
-import javafx.concurrent.Task;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Device detection manager using JavaFX Task for async UI-friendly updates.
- */
 public class DeviceDetectionManager {
 
     private SerialPort port;
     private BufferedReader in;
     private OutputStream out;
 
-    public DeviceDetectionManager() {}
+    // ================= PORT LIFECYCLE =================
 
-    /**
-     * Creates a Task that performs device detection.
-     * @return Task<DeviceResult>
-     */
-    public Task<DeviceResult> createDetectionTask() {
-        return new Task<>() {
-            @Override
-            protected DeviceResult call() throws Exception {
+    public synchronized void openPort(SerialPort selectedPort, int baudRate) throws Exception {
+        if (selectedPort == null) throw new IllegalArgumentException("No serial port selected");
 
-                for (SerialPort p : SerialPort.getCommPorts()) {
-                    try {
-                        if (!p.openPort()) continue;
+        if (isPortOpen()) return;
 
-                        port = p;
-                        port.setBaudRate(115200);
-                        port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 2000, 0);
+        port = selectedPort;
+        port.setBaudRate(baudRate);
+        port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 2000, 0);
 
-                        in = new BufferedReader(new InputStreamReader(port.getInputStream()));
-                        out = port.getOutputStream();
+        if (!port.openPort()) throw new IllegalStateException("Unable to open serial port");
 
-                        // Handshake
-                        String ready = readLine(2000);
-                        if (!"PICO_READY".equals(ready)) {
-                            send("PING");
-                            if (!"PONG".equals(readLine(1000))) {
-                                port.closePort();
-                                continue;
-                            }
-                        }
+        in = new BufferedReader(new InputStreamReader(port.getInputStream(), StandardCharsets.US_ASCII));
+        out = port.getOutputStream();
 
-                        // Initialize results as null
-                        String module = null;
-                        String phone = null;
-                        String controller = null;
-
-                        // Flush input before each command
-                        flushInput();
-
-                        // Module detection
-                        try {
-                            send("GET_MODULE");
-                            module = readLine(1500);
-                            if (module.isEmpty()) module = null;
-                        } catch (Exception ex) {
-                            module = null;
-                        }
-
-                        flushInput();
-
-                        // Phone detection
-                        try {
-                            send("GET_PHONE");
-                            phone = readLine(1500);
-                            if (phone.isEmpty()) phone = null;
-                        } catch (Exception ex) {
-                            phone = null;
-                        }
-
-                        flushInput();
-
-                        // Controller detection
-                        try {
-                            send("GET_CONTROLLER");
-                            controller = readLine(1500);
-                            if (controller.isEmpty()) controller = null;
-                        } catch (Exception ex) {
-                            controller = null;
-                        }
-
-                        port.closePort();
-
-                        // Return partial results (null = not detected)
-                        return new DeviceResult(module, phone, controller);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                throw new RuntimeException("No compatible device found.");
-            }
-        };
+        // Wait a moment for Pico to boot and print READY
+        TimeUnit.MILLISECONDS.sleep(1500);
     }
 
-    // Helper to clear leftover serial data
-    private void flushInput() {
+    public synchronized boolean isPortOpen() {
+        return port != null && port.isOpen();
+    }
+
+    public synchronized void closePort() {
         try {
-            while (in.ready()) in.readLine();
-        } catch (Exception ignored) {}
+            if (in != null) in.close();
+            if (out != null) out.close();
+            if (port != null && port.isOpen()) port.closePort();
+        } catch (Exception ignored) {
+        } finally {
+            in = null;
+            out = null;
+            port = null;
+        }
     }
 
+    // ================= DEVICE DETECTION =================
 
-    // --------------------------------------------------
-    private void send(String cmd) throws Exception {
+    public DeviceResult detectDevice() throws Exception {
+        ensureOpen();
 
-        out.write((cmd + "\n").getBytes());
+        // Wait for READY from Pico (or retry handshake)
+        String ready = readLine(5000);
+        if (ready == null || (!ready.contains("READY") && !ready.contains("PICO_READY"))) {
+            sendCommand("PING");
+            String pong = readLine(2000);
+            if (pong == null || !pong.equals("PONG")) {
+                throw new IllegalStateException("Handshake failed: no response from Pico");
+            }
+        }
+
+        String module = detect("GET_MODULE");
+        String phone = detect("GET_PHONE");
+        String controller = detect("GET_CONTROLLER");
+
+        return new DeviceResult(module, phone, controller);
+    }
+
+    private String detect(String command) {
+        try {
+            flushInput();
+            sendCommand(command);
+            return readLine(2000);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // ================= SMS =================
+
+    public synchronized void sendMessage(String phone, String message) throws Exception {
+        ensureOpen();
+
+        if (phone == null || phone.isBlank()) throw new IllegalArgumentException("Invalid phone number");
+        if (message == null || message.isBlank()) throw new IllegalArgumentException("Message cannot be empty");
+
+        flushInput();
+
+        // MicroPython expects: SMS <phone> <message>
+        sendCommand("SMS " + phone + " " + message);
+
+        // Wait for Pico confirmation (+CMGS:<id>)
+        String response = readLine(10000);
+        if (response == null || !response.contains("+CMGS")) {
+            throw new IllegalStateException("SMS failed: no confirmation from Pico");
+        }
+    }
+
+    // ================= LOW LEVEL =================
+
+    private void sendCommand(String cmd) throws Exception {
+        if (out == null) throw new IllegalStateException("Output stream not initialized");
+        out.write((cmd + "\r\n").getBytes(StandardCharsets.US_ASCII));
         out.flush();
     }
 
-    private String readLine(long timeoutMs) {
+    private String readLine(long timeoutMs) throws Exception {
         long start = System.currentTimeMillis();
-        try {
-            while (System.currentTimeMillis() - start < timeoutMs) {
-                if (in.ready()) {
-                    return in.readLine().trim();
+        while (System.currentTimeMillis() - start < timeoutMs) {
+            if (in != null && in.ready()) {
+                String line = in.readLine();
+                if (line != null) {
+                    line = line.trim();
+                    if (!line.isEmpty()) return line;
                 }
             }
-        } catch (Exception ignored) {}
-        return "";
-    }
-
-    public static String cleanPhoneResponse(String raw) {
-        if (raw == null || raw.isEmpty()) return "NO_RESPONSE";
-        String[] tokens = raw.split(",");
-        String phone = null;
-        for (String token : tokens) {
-            token = token.replace("\"", "").trim();
-            if (token.startsWith("+63")) {
-                phone = token;
-                break;
-            }
+            TimeUnit.MILLISECONDS.sleep(10);
         }
-        boolean ok = raw.toUpperCase().contains("OK");
-        if (phone == null) phone = "NO SIMCARD DETECTED";
-        return ok ? phone + " OK" : phone;
+        return null;
     }
 
-    // ----------------- Result holder -----------------
+    private void flushInput() throws Exception {
+        while (in != null && in.ready()) {
+            in.readLine(); // discard any leftover lines
+        }
+    }
+
+    private void ensureOpen() {
+        if (!isPortOpen()) throw new IllegalStateException("Serial port not open");
+    }
+
+    // ================= RESULT =================
+
     public static class DeviceResult {
         public final String module;
         public final String phone;
@@ -156,6 +148,14 @@ public class DeviceDetectionManager {
             this.phone = phone;
             this.controller = controller;
         }
-    }
 
+        @Override
+        public String toString() {
+            return "DeviceResult{" +
+                    "module='" + module + '\'' +
+                    ", phone='" + phone + '\'' +
+                    ", controller='" + controller + '\'' +
+                    '}';
+        }
+    }
 }

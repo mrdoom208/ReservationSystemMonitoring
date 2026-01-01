@@ -1,7 +1,10 @@
 package com.mycompany.reservationsystem.controller.main;
 
+import com.fazecast.jSerialComm.SerialPort;
 import com.mycompany.reservationsystem.App;
+import com.mycompany.reservationsystem.controller.popup.editAccountController;
 import com.mycompany.reservationsystem.dto.*;
+import com.mycompany.reservationsystem.hardware.DeviceDetectionManager;
 import com.mycompany.reservationsystem.model.*;
 import com.mycompany.reservationsystem.service.PermissionService;
 import com.mycompany.reservationsystem.util.BackgroundViewLoader;
@@ -16,6 +19,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -42,6 +46,25 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     public User currentuser;
     private BackgroundViewLoader viewLoader;
+    private DeviceDetectionManager deviceDetectionManager;
+
+    public void setDeviceDetectionManager(DeviceDetectionManager deviceDetectionManager) {
+        this.deviceDetectionManager = deviceDetectionManager;
+    }
+
+    public DeviceDetectionManager getDeviceDetectionManager() {
+        return deviceDetectionManager;
+    }
+
+    private SerialPort port;
+
+    public void setPort(SerialPort port) {
+        this.port = port;
+    }
+
+    public SerialPort getPort() {
+        return port;
+    }
 
     public void setUser(User user) {
         this.currentuser = user;
@@ -52,7 +75,6 @@ public class AdministratorUIController implements Initializable, ReservationList
     public User getCurrentUser() {
         return currentuser;
     }
-
     @FXML
     private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn,
             Messagingbtn, ManageStaffAndAccountsbtn, Reportsbtn, ActivityLogbtn;
@@ -186,6 +208,33 @@ public class AdministratorUIController implements Initializable, ReservationList
         }
     }
     @FXML
+    private void Profile(){
+        Platform.runLater(() ->{
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main/Profile.fxml"));
+                loader.setControllerFactory(springContext::getBean);
+                Parent root = loader.load();
+
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.initOwner(App.primaryStage); // mainStage is your primary stage
+                dialogStage.initStyle(StageStyle.TRANSPARENT);
+                dialogStage.setResizable(false);
+                Scene scn = new Scene(root);
+                scn.setFill(Color.TRANSPARENT);
+                dialogStage.setScene(scn);
+
+                // Link controller with dialog stage
+                ProfileController controller = loader.getController();
+                controller.setDialogStage(dialogStage);
+                controller.setCurrentuser(currentuser);
+                dialogStage.showAndWait(); // wait until closed
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+    @FXML
     private void Settings(ActionEvent event) {
         Platform.runLater(() -> {
             try {
@@ -228,7 +277,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         switch (currentViewId) {
             case "Dashboardbtn":
                 viewLoader.preloadView("/fxml/main/Reservation.fxml");
-                viewLoader.preloadView("/fxml/main/Settings.fxml");
+                //viewLoader.preloadView("/fxml/main/Settings.fxml");
                 break;
             case "ReservationManagementbtn":
                 viewLoader.preloadView("/fxml/main/Table.fxml");
@@ -297,6 +346,10 @@ public class AdministratorUIController implements Initializable, ReservationList
     public ReportsController getReportsController() {
         return (ReportsController) viewLoader.getCachedController("/fxml/main/Reports.fxml");
     }
+    public SettingsController getSettingsController() {
+        return (SettingsController) viewLoader.getCachedController("/fxml/main/Settings.fxml");
+    }
+
 
     @Override
     public void onNewReservation(WebupdateDTO reservation) {
@@ -312,7 +365,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         }
     }
     @FXML
-    private void logout(ActionEvent event) {
+    private void logout() {
         // 1. Stop background tasks
         shutdown();
 
@@ -321,6 +374,7 @@ public class AdministratorUIController implements Initializable, ReservationList
         }
 
         // 2. Clear user session
+        this.currentuser.setStatus("Offline");
         this.currentuser = null;
 
         // 3. Close current stage or remove current scene
