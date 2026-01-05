@@ -59,6 +59,7 @@ public class GrantPermission {
         createIfMissing("REMOVE_LOGS", "ACTIVITY_LOGS");
 
         // ------------------ Settings ------------------
+        createIfMissing("CHANGE_TITLE","SETTINGS");
         createIfMissing("VIEW_PERMISSION", "SETTINGS");
         createIfMissing("VIEW_DATABASE", "SETTINGS");
     }
@@ -78,7 +79,7 @@ public class GrantPermission {
                 "SEND_MESSAGE","CREATE_MESSAGE","EDIT_MESSAGE","DELETE_MESSAGE",
                 "CREATE_ACCOUNT","EDIT_ACCOUNT","REMOVE_ACCOUNT",
                 "REMOVE_LOGS",
-                "VIEW_PERMISSION","VIEW_DATABASE"
+                "CHANGE_TITLE","VIEW_PERMISSION","VIEW_DATABASE"
         );
 
         // ------------------ MANAGER ------------------

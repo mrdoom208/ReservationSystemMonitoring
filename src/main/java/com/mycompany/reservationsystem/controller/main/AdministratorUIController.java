@@ -2,10 +2,12 @@ package com.mycompany.reservationsystem.controller.main;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.mycompany.reservationsystem.App;
+import com.mycompany.reservationsystem.config.AppSettings;
 import com.mycompany.reservationsystem.controller.popup.editAccountController;
 import com.mycompany.reservationsystem.dto.*;
 import com.mycompany.reservationsystem.hardware.DeviceDetectionManager;
 import com.mycompany.reservationsystem.model.*;
+import com.mycompany.reservationsystem.service.MessageService;
 import com.mycompany.reservationsystem.service.PermissionService;
 import com.mycompany.reservationsystem.util.BackgroundViewLoader;
 import com.mycompany.reservationsystem.websocket.ReservationListener;
@@ -46,7 +48,7 @@ public class AdministratorUIController implements Initializable, ReservationList
 
     public User currentuser;
     private BackgroundViewLoader viewLoader;
-    private DeviceDetectionManager deviceDetectionManager;
+    private DeviceDetectionManager deviceDetectionManager = new DeviceDetectionManager();
 
     public void setDeviceDetectionManager(DeviceDetectionManager deviceDetectionManager) {
         this.deviceDetectionManager = deviceDetectionManager;
@@ -56,25 +58,17 @@ public class AdministratorUIController implements Initializable, ReservationList
         return deviceDetectionManager;
     }
 
-    private SerialPort port;
-
-    public void setPort(SerialPort port) {
-        this.port = port;
-    }
-
-    public SerialPort getPort() {
-        return port;
-    }
-
     public void setUser(User user) {
         this.currentuser = user;
         applyPermissions();
         System.out.println(currentuser.getPosition());
+        accountname.setText(currentuser.getFirstname()+" "+currentuser.getLastname());
     }
 
     public User getCurrentUser() {
         return currentuser;
     }
+
     @FXML
     private Button Dashboardbtn, ReservationManagementbtn, TableManagementbtn,
             Messagingbtn, ManageStaffAndAccountsbtn, Reportsbtn, ActivityLogbtn;
@@ -83,15 +77,41 @@ public class AdministratorUIController implements Initializable, ReservationList
     @FXML
     private ScrollPane MessagingPane;
     @FXML
-    private Label header;
+    private Label header,accountname;
     @FXML
     private StackPane content;
+    /*--------Bottom Pane-------------*/
+    @FXML
+    private HBox HboxProgress;
 
+    public HBox getHboxProgress(){
+        return HboxProgress;
+    }
+
+    @FXML
+    private Label LabelProgress;
+
+    public Label getLabelProgress(){
+        return LabelProgress;
+    }
+
+    @FXML
+    private ProgressBar BarProgress;
+
+    public ProgressBar getBarProgress(){
+        return BarProgress;
+    }
+
+
+    /*--------------------------------------*/
     @Autowired
     private ConfigurableApplicationContext springContext;
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private MessageService messageService;
 
     private Reservation selectedReservation;
 
@@ -121,6 +141,9 @@ public class AdministratorUIController implements Initializable, ReservationList
         // Load dashboard initially
         Dashboardbtn.fire();
 
+        missingDetails();
+
+
         // Setup WebSocket in separate thread
         WebSocketClient wsClient = new WebSocketClient();
         wsClient.addListener(this);
@@ -131,7 +154,13 @@ public class AdministratorUIController implements Initializable, ReservationList
                 e.printStackTrace();
             }
         }).start();
+
+        HboxProgress.setManaged(false);
+        HboxProgress.setVisible(false);
+
     }
+
+
 
     @FXML
     private void navigate(ActionEvent event) {
@@ -364,6 +393,26 @@ public class AdministratorUIController implements Initializable, ReservationList
             });
         }
     }
+    private void missingDetails(){
+        messageService.createIfMissing("New Reservation");
+        messageService.createIfMissing("Confirm Reservation");
+        messageService.createIfMissing("Cancelled Reservation");
+        messageService.createIfMissing("Complete Reservation");
+
+
+        if(AppSettings.loadMessageLabel("message.new").isBlank()){
+            AppSettings.saveMessageLabel("message.new","New Reservation");}
+
+        if(AppSettings.loadMessageLabel("message.cancelled").isBlank()){
+            AppSettings.saveMessageLabel("message.cancelled","Cancelled Reservation");}
+
+        if(AppSettings.loadMessageLabel("message.confirm").isBlank()){
+            AppSettings.saveMessageLabel("message.confirm","Confirm Reservation");}
+
+        if(AppSettings.loadMessageLabel("message.complete").isBlank()){
+            AppSettings.saveMessageLabel("message.complete","Complete Reservation");}
+    }
+
     @FXML
     private void logout() {
         // 1. Stop background tasks
@@ -387,8 +436,10 @@ public class AdministratorUIController implements Initializable, ReservationList
 
                 // Replace the scene content
                 Stage loginStage = new Stage();
-                loginStage.initStyle(StageStyle.UNDECORATED);
-                loginStage.setScene(new Scene(loginRoot));
+                loginStage.initStyle(StageStyle.TRANSPARENT);
+                Scene scn = new Scene(loginRoot);
+                scn.setFill(Color.TRANSPARENT);
+                loginStage.setScene(scn);
                 loginStage.setTitle("Login");
                 loginStage.setResizable(false); // optional
                 loginStage.show();

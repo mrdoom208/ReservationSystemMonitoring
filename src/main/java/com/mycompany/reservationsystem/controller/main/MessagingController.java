@@ -1,5 +1,6 @@
 package com.mycompany.reservationsystem.controller.main;
 
+import com.mycompany.reservationsystem.config.AppSettings;
 import com.mycompany.reservationsystem.hardware.DeviceDetectionManager;
 import com.mycompany.reservationsystem.model.User;
 import com.mycompany.reservationsystem.service.MessageService;
@@ -7,23 +8,29 @@ import com.mycompany.reservationsystem.service.PermissionService;
 import com.mycompany.reservationsystem.service.ReservationService;
 import com.mycompany.reservationsystem.dto.CustomerReportDTO;
 import com.mycompany.reservationsystem.model.Message;
+import com.mycompany.reservationsystem.util.dialog.ConfirmationDialog;
+import com.mycompany.reservationsystem.util.dialog.DeleteDialog;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import com.mycompany.reservationsystem.util.ComboBoxUtil;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +59,9 @@ public class MessagingController {
     private MFXComboBox<Message> MessageLabel,MessageLabels;
 
     @FXML
+    private MFXComboBox<String> SortCustomer;
+
+    @FXML
     private MFXScrollPane MessagingPane;
 
     @FXML
@@ -67,7 +77,7 @@ public class MessagingController {
     private TableColumn<CustomerReportDTO, String> phoneinfo;
 
     @FXML
-    private Label UIresponse;
+    private Label UIresponse,sendmessageresponse;
 
     @FXML
     private MFXButton saveMessage;
@@ -86,6 +96,11 @@ public class MessagingController {
 
     @FXML
     private TableColumn<CustomerReportDTO, BigDecimal> totalrevinfo;
+
+    private HBox HboxProgress;
+    private Label LabelProgress;
+    private ProgressBar BarProgress;
+
 
     @Autowired
     ReservationService reservationService;
@@ -108,7 +123,7 @@ public class MessagingController {
     @FXML
     private void handleNewMessage() {
         // Add empty string to ComboBox
-        Message newMessage = new Message("New Message","");
+        Message newMessage = new Message("New Message","",false);
 
 
         // Add to ObservableList
@@ -132,6 +147,7 @@ public class MessagingController {
         }
 
         messageService.saveMessage(
+                msg.getId(),
                 msg.getMessageLabel(),
                 msg.getMessageDetails()
         );
@@ -144,26 +160,46 @@ public class MessagingController {
 
     @FXML
     private void handleDeleteMessage(){
-        Message msg = MessageLabel.getSelectionModel().getSelectedItem();
-        messageService.deleteMessage(msg.getId());
 
-        newMessageLabel.clear();
-        MessageDetails.clear();
-        loadMessages();
-        messageresponse(false,msg.getMessageLabel()+" Message Removed Successfully");
+        Message msg = MessageLabel.getSelectionModel().getSelectedItem();
+        if (msg == null) {
+            messageresponse(false, "Please select a message to delete.");
+            return;
+        }
+
+        DeleteDialog.show(
+                "Are you sure you want to delete this " + msg.getMessageLabel() + " message?",
+                () -> {
+                    try {
+                        messageService.deleteMessage(msg.getId());
+                        newMessageLabel.clear();
+                        MessageDetails.clear();
+                        loadMessages();
+
+                        messageresponse(true, msg.getMessageLabel() + " Message Removed Successfully");
+                    } catch (IllegalArgumentException ex) {
+                        // This is called if it's the default message
+                        messageresponse(false, ex.getMessage());
+                    }
+                });
     }
 
 
     public void setupMessages(){
         MessageLabels.setItems(labelsObs);
         MessageLabel.setItems(labelsObs);
-        ComboBoxUtil.MFXComboboxMessageFormat(MessageLabel);
-        ComboBoxUtil.MFXComboboxMessageFormat(MessageLabels);
+        ComboBoxUtil.formatMessageComboBox(MessageLabel);
+        ComboBoxUtil.formatMessageComboBox(MessageLabels);
         MessageLabel.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldMsg, newMsg) -> {
                     if (newMsg != null) {
                         newMessageLabel.setText(newMsg.getMessageLabel());
+                        if(newMsg.isDefault()){
+                            newMessageLabel.setDisable(true);
+                        }else{
+                            newMessageLabel.setDisable(false);
+                        }
                         MessageDetails.setText(newMsg.getMessageDetails());
                     }
                 });
@@ -196,39 +232,209 @@ public class MessagingController {
 
     }
     @FXML
-    private void SendMessage(){
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                try {
-                    // Example: hardcoded phone and message
-                    String phone = "+639924713488";
-                    String message = "Hi This is Someone from Type A";
+    private void SendMessage() {
+        // 1. Get selected customers
+        List<CustomerReportDTO> selectedCustomers = CustomerInfo.getItems()
+                .stream()
+                .filter(CustomerReportDTO::isSelected)
+                .toList();
 
-                    // Send message using DeviceDetectionManager
-                    deviceDetectionManager.sendMessage(phone, message);
+        if (selectedCustomers.isEmpty()) {
+            sendresponse(false, "Please select at least one customer");
+            return;
+        }
 
-                    // Update UI on success
-                    javafx.application.Platform.runLater(() ->
-                            messageresponse(true, "Message sent successfully to " + phone)
-                    );
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    // Update UI on failure
-                    javafx.application.Platform.runLater(() ->
-                            messageresponse(false, "Failed to send message: " + ex.getMessage())
-                    );
+        // 2. Get selected message
+        Message selectedMessage = MessageLabels.getSelectionModel().getSelectedItem();
+        if (selectedMessage == null) {
+            sendresponse(false, "Please select a message");
+            return;
+        }
+
+        String message = selectedMessage.getMessageDetails();
+        if (message == null || message.isBlank()) {
+            sendresponse(false, "Message content is empty");
+            return;
+        }
+
+        // 3. Show confirmation dialog
+        ConfirmationDialog.show(
+                "Are you sure you want to send this message to "
+                        + selectedCustomers.size() + " customer(s)?",
+                () -> {
+                    // Only proceed if user clicks Yes
+
+                    // 4. Prepare progress bar
+                    HboxProgress.setManaged(true);
+                    HboxProgress.setVisible(true);
+                    BarProgress.setProgress(0);
+                    LabelProgress.setText("Preparing to send messages...");
+
+                    int total = selectedCustomers.size();
+
+                    // 5. Background task for sending messages
+                    Task<Void> task = new Task<>() {
+                        @Override
+                        protected Void call() throws Exception {
+                            String port = AppSettings.loadSerialPort();
+                            if (port == null || port.isBlank()) {
+                                throw new IllegalStateException("No serial port selected");
+                            }
+
+                            // Open port if not already open
+                            if (!deviceDetectionManager.isPortOpen()) {
+                                deviceDetectionManager.openPort(port, 115200);
+                            }
+
+                            updateProgress(0, total);
+                            updateMessage("Starting to send messages...");
+
+                            for (int i = 0; i < total; i++) {
+                                CustomerReportDTO customer = selectedCustomers.get(i);
+                                String phone = customer.getPhone();
+                                if (phone == null || phone.isBlank()) continue;
+
+                                // --- SEND SMS HERE ---
+                                deviceDetectionManager.sendMessage(phone, message); // your method
+
+                                // Update progress
+                                updateProgress(i + 1, total);
+                                updateMessage("Sending message " + (i + 1) + " of " + total);
+                            }
+
+                            return null;
+                        }
+                    };
+
+                    // Bind progress bar and label
+                    BarProgress.progressProperty().bind(task.progressProperty());
+                    LabelProgress.textProperty().bind(task.messageProperty());
+
+                    task.setOnSucceeded(e -> {
+                        deviceDetectionManager.closePort();
+                        BarProgress.progressProperty().unbind();
+                        LabelProgress.textProperty().unbind();
+                        BarProgress.setProgress(1);
+                        LabelProgress.setText("Messages sent successfully!");
+                        sendresponse(true, "Message sent to " + total + " customer(s)");
+                        HboxProgress.setManaged(false);
+                        HboxProgress.setVisible(false);
+                    });
+
+                    task.setOnFailed(e -> {
+                        deviceDetectionManager.closePort();
+                        BarProgress.progressProperty().unbind();
+                        LabelProgress.textProperty().unbind();
+                        LabelProgress.setText("Failed to send messages");
+                        sendresponse(false, task.getException().getMessage());
+                        HboxProgress.setManaged(false);
+                        HboxProgress.setVisible(false);
+                    });
+
+                    new Thread(task, "sms-sender").start();
                 }
-                return null;
-            }
-        };
-        new Thread(task).start();
-
+        );
     }
 
 
 
+
+
     public void setupCustomerInformation(){
+        SortCustomer.getItems().addAll(
+                "Reservation (↓)",
+                "Reservation (↑)",
+                "Revenue (↓)",
+                "Revenue (↑)",
+                "Average Spend (↓)",
+                "Average Spend (↑)"
+        );
+
+        SortedList<CustomerReportDTO> sortedCustomerInfo =
+                new SortedList<>(filterCustomerInfo);
+
+        SortCustomer.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null) return;
+
+            Comparator<CustomerReportDTO> comparator = null;
+
+            switch (newVal) {
+
+                // -------- TOTAL RESERVATION --------
+                case "Reservation (↓)":
+                    comparator = (a, b) -> {
+                        Long x = a.getTotalReservation();
+                        Long y = b.getTotalReservation();
+                        if (x == null && y == null) return 0;
+                        if (x == null) return 1;
+                        if (y == null) return -1;
+                        return Long.compare(y, x);
+                    };
+                    break;
+
+                case "Reservation (↑)":
+                    comparator = (a, b) -> {
+                        Long x = a.getTotalReservation();
+                        Long y = b.getTotalReservation();
+                        if (x == null && y == null) return 0;
+                        if (x == null) return 1;
+                        if (y == null) return -1;
+                        return Long.compare(x, y);
+                    };
+                    break;
+
+                // -------- TOTAL REVENUE --------
+                case "Revenue (↓)":
+                    comparator = (a, b) -> {
+                        BigDecimal x = a.getTotalRevenue();
+                        BigDecimal y = b.getTotalRevenue();
+                        if (x == null && y == null) return 0;
+                        if (x == null) return 1;
+                        if (y == null) return -1;
+                        return y.compareTo(x);
+                    };
+                    break;
+
+                case "Revenue (↑)":
+                    comparator = (a, b) -> {
+                        BigDecimal x = a.getTotalRevenue();
+                        BigDecimal y = b.getTotalRevenue();
+                        if (x == null && y == null) return 0;
+                        if (x == null) return 1;
+                        if (y == null) return -1;
+                        return x.compareTo(y);
+                    };
+                    break;
+
+                // -------- AVERAGE SPEND --------
+                case "Average Spend (↓)":
+                    comparator = (a, b) -> {
+                        BigDecimal x = BigDecimal.valueOf(a.getAverageRevenue());
+                        BigDecimal y = BigDecimal.valueOf(b.getAverageRevenue());
+                        if (x == null && y == null) return 0;
+                        if (x == null) return 1;
+                        if (y == null) return -1;
+                        return y.compareTo(x);
+                    };
+                    break;
+
+                case "Average Spend (↑)":
+                    comparator = (a, b) -> {
+                        BigDecimal x = BigDecimal.valueOf(a.getAverageRevenue());
+                        BigDecimal y = BigDecimal.valueOf(b.getAverageRevenue());
+                        if (x == null && y == null) return 0;
+                        if (x == null) return 1;
+                        if (y == null) return -1;
+                        return x.compareTo(y);
+                    };
+                    break;
+            }
+            // Prevent TableColumn sorting conflicts
+            CustomerInfo.getSortOrder().clear();
+            sortedCustomerInfo.setComparator(comparator);
+        });
+
+
 
 
         selectAllCustomerInfo.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
@@ -299,10 +505,9 @@ public class MessagingController {
                 col.setCellValueFactory(new PropertyValueFactory<>(namecol[i]));
             }
         }
-        CustomerInfo.setItems(filterCustomerInfo);
-
-
+        CustomerInfo.setItems(sortedCustomerInfo);
     }
+
     public void loadCustomerInformation(){
         customerInformationPage = 0;
         allDataLoaded = false;
@@ -350,6 +555,19 @@ public class MessagingController {
         }
 
     }
+    public void sendresponse(boolean successfully,String details){
+        if(!successfully){
+            sendmessageresponse.getStyleClass().removeAll("login-success", "login-message");
+            sendmessageresponse.getStyleClass().add("login-error");
+            sendmessageresponse.setText(details);
+        }
+        else{
+            sendmessageresponse.getStyleClass().removeAll("login-error", "login-message-hidden");
+            sendmessageresponse.getStyleClass().add("login-success");
+            sendmessageresponse.setText(details);
+        }
+
+    }
     private void applyPermissions() {
         if (currentuser == null) return;
 
@@ -373,12 +591,18 @@ public class MessagingController {
         );
     }
 
+
     @FXML
     private void initialize(){
         currentuser = adminUIController.getCurrentUser();
         deviceDetectionManager = adminUIController.getDeviceDetectionManager();
+
+        HboxProgress = adminUIController.getHboxProgress();
+        LabelProgress = adminUIController.getLabelProgress();
+        BarProgress = adminUIController.getBarProgress();
+
         applyPermissions();
-        loadMessages();
+        Platform.runLater(this::loadMessages);
         loadCustomerInformation();
         setupMessages();
         setupCustomerInformation();

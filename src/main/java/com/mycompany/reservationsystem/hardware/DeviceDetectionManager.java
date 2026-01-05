@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
 
 public class DeviceDetectionManager {
 
@@ -14,24 +13,36 @@ public class DeviceDetectionManager {
     private BufferedReader in;
     private OutputStream out;
 
-    // ================= PORT LIFECYCLE =================
+    /* ================= PORT LIFECYCLE ================= */
 
-    public synchronized void openPort(SerialPort selectedPort, int baudRate) throws Exception {
-        if (selectedPort == null) throw new IllegalArgumentException("No serial port selected");
+    public synchronized void openPort(String portName, int baudRate) throws Exception {
+        if (portName == null || portName.isBlank()) {
+            throw new IllegalArgumentException("Port name is null or empty");
+        }
 
         if (isPortOpen()) return;
 
-        port = selectedPort;
+        port = SerialPort.getCommPort(portName);
         port.setBaudRate(baudRate);
-        port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 2000, 0);
+        port.setComPortTimeouts(
+                SerialPort.TIMEOUT_READ_SEMI_BLOCKING,
+                500,
+                0
+        );
 
-        if (!port.openPort()) throw new IllegalStateException("Unable to open serial port");
+        if (!port.openPort()) {
+            port = null;
+            throw new IllegalStateException("Unable to open serial port: " + portName);
+        }
 
-        in = new BufferedReader(new InputStreamReader(port.getInputStream(), StandardCharsets.US_ASCII));
+        in = new BufferedReader(
+                new InputStreamReader(port.getInputStream(), StandardCharsets.US_ASCII)
+        );
         out = port.getOutputStream();
 
-        // Wait a moment for Pico to boot and print READY
-        TimeUnit.MILLISECONDS.sleep(1500);
+        // minimal boot delay (Pico / MCU reset)
+        Thread.sleep(300);
+        flushInput();
     }
 
     public synchronized boolean isPortOpen() {
@@ -51,92 +62,123 @@ public class DeviceDetectionManager {
         }
     }
 
-    // ================= DEVICE DETECTION =================
+    /* ================= DEVICE DETECTION ================= */
 
     public DeviceResult detectDevice() throws Exception {
         ensureOpen();
+        flushInput();
 
-        // Wait for READY from Pico (or retry handshake)
-        String ready = readLine(5000);
-        if (ready == null || (!ready.contains("READY") && !ready.contains("PICO_READY"))) {
+        // ---- HANDSHAKE ----
+        String boot = readResponse(800);
+        if (boot == null || !boot.contains("READY")) {
             sendCommand("PING");
-            String pong = readLine(2000);
-            if (pong == null || !pong.equals("PONG")) {
-                throw new IllegalStateException("Handshake failed: no response from Pico");
+            String pong = readResponse(800);
+            if (pong == null || !pong.contains("PONG")) {
+                throw new IllegalStateException("Handshake failed: device not responding");
             }
         }
 
-        String module = detect("GET_MODULE");
-        String phone = detect("GET_PHONE");
-        String controller = detect("GET_CONTROLLER");
+        String controller = sendAndRead("GET_CONTROLLER", 400);
+        String module = sendAndRead("GET_MODULE", 800);
+        String phone = sendAndRead("GET_PHONE", 400);
 
-        return new DeviceResult(module, phone, controller);
+        return new DeviceResult(
+                clean(module),
+                clean(phone),
+                clean(controller)
+        );
     }
 
-    private String detect(String command) {
-        try {
-            flushInput();
-            sendCommand(command);
-            return readLine(2000);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    // ================= SMS =================
+    /* ================= SMS ================= */
 
     public synchronized void sendMessage(String phone, String message) throws Exception {
         ensureOpen();
 
-        if (phone == null || phone.isBlank()) throw new IllegalArgumentException("Invalid phone number");
-        if (message == null || message.isBlank()) throw new IllegalArgumentException("Message cannot be empty");
+        if (phone == null || phone.isBlank())
+            throw new IllegalArgumentException("Invalid phone number");
+
+        if (message == null || message.isBlank())
+            throw new IllegalArgumentException("Message cannot be empty");
+
+        message = message.replace("\n", " ").replace("\r", "");
 
         flushInput();
-
-        // MicroPython expects: SMS <phone> <message>
         sendCommand("SMS " + phone + " " + message);
 
-        // Wait for Pico confirmation (+CMGS:<id>)
-        String response = readLine(10000);
-        if (response == null || !response.contains("+CMGS")) {
-            throw new IllegalStateException("SMS failed: no confirmation from Pico");
+        String response = readResponse(5000);
+
+        if (response == null) {
+            throw new IllegalStateException("No response from device");
+        }
+
+        if (response.contains("ERROR")) {
+            throw new IllegalStateException("Device error: " + response);
+        }
+
+        if (!response.contains("OK") && !response.contains("+CMGS")) {
+            throw new IllegalStateException("Unexpected response: " + response);
         }
     }
 
-    // ================= LOW LEVEL =================
+    /* ================= LOW LEVEL ================= */
+
+    private String sendAndRead(String cmd, long timeout) throws Exception {
+        flushInput();
+        sendCommand(cmd);
+        return readResponse(timeout);
+    }
 
     private void sendCommand(String cmd) throws Exception {
-        if (out == null) throw new IllegalStateException("Output stream not initialized");
+        if (out == null)
+            throw new IllegalStateException("Serial output not initialized");
+
         out.write((cmd + "\r\n").getBytes(StandardCharsets.US_ASCII));
         out.flush();
     }
 
-    private String readLine(long timeoutMs) throws Exception {
+    private String readResponse(long timeoutMs) throws Exception {
         long start = System.currentTimeMillis();
+        StringBuilder sb = new StringBuilder();
+
         while (System.currentTimeMillis() - start < timeoutMs) {
-            if (in != null && in.ready()) {
+            while (in != null && in.ready()) {
                 String line = in.readLine();
                 if (line != null) {
                     line = line.trim();
-                    if (!line.isEmpty()) return line;
+                    if (!line.isEmpty()) {
+                        sb.append(line).append('\n');
+
+                        if (line.equals("OK")
+                                || line.startsWith("ERROR")
+                                || line.startsWith("+CMGS")) {
+                            return sb.toString().trim();
+                        }
+                    }
                 }
             }
-            TimeUnit.MILLISECONDS.sleep(10);
+            Thread.sleep(50);
         }
-        return null;
+        return sb.length() == 0 ? null : sb.toString().trim();
     }
 
     private void flushInput() throws Exception {
         while (in != null && in.ready()) {
-            in.readLine(); // discard any leftover lines
+            in.readLine();
         }
     }
 
     private void ensureOpen() {
-        if (!isPortOpen()) throw new IllegalStateException("Serial port not open");
+        if (!isPortOpen()) {
+            throw new IllegalStateException("Serial port not open");
+        }
     }
 
-    // ================= RESULT =================
+    private String clean(String input) {
+        if (input == null) return null;   // <- important!
+        input = input.replace("\0", "").trim();
+        return input.isEmpty() ? null : input;}
+
+    /* ================= RESULT ================= */
 
     public static class DeviceResult {
         public final String module;

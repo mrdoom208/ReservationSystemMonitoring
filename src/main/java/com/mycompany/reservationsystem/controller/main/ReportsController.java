@@ -6,6 +6,7 @@ import com.mycompany.reservationsystem.model.Reservation;
 import com.mycompany.reservationsystem.repository.ReservationRepository;
 import com.mycompany.reservationsystem.repository.ReservationTableLogsRepository;
 import com.mycompany.reservationsystem.transition.ChartsTransition;
+import com.mycompany.reservationsystem.util.TableLoader;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXDatePicker;
@@ -22,10 +23,7 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +76,8 @@ public class ReportsController {
     @FXML private BarChart<String, Number> totalCustomerChart, totalReservationChart, totalRevenueChart;
     @FXML private BarChart<String, Number> totalCustomerChartTableUsage, totalReservationChartTableUsage, totalRevenueChartTableUsage;
 
+    //======================= StackPane =======================
+    @FXML private StackPane ResRepContainer,CusRepContainer, RevRepContainer, TableUseContainer;
     // ====================== TableViews ======================
     @FXML private TableView<CustomerReportDTO> CusRepTable;
     @FXML private TableView<Reservation> ResRepTable;
@@ -274,11 +274,14 @@ public class ReportsController {
     }
 
     private void loadReservationReports() {
-        List<Reservation> reservations = reservationRepository.findAll();
-        reservationReports.setAll(reservations);
+        TableLoader.loadListWithProgress(
+                reservationReports,                 // your ObservableList
+                () -> reservationRepository.findAll(), // supplier for data
+                ResRepContainer,                    // the StackPane
+                result -> System.out.println("Loaded " + result.size() + " reservations") // optional callback
+        );
         updateReservationPieChart();
     }
-
     private void updateReservationPieChart() {
         Map<String, Long> statusCounts = filterReservationReports.stream()
                 .collect(Collectors.groupingBy(Reservation::getStatus, Collectors.counting()));
@@ -418,7 +421,7 @@ public class ReportsController {
         setupTableColumns(ResInCusRep,
                 new TableColumn[]{referenceResInCusRep, nameResInCusRep, phoneResInCusRep, statusResInCusRep,
                         revenueResInCusRep, timeResInCusRep, dateResInCusRep},
-                new double[]{0.2, 0.25, 0.2, 0.18, 0.15, 0.2, 0.2},
+                new double[]{0.2, 0.25, 0.24, 0.18, 0.2, 0.2, 0.2},
                 new String[]{"reference", "customerName", "customerPhone", "status", "revenue",
                         "reservationPendingtime", "date"});
 

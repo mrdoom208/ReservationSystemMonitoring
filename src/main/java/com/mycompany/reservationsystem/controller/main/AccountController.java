@@ -1,9 +1,8 @@
 package com.mycompany.reservationsystem.controller.main;
 
 import com.mycompany.reservationsystem.App;
-import com.mycompany.reservationsystem.controller.popup.DeleteTableDialogController;
+import com.mycompany.reservationsystem.controller.popup.DeleteDialogController;
 import com.mycompany.reservationsystem.controller.popup.addAccountController;
-import com.mycompany.reservationsystem.controller.popup.addTableDialogController;
 import com.mycompany.reservationsystem.controller.popup.editAccountController;
 import com.mycompany.reservationsystem.model.User;
 import com.mycompany.reservationsystem.repository.UserRepository;
@@ -161,11 +160,11 @@ public class AccountController {
 
                     if (data != null) {
                         try {
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup/deleteTableDialog.fxml"));
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup/deleteDialog.fxml"));
                             Parent root = loader.load();
 
                             // Get controller to handle callback
-                            DeleteTableDialogController controller = loader.getController();
+                            DeleteDialogController controller = loader.getController();
                             controller.setOnDelete(() -> {
                                 if ("Active".equals(data.getStatus())) {
                                     adminUIController.getTableController().showAlert("This account cannot be deleted because it is currently in use");

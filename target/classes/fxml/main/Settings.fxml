@@ -4,10 +4,12 @@
 <?import io.github.palexdev.materialfx.controls.MFXCheckbox?>
 <?import io.github.palexdev.materialfx.controls.MFXComboBox?>
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import io.github.palexdev.materialfx.controls.MFXToggleButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.BorderPane?>
@@ -26,9 +28,10 @@
          <children>
             <Button fx:id="GeneralBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showGeneral" styleClass="settings-nav" text="GENERAL" />
             <Button fx:id="CustomizeBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showCustomize" styleClass="settings-nav" text="CUSTOMIZE" />
-            <Button fx:id="MessageBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showMessage" styleClass="settings-nav" text="MESSAGING" />
+            <Button fx:id="MessageBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showMessage" styleClass="settings-nav" text="MESSAGING " />
             <Button fx:id="PermissionBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showPermission" styleClass="settings-nav" text="PERMISSION" />
             <Button fx:id="DatabaseBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showDatabase" styleClass="settings-nav" text="DATABASE" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="settings-nav" text="WEBSITE SETUP" visible="false" />
          </children>
          <padding>
             <Insets left="20.0" top="20.0" />
@@ -36,24 +39,27 @@
       </VBox>
       <BorderPane styleClass="plain-pane-primary" HBox.hgrow="ALWAYS">
          <center>
-            <StackPane maxWidth="1.7976931348623157E308" prefHeight="480.0" prefWidth="490.0" BorderPane.alignment="CENTER">
+            <StackPane maxWidth="1.7976931348623157E308" prefHeight="480.0" prefWidth="490.0" BorderPane.alignment="CENTER_RIGHT">
                <children>
                   <BorderPane fx:id="GeneralPane" prefHeight="200.0" prefWidth="200.0" visible="false">
                      <padding>
-                        <Insets left="10.0" right="10.0" top="10.0" />
+                        <Insets left="10.0" top="10.0" />
                      </padding>
                      <center>
-                        <GridPane hgap="20.0" vgap="10.0" BorderPane.alignment="CENTER">
+                        <GridPane hgap="20.0" vgap="20.0" BorderPane.alignment="CENTER">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="209.0" minWidth="10.0" percentWidth="22.0" prefWidth="100.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="206.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="155.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="150.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="67.0" />
                           </columnConstraints>
                           <rowConstraints>
-                            <RowConstraints maxHeight="92.0" minHeight="0.0" percentHeight="12.0" prefHeight="44.0" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="179.0" minHeight="8.0" percentHeight="12.0" prefHeight="51.0" vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="275.0" minHeight="10.0" percentHeight="10.0" prefHeight="49.0" vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="266.0" minHeight="10.0" percentHeight="12.0" prefHeight="90.0" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="237.0" minHeight="10.0" percentHeight="12.0" prefHeight="202.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
                               <RowConstraints maxHeight="237.0" minHeight="10.0" prefHeight="202.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
@@ -66,59 +72,143 @@
                               <Label alignment="CENTER" styleClass="static-label" text="Time zone" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
                               <Label alignment="CENTER" styleClass="static-label" text="Notification preferences" textAlignment="CENTER" wrapText="true" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
                               <Label alignment="CENTER" styleClass="static-label" text="Auto Cancel Time" textAlignment="CENTER" wrapText="true" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
-                              <MFXTextField allowEdit="false" disable="true" floatMode="DISABLED" prefHeight="37.0" prefWidth="287.0" GridPane.columnIndex="1" />
-                              <MFXComboBox prefHeight="0.0" prefWidth="159.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                              <MFXTextField fx:id="ApplicationTitle" disable="true" floatMode="DISABLED" prefHeight="35.0" prefWidth="351.0" styleClass="filter-date" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="LEFT" />
+                              <MFXComboBox floatMode="DISABLED" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="159.0" styleClass="filter-date" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <MFXComboBox floatMode="DISABLED" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="118.0" styleClass="filter-date" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <HBox alignment="CENTER_LEFT" prefHeight="35.0" prefWidth="200.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                                  <children>
                                     <MFXCheckbox maxWidth="-Infinity" prefHeight="28.0" prefWidth="0.0" styleClass="selectAll" text="SMS Message" HBox.hgrow="ALWAYS" />
                                     <MFXCheckbox maxWidth="-Infinity" prefHeight="28.0" prefWidth="98.0" styleClass="selectAll" text="Email" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
-                              <MFXComboBox prefHeight="30.0" prefWidth="118.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <MFXComboBox GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <MFXComboBox fx:id="AutoCancelTime" floatMode="DISABLED" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="143.0" styleClass="filter-date" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                            </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
                         </GridPane>
                      </center>
                   </BorderPane>
                   <BorderPane fx:id="MessagePane" prefHeight="200.0" prefWidth="200.0">
                      <center>
-                        <GridPane vgap="20.0" BorderPane.alignment="CENTER">
-                          <columnConstraints>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="379.0" minWidth="10.0" prefWidth="193.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="417.0" minWidth="10.0" prefWidth="327.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="384.0" minWidth="10.0" prefWidth="118.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="236.0" minWidth="0.0" prefWidth="154.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints maxHeight="-Infinity" minHeight="0.0" percentHeight="0.0" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label styleClass="static-label" text="Message Device Port " />
-                              <MFXComboBox fx:id="messageDevicePortCombo" floatMode="DISABLED" maxWidth="1.7976931348623157E308" styleClass="filter-date" text="No Device Found" GridPane.columnIndex="1" />
-                              <MFXButton fx:id="TestButton" maxHeight="1.7976931348623157E308" onAction="#TestDevice" prefHeight="34.0" prefWidth="80.0" text="TEST" GridPane.columnIndex="2" />
-                              <Label styleClass="static-label" text="Controller" GridPane.rowIndex="1" />
-                              <Label styleClass="static-label" text="Module" GridPane.rowIndex="2" />
-                              <Label styleClass="static-label" text="Phone No." GridPane.rowIndex="3" />
-                              <Label fx:id="ControllerName" styleClass="static-label" text="No Controller Detected" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label fx:id="ModuleName" styleClass="static-label" text="No Module Detected" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <Label fx:id="PhoneNo" styleClass="static-label" text="No SIM Card Detected" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <ProgressIndicator fx:id="ControllerProgress" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                              <ProgressIndicator fx:id="ModuleProgress" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <ProgressIndicator fx:id="PhoneNoProgress" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                           </children>
+                        <ScrollPane fitToWidth="true" prefHeight="488.0" prefWidth="792.0" styleClass="Scrollpane" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
-                              <Insets top="20.0" />
+                              <Insets left="20.0" top="5.0" />
                            </BorderPane.margin>
-                        </GridPane>
+                           <content>
+                              <VBox spacing="20.0">
+                                 <children>
+                                    <GridPane styleClass="Statistics-cell" vgap="20.0">
+                                      <columnConstraints>
+                                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="379.0" minWidth="10.0" prefWidth="199.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="417.0" minWidth="10.0" prefWidth="308.0" />
+                                          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="384.0" minWidth="10.0" prefWidth="124.0" />
+                                          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="236.0" minWidth="0.0" prefWidth="60.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                          <RowConstraints maxHeight="-Infinity" minHeight="10.0" percentHeight="0.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" percentHeight="0.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                                          <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <Label styleClass="static-label" text="Port " GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets left="30.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <MFXComboBox fx:id="messageDevicePortCombo" floatMode="DISABLED" maxWidth="1.7976931348623157E308" styleClass="filter-date" text="No Device Found" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                          <MFXButton fx:id="TestButton" maxHeight="1.7976931348623157E308" onAction="#TestDevice" prefHeight="34.0" prefWidth="80.0" text="TEST" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                          <Label styleClass="static-label" text="Controller" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets left="30.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label styleClass="static-label" text="Module" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets left="30.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label styleClass="static-label" text="Phone No." GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets left="30.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label fx:id="ControllerName" styleClass="static-label" text="No Controller Detected" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                          <Label fx:id="ModuleName" styleClass="static-label" text="No Module Detected" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                          <Label fx:id="PhoneNo" styleClass="static-label" text="No SIM Card Detected" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                          <ProgressIndicator fx:id="ControllerProgress" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                          <ProgressIndicator fx:id="ModuleProgress" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                          <ProgressIndicator fx:id="PhoneNoProgress" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                          <Label styleClass="Part" text="DEVICE INFORMATION" GridPane.columnSpan="2" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </padding>
+                                    </GridPane>
+                                    <GridPane styleClass="Statistics-cell" vgap="20.0">
+                                      <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="241.0" minWidth="10.0" prefWidth="167.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="235.0" minWidth="10.0" prefWidth="225.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <Label maxHeight="1.7976931348623157E308" styleClass="Part" text="SMS MESSAGE SETUP" />
+                                          <Label styleClass="static-label" text="New Reservation" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets left="30.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label styleClass="static-label" text="Cancelled Reservation" GridPane.rowIndex="2">
+                                             <GridPane.margin>
+                                                <Insets left="30.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label styleClass="static-label" text="Confirm Reservation" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets left="30.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label styleClass="static-label" text="Complete Reservation" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets left="30.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <MFXComboBox fx:id="newReservation" floatMode="DISABLED" maxWidth="1.7976931348623157E308" styleClass="filter-date" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                          <MFXComboBox fx:id="confirmReservation" floatMode="DISABLED" maxWidth="1.7976931348623157E308" styleClass="filter-date" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                          <MFXComboBox fx:id="completeReservation" floatMode="DISABLED" maxWidth="1.7976931348623157E308" styleClass="filter-date" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                          <MFXToggleButton fx:id="newReservationtoggle" styleClass="static-label" text="OFF" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                          <MFXToggleButton fx:id="cancelledReservationtoggle" styleClass="static-label" text="OFF" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                          <MFXToggleButton fx:id="confirmReservationtoggle" styleClass="static-label" text="OFF" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                          <MFXToggleButton fx:id="completeReservationtoggle" styleClass="static-label" text="OFF" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                          <MFXComboBox fx:id="cancelledReservation" floatMode="DISABLED" maxWidth="1.7976931348623157E308" styleClass="filter-date" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                       </padding>
+                                    </GridPane>
+                                 </children>
+                                 <padding>
+                                    <Insets right="10.0" />
+                                 </padding>
+                              </VBox>
+                           </content>
+                           <padding>
+                              <Insets top="10.0" />
+                           </padding>
+                        </ScrollPane>
                      </center>
                      <padding>
-                        <Insets left="10.0" right="10.0" top="10.0" />
+                        <Insets left="10.0" />
                      </padding></BorderPane>
                   <BorderPane fx:id="DatabasePane" prefHeight="200.0" prefWidth="200.0" visible="false">
                      <padding>
@@ -168,6 +258,38 @@
                         <Insets bottom="15.0" />
                      </StackPane.margin>
                   </BorderPane>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0" visible="false">
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                     <center>
+                        <GridPane hgap="10.0" vgap="10.0" BorderPane.alignment="CENTER">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Website Url" />
+                              <Label text="Shutdown Time" GridPane.rowIndex="2" />
+                              <Label text="Status" GridPane.rowIndex="3" />
+                              <MFXTextField floatMode="DISABLED" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                              <MFXComboBox floatMode="DISABLED" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                           </children>
+                        </GridPane>
+                     </center>
+                  </BorderPane>
                </children>
             </StackPane>
          </center>
@@ -177,10 +299,10 @@
                   <Insets bottom="15.0" right="15.0" />
                </padding>
                <children>
-                  <Label maxHeight="1.7976931348623157E308" maxWidth="-Infinity" styleClass="static-label" text="Label" />
+                  <Label fx:id="UIresponse" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" />
                   <MFXButton maxHeight="1.7976931348623157E308" onAction="#handleOK" prefWidth="80.0" styleClass="filter-btn" text="OK" />
                   <MFXButton fx:id="cancelBtn" maxHeight="1.7976931348623157E308" onAction="#handleCancel" prefWidth="80.0" styleClass="basic-btn" text="Cancel" />
-                  <MFXButton maxHeight="1.7976931348623157E308" onAction="#applyChanges" prefWidth="80.0" styleClass="custom-btn" text="Apply" />
+                  <MFXButton fx:id="Apply" maxHeight="1.7976931348623157E308" onAction="#applyChanges" prefWidth="80.0" styleClass="custom-btn" text="Apply" />
                </children>
                <BorderPane.margin>
                   <Insets />
@@ -197,9 +319,6 @@
          <left>
             <Region prefHeight="447.0" prefWidth="20.0" BorderPane.alignment="CENTER" />
          </left>
-         <right>
-            <Region prefHeight="200.0" prefWidth="20.0" BorderPane.alignment="CENTER" />
-         </right>
       </BorderPane>
    </children>
    <effect>

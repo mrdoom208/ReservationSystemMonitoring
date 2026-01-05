@@ -1,11 +1,10 @@
 package com.mycompany.reservationsystem.controller.main;
 
 import com.mycompany.reservationsystem.App;
-import com.mycompany.reservationsystem.controller.popup.DeleteTableDialogController;
+import com.mycompany.reservationsystem.controller.popup.DeleteDialogController;
 import com.mycompany.reservationsystem.controller.popup.addTableDialogController;
 import com.mycompany.reservationsystem.controller.popup.editTableDialogController;
 import com.mycompany.reservationsystem.controller.popup.setAmountPaidController;
-import com.mycompany.reservationsystem.model.ManageTables;
 import com.mycompany.reservationsystem.service.ActivityLogService;
 import com.mycompany.reservationsystem.service.PermissionService;
 import com.mycompany.reservationsystem.service.ReservationService;
@@ -429,9 +428,9 @@ public class TableController {
                 if (data == null) return;
 
                 try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup/deleteTableDialog.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup/deleteDialog.fxml"));
                     Parent root = loader.load();
-                    DeleteTableDialogController controller = loader.getController();
+                    DeleteDialogController controller = loader.getController();
 
                     controller.setOnDelete(() -> {
                         if (reservationRepository.existsByTable_Id(data.getTableId())) {

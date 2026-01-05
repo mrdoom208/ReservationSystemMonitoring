@@ -1,5 +1,6 @@
 package com.mycompany.reservationsystem;
 
+import com.mycompany.reservationsystem.config.AppSettings;
 import com.mycompany.reservationsystem.controller.main.AdministratorUIController;
 import com.mycompany.reservationsystem.util.BackgroundViewLoader;
 import io.github.palexdev.materialfx.MFXResourcesLoader;
@@ -12,6 +13,7 @@ import javafx.beans.binding.Bindings;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -34,6 +36,8 @@ public class App extends Application {
     private static Scene scene;
     private ConfigurableApplicationContext springContext;
     public static BackgroundViewLoader backgroundLoader;
+    public String ApplicationTitle;
+
 
 
     @Override
@@ -45,6 +49,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+
+        this.ApplicationTitle = AppSettings.loadApplicationTitle();
         // Either global for entire app
         App.primaryStage = stage;
 
@@ -66,6 +72,8 @@ public class App extends Application {
         Font.loadFont(getClass().getResourceAsStream("/fonts/Lora-Bold.ttf"),14);
 
         scene = new Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+
         root.styleProperty().bind(
                 Bindings.createStringBinding(() -> {
                     double referenceWidth = 1600;   // base width
@@ -77,9 +85,9 @@ public class App extends Application {
                 }, scene.widthProperty(), scene.heightProperty())
         );
 
-        stage.initStyle(StageStyle.UNDECORATED);
+        stage.initStyle(StageStyle.TRANSPARENT);
         stage.setScene(scene);
-        stage.setTitle("Reservation System");
+        stage.setTitle(ApplicationTitle);
         stage.show();
     }
     @Override

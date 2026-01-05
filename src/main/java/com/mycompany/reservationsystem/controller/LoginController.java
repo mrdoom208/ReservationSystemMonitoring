@@ -4,6 +4,7 @@
  */
 package com.mycompany.reservationsystem.controller;
 import com.mycompany.reservationsystem.App;
+import com.mycompany.reservationsystem.config.AppSettings;
 import com.mycompany.reservationsystem.controller.main.AdministratorUIController;
 import com.mycompany.reservationsystem.service.ActivityLogService;
 import com.mycompany.reservationsystem.model.User;
@@ -15,6 +16,7 @@ import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -30,6 +32,7 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
+
 
 /**
  *
@@ -49,6 +52,9 @@ public class LoginController {
     private Label messageLabel;
     @FXML
     private StackPane dragArea;
+
+    private ProgressIndicator buttonSpinner;
+    private String originalButtonText;
     @Autowired
     private UserRepository userRepository;
     
@@ -80,17 +86,7 @@ public class LoginController {
         if (!clicked.getStyleClass().contains("login-button-active")) {
             clicked.getStyleClass().add("login-button-active");
         }
-        
-        if(clicked == Staff){
 
-            manager = false;
-            
-            
-        }else{
-
-            manager = true;
-            
-        }
             
     }
 
@@ -120,83 +116,101 @@ public class LoginController {
         Platform.exit();     // cleanly shuts down JavaFX
         System.exit(0);      // ensures JVM exits
     }
-    
+
     @FXML
-    public void SubmitButton(ActionEvent event){
-        Button clicked = Submit;
-        String defaultstyle = "-fx-background-color: linear-gradient(to bottom, #FF0000, #FF3333);";
-        clicked.setStyle("-fx-background-color: rgba(255, 0, 0, 0.2);");
-        PauseTransition pause = new PauseTransition(Duration.seconds(0.3));
-        pause.setOnFinished(e -> clicked.setStyle(defaultstyle));
-        pause.play();
-            
+    public void SubmitButton(ActionEvent event) {
         String userf = usernamefield.getText();
         String passf = passwordfield.getText();
-        
-        User found = userRepository.findByUsernameAndPassword(userf, passf);
-        System.out.println();
-        if (found != null) {
-            
+
+        showButtonLoading();
+
+        Task<User> loginTask = new Task<>() {
+            @Override
+            protected User call() {
+                return userRepository.findByUsernameAndPassword(userf, passf);
+            }
+        };
+
+        loginTask.setOnSucceeded(e -> {
+            hideButtonLoading();
+
+            User found = loginTask.getValue();
+            if (found == null) {
+                showError("Wrong Username or Password");
+                return;
+            }
+
             try {
                 showSuccess("Login Successfully, Welcome Back!");
-                System.out.println("Login Successfully");
-                    found.setStatus("Active");
-                    userRepository.save(found);
-                    String fxmlFile = "/fxml/main/AdministratorUI.fxml";
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
-                    loader.setControllerFactory(springContext::getBean);
-                    Parent root = loader.load();
-                    AdministratorUIController controller = loader.getController();
-                    controller.setUser(found);
 
-                activityLogService.logAction(
-                        found.getUsername(),                    // username
-                        found.getPosition().toString(),        // position/role
-                        "Account",                                     // module
-                        "Login",                             // action
-                        String.format(
-                                "User %s %s signed in",
-                                found.getFirstname(),
-                                found.getLastname()                 // old table status
-                        )
+                found.setStatus("Active");
+                userRepository.save(found);
+
+                FXMLLoader loader = new FXMLLoader(
+                        getClass().getResource("/fxml/main/AdministratorUI.fxml")
                 );
-                    Stage stage = new Stage();
-                    Scene scene = new Scene(root);
-                    root.styleProperty().bind(
+                loader.setControllerFactory(springContext::getBean);
+                Parent root = loader.load();
+
+                AdministratorUIController controller = loader.getController();
+                controller.setUser(found);
+
+                Stage stage = new Stage();
+                stage.setTitle(AppSettings.loadApplicationTitle());
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                root.styleProperty().bind(
                         Bindings.createStringBinding(() -> {
                             double referenceWidth = 1600;   // base width
                             double referenceHeight = 900;  // base height
-                        double scale = Math.min(scene.getWidth() / referenceWidth, scene.getHeight() / referenceHeight);
+                            double scale = Math.min(scene.getWidth() / referenceWidth, scene.getHeight() / referenceHeight);
 
                             double fontSize = Math.min(32, Math.max(14, 16 * scale)); // 16 is base font size
-                           return "-fx-font-size: " + fontSize + "px;";
+                            return "-fx-font-size: " + fontSize + "px;";
                         }, scene.widthProperty(), scene.heightProperty())
-                    );
-                    stage.setScene(scene);
-                    stage.initStyle(StageStyle.UNDECORATED);
-                    stage.setMaximized(true);
-                    stage.setResizable(true);
-                    stage.setMinWidth(1300);
-                    stage.setMinHeight(720);
-                    stage.centerOnScreen();
-                    stage.show();
-                     ((Node) event.getSource()).getScene().getWindow().hide();
+                );
+                stage.initStyle(StageStyle.UNDECORATED);
+                stage.setMaximized(true);
+                stage.show();
 
-                }catch (IOException e) {
-                    e.printStackTrace();
-                }    
-                }else{
-                    showError("Wrong Username or Password");
-                    System.out.println("Wrong Username or Password");
-                    User user = new User();
-                    user.setUsername(userf);
-                    user.setPassword(passf);
-                    user.setPosition(User.Position.MANAGER);
-                    userRepository.save(user);
-                }
+                ((Node) event.getSource()).getScene().getWindow().hide();
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                showError("Failed to load dashboard");
             }
+        });
+
+        loginTask.setOnFailed(e -> {
+            hideButtonLoading();
+            showError("Login failed");
+            loginTask.getException().printStackTrace();
+        });
+
+        new Thread(loginTask, "login-task").start();
+    }
+
+    private void showButtonLoading() {
+        originalButtonText = Submit.getText();
+
+        if (buttonSpinner == null) {
+            buttonSpinner = new ProgressIndicator();
+            buttonSpinner.setMaxSize(18, 18);
+        }
+
+        Submit.setText("");
+        Submit.setGraphic(buttonSpinner);
+        Submit.setDisable(true);
+    }
+
+    private void hideButtonLoading() {
+        Submit.setGraphic(null);
+        Submit.setText(originalButtonText);
+        Submit.setDisable(false);
+    }
+
     private void showError(String message) {
-        messageLabel.getStyleClass().removeAll("login-success", "login-message");
+        messageLabel.getStyleClass().removeAll("login-success", "login-message-hidden");
         messageLabel.getStyleClass().add("login-error");
         messageLabel.setText(message);
     }

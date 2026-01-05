@@ -5,12 +5,14 @@
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -49,19 +51,24 @@
                                         <MFXButton fx:id="applyAL" buttonType="RAISED" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" styleClass="filter-btn" text="Apply / Refresh" />
                                     </children>
                                 </HBox>
-                                <TableView fx:id="ActivityLogsTable" prefHeight="399.0" prefWidth="1025.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
-                                    <columns>
-                                        <TableColumn fx:id="userAL" prefWidth="75.0" text="Username" />
-                                        <TableColumn fx:id="positionAL" prefWidth="160.0" text="Position" />
-                                        <TableColumn fx:id="moduleAL" prefWidth="132.0" text="Module" />
-                                        <TableColumn fx:id="actionAL" prefWidth="206.0" text="Action" />
-                                        <TableColumn fx:id="descriptionAL" prefWidth="236.0" text="Description" />
-                                        <TableColumn fx:id="timestampsAL" prefWidth="120.0" text="Timestamp" />
-                                    </columns>
-                                    <VBox.margin>
-                                        <Insets />
-                                    </VBox.margin>
-                                </TableView>
+                        <StackPane VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <children>
+                                      <TableView fx:id="ActivityLogsTable" prefHeight="399.0" prefWidth="1025.0" styleClass="DefaultTable">
+                                          <columns>
+                                              <TableColumn fx:id="userAL" prefWidth="75.0" text="Username" />
+                                              <TableColumn fx:id="positionAL" prefWidth="160.0" text="Position" />
+                                              <TableColumn fx:id="moduleAL" prefWidth="132.0" text="Module" />
+                                              <TableColumn fx:id="actionAL" prefWidth="206.0" text="Action" />
+                                              <TableColumn fx:id="descriptionAL" prefWidth="236.0" text="Description" />
+                                              <TableColumn fx:id="timestampsAL" prefWidth="120.0" text="Timestamp" />
+                                          </columns>
+                                      </TableView>
+                              <ProgressIndicator fx:id="progressAL" visible="false" />
+                           </children>
+                        </StackPane>
                             </children>
                             <VBox.margin>
                                 <Insets />

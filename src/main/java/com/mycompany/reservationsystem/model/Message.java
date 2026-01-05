@@ -18,15 +18,17 @@ public class Message {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean isDefault;
 
 
     //Constructor
     public Message() {
     }
 
-    public Message(String messageLabel, String messageDetails) {
+    public Message(String messageLabel, String messageDetails, boolean isDefault) {
         this.messageLabel = messageLabel;
         this.messageDetails = messageDetails;
+        this.isDefault = isDefault;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -71,4 +73,11 @@ public class Message {
         this.updatedAt = updatedAt;
     }
 
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
+    }
 }

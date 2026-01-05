@@ -95,11 +95,29 @@ public class FieldValidators {
         }
     }
     public static boolean startsWith09(TextField textField) {
+        if (textField == null) return false;
+
         String text = textField.getText();
-        if (text == null || !text.startsWith("09")) {
+        if (text == null) {
             markInvalid(textField);
             return false;
         }
+
+        // Remove spaces
+        String digits = text.replaceAll("\\s+", "");
+
+        // Must start with 09
+        if (!digits.startsWith("09")) {
+            markInvalid(textField);
+            return false;
+        }
+
+        // Must be at least 11 digits
+        if (digits.length() < 11) {
+            markInvalid(textField);
+            return false;
+        }
+
         clear(textField);
         return true;
     }

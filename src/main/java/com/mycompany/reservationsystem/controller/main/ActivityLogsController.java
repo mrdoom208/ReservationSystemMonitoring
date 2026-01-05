@@ -13,6 +13,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -69,15 +73,32 @@ public class ActivityLogsController {
     @FXML
     private TableColumn<?, ?> userAL;
 
+    @FXML
+    private ProgressIndicator progressAL;
+
     private final ObservableList<ActivityLog> activitylogsdata = FXCollections.observableArrayList();
     private FilteredList<ActivityLog> filteredActivityLogs = new FilteredList<>(activitylogsdata, p -> true);
 
     @Autowired
     private ActivityLogRepository activityLogRepository;
 
+    private int currentPage = 0;
+    private final int pageSize = 50; // rows per page
+    private boolean hasMore = true; // to check if there are more pages
+
 
     private void setupActivityLogs(){
-        applyAL.setOnAction(e -> loadActivityLogs());
+        applyAL.setOnAction(e -> loadActivityLogsPage(true));
+        ActivityLogsTable.setRowFactory(tv -> {
+            TableRow<ActivityLog> row = new TableRow<>();
+            row.itemProperty().addListener((obs, oldItem, newItem) -> {
+                // if row is not empty and it's the last loaded row, fetch next page
+                if (!row.isEmpty() && row.getIndex() >= activitylogsdata.size() - 1) {
+                    loadActivityLogsPage(false);
+                }
+            });
+            return row;
+        });
         searchAL.textProperty().addListener((obs, oldValue, newValue) -> {
             String search = (newValue == null) ? "" : newValue.toLowerCase();
 
@@ -143,23 +164,53 @@ public class ActivityLogsController {
 
         ActivityLogsTable.setPlaceholder(new Label("No Activity Data "));
     }
-    private void loadActivityLogs(){
+    private void loadActivityLogsPage(boolean reset) {
+        if (reset) {
+            currentPage = 0;
+            hasMore = true;
+            activitylogsdata.clear();
+        }
+
+        if (!hasMore) return;
+
+        progressAL.setVisible(true); // show indicator
+
         LocalDate from = fromAL.getValue();
         LocalDateTime startDateTime = (from != null) ? from.atStartOfDay() : null;
 
         LocalDate to = toAL.getValue();
         LocalDateTime endDateTime = (to != null) ? to.atTime(23, 59, 59) : null;
 
+        int pageToLoad = currentPage;
 
-        List<ActivityLog> data = activityLogRepository.filterByDate(startDateTime,endDateTime);
-        activitylogsdata.setAll(data);
+        javafx.concurrent.Task<Page<ActivityLog>> task = new javafx.concurrent.Task<>() {
+            @Override
+            protected Page<ActivityLog> call() {
+                Pageable pageable = PageRequest.of(pageToLoad, pageSize, Sort.by("timestamp").descending());
+                return activityLogRepository.filterByDate(startDateTime, endDateTime, pageable);
+            }
+        };
 
+        task.setOnSucceeded(event -> {
+            Page<ActivityLog> dataPage = task.getValue();
+            activitylogsdata.addAll(dataPage.getContent());
+            hasMore = dataPage.hasNext();
+            currentPage++;
+            progressAL.setVisible(false); // hide after loading
+        });
+
+        task.setOnFailed(event -> {
+            progressAL.setVisible(false);
+            task.getException().printStackTrace();
+        });
+
+        new Thread(task).start();
     }
 
     @FXML
     private void initialize(){
         currentuser = adminUIController.getCurrentUser();
-        loadActivityLogs();
+        loadActivityLogsPage(true);
         setupActivityLogs();
 
 

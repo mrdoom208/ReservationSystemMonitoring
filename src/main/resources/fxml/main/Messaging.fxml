@@ -6,6 +6,7 @@
 <?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -21,21 +22,21 @@
             <center>
                 <VBox prefHeight="200.0" prefWidth="100.0" styleClass="DashboardPane" BorderPane.alignment="CENTER">
                     <children>
-                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="15.0" VBox.vgrow="ALWAYS">
+                        <HBox prefHeight="100.0" spacing="15.0" VBox.vgrow="ALWAYS">
                             <children>
-                                <VBox prefHeight="200.0" prefWidth="450.0" spacing="10.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
+                                <VBox prefHeight="200.0" prefWidth="500.0" spacing="10.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="BoldText" text="Message" />
                                         <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="10.0">
                                             <children>
-                                    <MFXTextField fx:id="newMessageLabel" floatMode="BORDER" floatingText="Message Label" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="200.0" styleClass="filter-search" />
-                                                <MFXComboBox fx:id="MessageLabel" floatingText="Existing Messages" maxWidth="1.7976931348623157E308" styleClass="filter-date" HBox.hgrow="ALWAYS" />
+                                    <MFXTextField fx:id="newMessageLabel" floatMode="BORDER" floatingText="Label" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="150.0" styleClass="filter-search" HBox.hgrow="ALWAYS" />
+                                                <MFXComboBox fx:id="MessageLabel" floatMode="BORDER" floatingText="Save Messages" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="150.0" styleClass="filter-date" HBox.hgrow="ALWAYS" />
                                                 <MFXButton fx:id="deleteMessage" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#handleDeleteMessage" styleClass="delete" text="Delete" />
                                                 <MFXButton fx:id="newMessage" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#handleNewMessage" styleClass="complete" text="New Message" />
                                             </children>
                                         </HBox>
                                         <TextArea fx:id="MessageDetails" promptText="Write a message" styleClass="message-area" wrapText="true" VBox.vgrow="ALWAYS" />
-                                        <HBox alignment="CENTER_RIGHT" prefWidth="505.0">
+                                        <HBox alignment="CENTER_RIGHT" minHeight="35.0" prefWidth="505.0">
                                             <children>
                                     <Label fx:id="UIresponse" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Response" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                                 <MFXButton fx:id="saveMessage" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" onAction="#handleSaveMessage" styleClass="filter-btn" text="Save Message" />
@@ -46,15 +47,14 @@
                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                     </padding>
                                 </VBox>
-                                <VBox prefHeight="907.0" prefWidth="450.0" spacing="10.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
+                                <VBox prefHeight="754.0" prefWidth="500.0" spacing="10.0" styleClass="Statistics-cell" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="BoldText" text="Customer Information" />
                                         <HBox prefHeight="0.0" prefWidth="504.0" spacing="10.0">
                                             <children>
                                                 <MFXCheckbox fx:id="selectAllCustomerInfo" maxHeight="1.7976931348623157E308" styleClass="selectAll" text="Select All" />
-                                                <MFXTextField fx:id="SearchCustomerInfo" floatMode="BORDER" floatingText="Search" maxWidth="1.7976931348623157E308" styleClass="filter-search" HBox.hgrow="ALWAYS" />
-                                                <MFXButton fx:id="deleteCustomerinfo" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" styleClass="delete" text="Delete" />
-                                                <MFXButton maxHeight="1.7976931348623157E308" maxWidth="-Infinity" styleClass="complete" text="New Customer" />
+                                                <MFXTextField fx:id="SearchCustomerInfo" floatMode="BORDER" floatingText="Search" maxWidth="1.7976931348623157E308" prefWidth="300.0" styleClass="filter-search" HBox.hgrow="ALWAYS" />
+                                    <MFXComboBox fx:id="SortCustomer" floatMode="DISABLED" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="120.0" styleClass="filter-date" text="Sort By" HBox.hgrow="ALWAYS" />
                                             </children>
                                         </HBox>
                                         <TableView fx:id="CustomerInfo" maxWidth="1.7976931348623157E308" prefHeight="200.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
@@ -69,10 +69,14 @@
                                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                             </columnResizePolicy>
                                         </TableView>
-                                        <HBox prefWidth="200.0" spacing="10.0">
+                                        <HBox alignment="CENTER_RIGHT" prefWidth="200.0" spacing="10.0">
                                             <children>
-                                                <MFXComboBox fx:id="MessageLabels" floatingText="Message Label" maxWidth="1.7976931348623157E308" styleClass="filter-date" HBox.hgrow="ALWAYS" />
-                                                <MFXButton fx:id="sendMessage" maxHeight="1.7976931348623157E308" styleClass="filter-btn" onAction="#SendMessage" text="Send Message" />
+                                    <Label fx:id="sendmessageresponse" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                                <MFXComboBox fx:id="MessageLabels" floatMode="BORDER" floatingText="Message Label" maxWidth="-Infinity" minWidth="-Infinity" popupOffsetY="0.0" styleClass="filter-date" HBox.hgrow="ALWAYS">
+                                       <cursor>
+                                          <Cursor fx:constant="DEFAULT" />
+                                       </cursor></MFXComboBox>
+                                                <MFXButton fx:id="sendMessage" maxHeight="1.7976931348623157E308" minWidth="-Infinity" onAction="#SendMessage" styleClass="filter-btn" text="Send Message" />
                                             </children>
                                         </HBox>
                                     </children>
@@ -84,7 +88,7 @@
                         </HBox>
                     </children>
                     <padding>
-                        <Insets top="34.0" />
+                        <Insets bottom="10.0" top="34.0" />
                     </padding>
                 </VBox>
             </center>

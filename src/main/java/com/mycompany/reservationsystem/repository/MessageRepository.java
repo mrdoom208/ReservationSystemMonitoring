@@ -16,8 +16,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     Optional<Message> findByMessageLabelIgnoreCase(String messageLabel);
 
 
-
-
     // Find messages by details containing keyword
     List<Message> findByMessageDetailsContainingIgnoreCase(String keyword);
 }
