@@ -1,16 +1,16 @@
 package com.mycompany.reservationsystem.controller.main;
 
-import com.fazecast.jSerialComm.SerialPort;
 import com.mycompany.reservationsystem.App;
 import com.mycompany.reservationsystem.config.AppSettings;
-import com.mycompany.reservationsystem.controller.popup.editAccountController;
 import com.mycompany.reservationsystem.dto.*;
 import com.mycompany.reservationsystem.hardware.DeviceDetectionManager;
 import com.mycompany.reservationsystem.model.*;
 import com.mycompany.reservationsystem.service.MessageService;
 import com.mycompany.reservationsystem.service.PermissionService;
+import com.mycompany.reservationsystem.service.UserService;
 import com.mycompany.reservationsystem.util.BackgroundViewLoader;
-import com.mycompany.reservationsystem.websocket.ReservationListener;
+import com.mycompany.reservationsystem.util.NotificationManager;
+import com.mycompany.reservationsystem.websocket.WebSocketListener;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -44,7 +44,7 @@ import static com.mycompany.reservationsystem.transition.ButtonTransition.setupB
  * @author formentera
  */
 @Component
-public class AdministratorUIController implements Initializable, ReservationListener {
+public class AdministratorUIController implements Initializable, WebSocketListener {
 
     public User currentuser;
     private BackgroundViewLoader viewLoader;
@@ -113,6 +113,9 @@ public class AdministratorUIController implements Initializable, ReservationList
     @Autowired
     private MessageService messageService;
 
+    @Autowired
+    private UserService userService;
+
     private Reservation selectedReservation;
 
     WebSocketClient wsClient;
@@ -145,7 +148,7 @@ public class AdministratorUIController implements Initializable, ReservationList
 
 
         // Setup WebSocket in separate thread
-        WebSocketClient wsClient = new WebSocketClient();
+        WebSocketClient wsClient = new WebSocketClient("ws://localhost:8080/ws");
         wsClient.addListener(this);
         new Thread(() -> {
             try {
@@ -381,7 +384,7 @@ public class AdministratorUIController implements Initializable, ReservationList
 
 
     @Override
-    public void onNewReservation(WebupdateDTO reservation) {
+    public void onMessage(WebUpdateDTO dto) {
         // Only update if Dashboard controller is already loaded (not forced loading)
         DashboardController controller = getDashboardController();
         if (controller != null) {
@@ -389,11 +392,14 @@ public class AdministratorUIController implements Initializable, ReservationList
             CompletableFuture.runAsync(() -> {
                 Platform.runLater(() -> {
                     controller.updateLabels();
+                    NotificationManager.show("New Reservation Added",
+                            dto.getMessage(), NotificationManager.NotificationType.SUCCESS);
                 });
             });
         }
     }
     private void missingDetails(){
+        userService.createAdminIfMissing();
         messageService.createIfMissing("New Reservation");
         messageService.createIfMissing("Confirm Reservation");
         messageService.createIfMissing("Cancelled Reservation");

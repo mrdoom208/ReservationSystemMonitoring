@@ -21,7 +21,7 @@ public class GrantPermission {
     @PostConstruct
     public void init() {
         seedPermissions();
-        //seedRolePermissions();
+        seedRolePermissions();
     }
 
     private void seedPermissions() {

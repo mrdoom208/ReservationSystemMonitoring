@@ -1,6 +1,6 @@
 package com.mycompany.reservationsystem.websocket;
 
-import com.mycompany.reservationsystem.dto.WebupdateDTO;
+import com.mycompany.reservationsystem.dto.WebUpdateDTO;
 import javafx.application.Platform;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
@@ -13,67 +13,68 @@ import java.util.List;
 
 public class WebSocketClient {
 
-    private final List<ReservationListener> listeners = new ArrayList<>();
-
+    private final List<WebSocketListener> listeners = new ArrayList<>();
     private WebSocketStompClient stompClient;
     private StompSession stompSession;
 
-    private final String url = "ws://localhost:8080/ws";
+    private final String url; // configurable
 
-    public void addListener(ReservationListener listener) {
+    public WebSocketClient(String websocketUrl) {
+        this.url = websocketUrl;
+    }
+
+    public void addListener(WebSocketListener listener) {
         listeners.add(listener);
     }
 
-    /**
-     * Connects to the WebSocket server
-     */
     public void connect() {
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        // Connect in a separate thread
         new Thread(() -> {
             try {
                 stompClient.connect(url, new StompSessionHandlerAdapter() {
                     @Override
                     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-                        System.out.println("WebSocket connected!");
                         stompSession = session;
+                        System.out.println("WebSocket connected!");
 
                         session.subscribe("/topic/forms", new StompFrameHandler() {
                             @Override
                             public Type getPayloadType(StompHeaders headers) {
-                                return WebupdateDTO.class;
+                                return WebUpdateDTO.class;
                             }
 
                             @Override
                             public void handleFrame(StompHeaders headers, Object payload) {
-                                WebupdateDTO reservation = (WebupdateDTO) payload;
-                                for (ReservationListener l : listeners) {
-                                    Platform.runLater(() -> l.onNewReservation(reservation));
+                                WebUpdateDTO reservation = (WebUpdateDTO) payload;
+                                for (WebSocketListener l : listeners) {
+                                    Platform.runLater(() -> l.onMessage(reservation));
                                 }
                             }
                         });
                     }
-                }).get(); // Wait for connection
+
+                    @Override
+                    public void handleTransportError(StompSession session, Throwable exception) {
+                        System.err.println("WebSocket transport error: " + exception.getMessage());
+                    }
+                }).get();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
-    /**
-     * Disconnects from the WebSocket server
-     */
     public void disconnect() {
         try {
             if (stompSession != null && stompSession.isConnected()) {
                 stompSession.disconnect();
-                System.out.println("WebSocket disconnected!");
             }
             if (stompClient != null) {
                 stompClient.stop();
             }
+            System.out.println("WebSocket disconnected!");
         } catch (Exception e) {
             e.printStackTrace();
         }

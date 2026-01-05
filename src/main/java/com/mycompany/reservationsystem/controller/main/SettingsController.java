@@ -11,6 +11,7 @@ import com.mycompany.reservationsystem.service.PermissionService;
 import com.mycompany.reservationsystem.service.WebsiteSyncService;
 import com.mycompany.reservationsystem.transition.BorderPaneTransition;
 import com.mycompany.reservationsystem.util.ComboBoxUtil;
+import com.mycompany.reservationsystem.util.ToggleButtonUtil;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
 import javafx.application.Platform;
@@ -100,8 +101,6 @@ public class SettingsController {
     /*------------------- UI RESPONSE  ------------------*/
     @FXML private Label UIresponse;
     @FXML private Button Apply;
-
-    private ObservableList<Message> Messages = FXCollections.observableArrayList();
 
 
     /* ================= INITIALIZE ================= */
@@ -315,31 +314,32 @@ public class SettingsController {
     //===================== MESSAGING =======================================
     private void setupMessaging(){
 
-        Messages.setAll(messageRepository.findAll());
-        Message msg = messageRepository
-                .findByMessageLabelIgnoreCase("New Reservation")
-                .orElse(null);
+        List<Message> allMessages = messageRepository.findAll();
 
-        newReservation.setItems(Messages);
-        cancelledReservation.setItems(Messages);
-        confirmReservation.setItems(Messages);
-        completeReservation.setItems(Messages);
+        // Use separate ObservableLists for each ComboBox
+        newReservation.setItems(FXCollections.observableArrayList(allMessages));
+        cancelledReservation.setItems(FXCollections.observableArrayList(allMessages));
+        confirmReservation.setItems(FXCollections.observableArrayList(allMessages));
+        completeReservation.setItems(FXCollections.observableArrayList(allMessages));
 
+        // Format each ComboBox
         ComboBoxUtil.formatMessageComboBox(newReservation);
         ComboBoxUtil.formatMessageComboBox(cancelledReservation);
         ComboBoxUtil.formatMessageComboBox(confirmReservation);
         ComboBoxUtil.formatMessageComboBox(completeReservation);
 
 
+        ComboBoxUtil.selectMessageByLabel(newReservation, AppSettings.loadMessageLabel("message.new"));
+        ComboBoxUtil.selectMessageByLabel(cancelledReservation, AppSettings.loadMessageLabel("message.cancelled"));
+        ComboBoxUtil.selectMessageByLabel(confirmReservation, AppSettings.loadMessageLabel("message.confirm"));
+        ComboBoxUtil.selectMessageByLabel(completeReservation, AppSettings.loadMessageLabel("message.complete"));
 
-        ComboBoxUtil.selectMessageByLabel(newReservation,AppSettings.loadMessageLabel("message.new"));
-        ComboBoxUtil.selectMessageByLabel(cancelledReservation,AppSettings.loadMessageLabel("message.cancelled"));
-        ComboBoxUtil.selectMessageByLabel(confirmReservation,AppSettings.loadMessageLabel("message.confirm"));
-        ComboBoxUtil.selectMessageByLabel(completeReservation,AppSettings.loadMessageLabel("message.complete"));
-
-
-
+        ToggleButtonUtil.setupToggle(newReservationtoggle, "newReservation");
+        ToggleButtonUtil.setupToggle(confirmReservationtoggle, "confirmReservation");
+        ToggleButtonUtil.setupToggle(cancelledReservationtoggle, "cancelledReservation");
+        ToggleButtonUtil.setupToggle(completeReservationtoggle, "completeReservation");
     }
+
 
 
 
@@ -424,10 +424,15 @@ public class SettingsController {
                 AppSettings.saveModule(ModuleName.getText());
                 AppSettings.savePhone(PhoneNo.getText());
                 AppSettings.saveCancelTime(AutoCancelTime.getSelectedItem());
-                AppSettings.saveMessageLabel("message.new",newReservation.getSelectedText());
-                AppSettings.saveMessageLabel("message.cancelled",cancelledReservation.getSelectedText());
-                AppSettings.saveMessageLabel("message.confirm",confirmReservation.getSelectedText());
-                AppSettings.saveMessageLabel("message.complete",completeReservation.getSelectedText());
+                AppSettings.saveMessageLabel("message.new",newReservation.getValue().getMessageLabel());
+                AppSettings.saveMessageLabel("message.cancelled",cancelledReservation.getValue().getMessageLabel());
+                AppSettings.saveMessageLabel("message.confirm",confirmReservation.getValue().getMessageLabel());
+                AppSettings.saveMessageLabel("message.complete",completeReservation.getValue().getMessageLabel());
+                AppSettings.saveMessageEnabled("newReservation",newReservationtoggle.isSelected());
+                AppSettings.saveMessageEnabled("cancelledReservation",cancelledReservationtoggle.isSelected());
+                AppSettings.saveMessageEnabled("confirmReservation",confirmReservationtoggle.isSelected());
+                AppSettings.saveMessageEnabled("completeReservation",completeReservationtoggle.isSelected());
+
 
                 /*------------- Permission ------------*/
                 permissionStates.forEach((id, map) ->

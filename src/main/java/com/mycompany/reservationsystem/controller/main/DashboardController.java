@@ -1,12 +1,16 @@
 package com.mycompany.reservationsystem.controller.main;
 
 import com.mycompany.reservationsystem.dto.ManageTablesDTO;
+import com.mycompany.reservationsystem.dto.WebUpdateDTO;
 import com.mycompany.reservationsystem.model.Reservation;
 import com.mycompany.reservationsystem.repository.ManageTablesRepository;
 import com.mycompany.reservationsystem.repository.ReservationRepository;
+import com.mycompany.reservationsystem.util.NotificationManager;
+import com.mycompany.reservationsystem.websocket.WebSocketListener;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -36,7 +40,7 @@ import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.applySta
 import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.applyTimeFormat;
 
 @Component
-public class DashboardController {
+public class DashboardController implements WebSocketListener {
     @FXML
     private TableColumn<Reservation, String> CustomerColm;
 
@@ -207,85 +211,7 @@ public class DashboardController {
         manageTablesData.setAll(tables);
 
     }
-    public void showNotification(String title, String message, String type) {
-        VBox container = notificationArea;
 
-        // Build notification UI
-        System.out.println("notificationArea: " + notificationArea);
-        HBox root = new HBox(15);
-        root.getStyleClass().add("notification-root");
-
-        if (type.equals("success"))
-            root.getStyleClass().add("success-border");
-        else
-            root.getStyleClass().add("error-border");
-
-        // Icon circle
-        StackPane iconCircle = new StackPane();
-        iconCircle.getStyleClass().add("icon-circle");
-
-        if (type.equals("success"))
-            iconCircle.getStyleClass().add("success-icon");
-        else
-            iconCircle.getStyleClass().add("error-icon");
-
-        Label icon = new Label(type.equals("success") ? "✓" : "✕");
-        icon.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
-        iconCircle.getChildren().add(icon);
-
-        // Texts
-        VBox texts = new VBox(5);
-        Label t = new Label(title);
-        t.getStyleClass().add("notification-title");
-
-        Label m = new Label(message);
-        m.getStyleClass().add("notification-message");
-        texts.getChildren().addAll(t, m);
-
-        root.getChildren().addAll(iconCircle, texts);
-
-        // Add to VBox (NEWEST ON TOP)
-        if (container.getChildren().size() >= 5) {
-            container.getChildren().remove(container.getChildren().size() - 1); // remove last (oldest)
-        }
-
-        container.getChildren().add(0, root);
-        root.setMaxWidth(Double.MAX_VALUE);
-        root.prefWidthProperty().bind(container.widthProperty());
-        // ---- ANIMATION ----
-        root.setOpacity(0);
-        root.setTranslateY(-20);
-
-        Timeline showAnim = new Timeline(
-                new KeyFrame(Duration.ZERO,
-                        new KeyValue(root.opacityProperty(), 0),
-                        new KeyValue(root.translateYProperty(), -20)
-                ),
-                new KeyFrame(Duration.millis(250),
-                        new KeyValue(root.opacityProperty(), 1),
-                        new KeyValue(root.translateYProperty(), 0)
-                )
-        );
-
-        // Auto close after 3 sec
-        Timeline wait = new Timeline(new KeyFrame(Duration.seconds(60)));
-
-        // Fade out and remove
-        Timeline fadeOut = new Timeline(
-                new KeyFrame(Duration.ZERO),
-                new KeyFrame(Duration.millis(250),
-                        new KeyValue(root.opacityProperty(), 0),
-                        new KeyValue(root.translateYProperty(), -20)
-                )
-        );
-
-        wait.setOnFinished(e -> fadeOut.play());
-
-        fadeOut.setOnFinished(e -> container.getChildren().remove(root));
-
-        showAnim.play();
-        wait.play();
-    }
 
     @FXML
     public void initialize(){
@@ -296,14 +222,8 @@ public class DashboardController {
         barchart();
         setupRecentReservation();
         setupTableView();
+        NotificationManager.setContainer(notificationArea);
 
-        showNotification("New Reservation Added","A new Reservation has been successfully added.","success");
-
-        showNotification(
-                "Reservation Cancelled",
-                "The reservation has been cancelled.",
-                "error"
-        );
 
 
 
@@ -311,4 +231,45 @@ public class DashboardController {
 
     }
 
+    @Override
+    public void onMessage(WebUpdateDTO dto) {
+        Platform.runLater(() -> {
+            System.out.println(dto.getCode()+dto.getMessage()+dto);
+
+            if ("NEW_RESERVATION".equals(dto.getCode())) {
+                System.out.println(dto.getCode());
+                NotificationManager.show("New Reservation Added",
+                        dto.getMessage(), NotificationManager.NotificationType.SUCCESS);
+
+                loadRecentReservations();
+                updateLabels();
+                barchart();
+            }
+            if ("CANCELLED_RESERVATION".equals(dto.getCode())) {
+                NotificationManager.show("Reservation Cancelled",
+                        dto.getMessage(), NotificationManager.NotificationType.ERROR);
+
+                loadRecentReservations();
+                updateLabels();
+                barchart();
+            }
+            if ("CHANGED_RESERVATION".equals(dto.getCode())) {
+                NotificationManager.show("Reservation Edited",
+                        dto.getMessage(), NotificationManager.NotificationType.CHANGE);
+
+                loadRecentReservations();
+                updateLabels();
+                barchart();
+            }
+            if ("NOSHOW_RESERVATION".equals(dto.getCode())) {
+                NotificationManager.show("Reservation No Show",
+                        dto.getMessage(), NotificationManager.NotificationType.ERROR);
+
+                loadRecentReservations();
+                updateLabels();
+                barchart();
+            }
+
+        });
+    }
 }

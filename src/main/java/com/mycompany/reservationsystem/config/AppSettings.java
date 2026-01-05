@@ -71,12 +71,14 @@ public final class AppSettings {
         return PREFS.get(key, "");
     }
 
-    // Optional: helper keys
-    public static final String NEW_RESERVATION_KEY = "message.new";
-    public static final String CANCELLED_RESERVATION_KEY = "message.cancelled";
-    public static final String CONFIRM_RESERVATION_KEY = "message.confirm";
-    public static final String COMPLETE_RESERVATION_KEY = "message.complete";
+    public static void saveMessageEnabled(String key, boolean enabled) {
+        PREFS.putBoolean(key + ".enabled", enabled);
+    }
 
+    // Load toggle state (default to true if missing)
+    public static boolean loadMessageEnabled(String key) {
+        return PREFS.getBoolean(key + ".enabled", false);
+    }
 
 
     //--------------- DATABASE INFO -----------------
