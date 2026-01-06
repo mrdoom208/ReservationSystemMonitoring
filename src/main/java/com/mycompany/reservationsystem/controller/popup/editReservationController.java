@@ -28,7 +28,7 @@ public class editReservationController {
         Pax.setText(String.valueOf(targetReservation.getPax()));
         Phone.setText(targetReservation.getCustomer().getPhone());
         Email.setText(targetReservation.getCustomer().getEmail());
-
+        statusComboBox.setValue(targetReservation.getStatus());
     }
     private Stage dialogStage;
     public void setDialogStage(Stage dialogStage){
@@ -79,7 +79,6 @@ public class editReservationController {
     @FXML
     private void initialize(){
         statusComboBox.getItems().addAll("Pending", "Confirm");
-        statusComboBox.setValue(targetReservation.getStatus());
         statusComboBox.setDisable(true);
         applyEmailRestriction(Email);
         applyNumbersOnly(Pax);

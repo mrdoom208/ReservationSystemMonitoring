@@ -14,11 +14,11 @@
       <Label fx:id="messageLabel" maxWidth="1.7976931348623157E308" styleClass="popup-message-hidden" text="Enter Amount Paid" />
       <VBox spacing="10.0" VBox.vgrow="ALWAYS">
          <children>
-            <MFXTextField fx:id="reference" disable="true" floatingText="Reservation Reference" maxWidth="1.7976931348623157E308" prefHeight="44.0" prefWidth="307.0" styleClass="filter-search" VBox.vgrow="ALWAYS" />
-            <MFXTextField fx:id="AmountPaid" floatingText="Amount Paid" maxWidth="1.7976931348623157E308" prefHeight="44.0" prefWidth="307.0" styleClass="filter-search" textLimit="11" VBox.vgrow="ALWAYS" />
-            <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="310.0" spacing="15.0" VBox.vgrow="ALWAYS">
+            <MFXTextField fx:id="reference" disable="true" floatingText="Reservation Reference" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="307.0" styleClass="filter-search" VBox.vgrow="ALWAYS" />
+            <MFXTextField fx:id="AmountPaid" floatingText="Amount Paid" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="307.0" styleClass="filter-search" textLimit="11" VBox.vgrow="ALWAYS" />
+            <HBox alignment="CENTER_RIGHT" prefHeight="39.0" prefWidth="308.0" spacing="15.0" VBox.vgrow="ALWAYS">
                <children>
-                  <MFXButton fx:id="cancelButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="51.0" prefWidth="77.0" styleClass="basic-btn" text="Cancel" HBox.hgrow="ALWAYS" />
+                  <MFXButton fx:id="cancelButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="77.0" styleClass="basic-btn" text="Cancel" HBox.hgrow="ALWAYS" />
                   <MFXButton fx:id="setAmount" defaultButton="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="filter-btn" text="Set Amount" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>

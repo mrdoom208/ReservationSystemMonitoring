@@ -40,7 +40,7 @@ import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.applySta
 import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.applyTimeFormat;
 
 @Component
-public class DashboardController implements WebSocketListener {
+public class DashboardController {
     @FXML
     private TableColumn<Reservation, String> CustomerColm;
 
@@ -224,52 +224,6 @@ public class DashboardController implements WebSocketListener {
         setupTableView();
         NotificationManager.setContainer(notificationArea);
 
-
-
-
-
-
     }
 
-    @Override
-    public void onMessage(WebUpdateDTO dto) {
-        Platform.runLater(() -> {
-            System.out.println(dto.getCode()+dto.getMessage()+dto);
-
-            if ("NEW_RESERVATION".equals(dto.getCode())) {
-                System.out.println(dto.getCode());
-                NotificationManager.show("New Reservation Added",
-                        dto.getMessage(), NotificationManager.NotificationType.SUCCESS);
-
-                loadRecentReservations();
-                updateLabels();
-                barchart();
-            }
-            if ("CANCELLED_RESERVATION".equals(dto.getCode())) {
-                NotificationManager.show("Reservation Cancelled",
-                        dto.getMessage(), NotificationManager.NotificationType.ERROR);
-
-                loadRecentReservations();
-                updateLabels();
-                barchart();
-            }
-            if ("CHANGED_RESERVATION".equals(dto.getCode())) {
-                NotificationManager.show("Reservation Edited",
-                        dto.getMessage(), NotificationManager.NotificationType.CHANGE);
-
-                loadRecentReservations();
-                updateLabels();
-                barchart();
-            }
-            if ("NOSHOW_RESERVATION".equals(dto.getCode())) {
-                NotificationManager.show("Reservation No Show",
-                        dto.getMessage(), NotificationManager.NotificationType.ERROR);
-
-                loadRecentReservations();
-                updateLabels();
-                barchart();
-            }
-
-        });
-    }
 }

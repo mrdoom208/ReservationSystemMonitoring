@@ -248,7 +248,6 @@ public class ReportsController {
     }
 
     private void applyReservationFilters() {
-        loadReservationReports();
 
         LocalDate from = dateFromResrep.getValue();
         LocalDate to = dateToResrep.getValue();
@@ -278,10 +277,11 @@ public class ReportsController {
                 reservationReports,                 // your ObservableList
                 () -> reservationRepository.findAll(), // supplier for data
                 ResRepContainer,                    // the StackPane
-                result -> System.out.println("Loaded " + result.size() + " reservations") // optional callback
+                result -> applyReservationFilters() // optional callback
         );
-        updateReservationPieChart();
+
     }
+
     private void updateReservationPieChart() {
         Map<String, Long> statusCounts = filterReservationReports.stream()
                 .collect(Collectors.groupingBy(Reservation::getStatus, Collectors.counting()));

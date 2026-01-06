@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MessageService {
@@ -50,6 +51,10 @@ public class MessageService {
     public List<Message> searchByLabel(String keyword) {
         return messageRepository.findByMessageLabelContainingIgnoreCase(keyword);
     }
+    public Optional<Message> findByLabel(String keyword) {
+        return messageRepository.findByMessageLabelIgnoreCase(keyword);
+    }
+
     @Transactional
     public void createIfMissing(String messageLabel) {
         messageRepository.findByMessageLabelIgnoreCase(messageLabel)
@@ -65,7 +70,6 @@ public class MessageService {
                     return messageRepository.save(msg);
                 });
     }
-
 
     @Transactional
     public void DefaultMessage() {

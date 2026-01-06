@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fx:id="ReservationPane" fitToHeight="true" fitToWidth="true" prefHeight="900.0" prefWidth="1000.0" styleClass="Scrollpane" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.reservationsystem.controller.main.ReservationController">
+<ScrollPane fx:id="ReservationPane" fitToHeight="true" fitToWidth="true" prefHeight="2000.0" prefWidth="1200.0" styleClass="Scrollpane" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.reservationsystem.controller.main.ReservationController">
     <content>
         <BorderPane fx:id="reservpane" prefHeight="1694.0" prefWidth="1154.0" styleClass="DashboardPane">
             <left>
@@ -93,16 +93,16 @@
                                                 <Insets />
                                             </VBox.margin>
                                         </TableView>
-                                        <HBox alignment="CENTER" prefHeight="52.0" prefWidth="714.0" spacing="10.0">
+                                        <HBox alignment="CENTER" prefHeight="52.0" prefWidth="714.0" spacing="15.0">
                                             <children>
-                                    <HBox maxHeight="1.7976931348623157E308" spacing="5.0">
+                                    <HBox maxHeight="1.7976931348623157E308" spacing="5.0" HBox.hgrow="NEVER">
                                        <children>
-                                          <MFXComboBox floatMode="BORDER" floatingText="Message" maxHeight="1.7976931348623157E308" styleClass="filter-date" />
-                                          <MFXButton maxHeight="1.7976931348623157E308" styleClass="sent-text-button" text="Send Text" />
+                                          <MFXComboBox fx:id="messagelabels" floatMode="BORDER" floatingText="Message" maxHeight="1.7976931348623157E308" prefWidth="200.0" styleClass="filter-date" HBox.hgrow="ALWAYS" />
+                                          <MFXButton fx:id="sendsms" maxHeight="1.7976931348623157E308" styleClass="sent-text-button" text="Send SMS" />
                                        </children>
                                     </HBox>
-                                    <MFXButton maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" styleClass="edit" text="Edit Reservation" />
-                                                <Region prefHeight="200.0" HBox.hgrow="ALWAYS">
+                                    <MFXButton fx:id="editreservation" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" onAction="#editCustomerReservation" styleClass="edit" text="Edit Reservation" />
+                                                <Region prefHeight="52.0" prefWidth="134.0" HBox.hgrow="ALWAYS">
                                                     <HBox.margin>
                                                         <Insets />
                                                     </HBox.margin>
@@ -173,9 +173,9 @@
                                                 </TableView>
                                                 <BorderPane prefHeight="0.0" prefWidth="337.0" GridPane.rowIndex="2">
                                                     <left>
-                                                        <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                                        <StackPane prefHeight="150.0" BorderPane.alignment="CENTER">
                                                             <children>
-                                                                <Label fx:id="CusToTable" prefHeight="29.0" prefWidth="217.0" styleClass="PlainText" text="SRV">
+                                                                <Label fx:id="CusToTable" prefHeight="29.0" styleClass="PlainText" text="SRV">
                                                                     <font>
                                                                         <Font size="15.0" />
                                                                     </font>
@@ -228,28 +228,27 @@
                                         <TableColumn fx:id="dateSCNR" prefWidth="75.0" text="Date" />
                                     </columns>
                                 </TableView>
-                                <HBox prefHeight="39.0" prefWidth="1015.0">
+                                <HBox alignment="CENTER_RIGHT" prefWidth="1015.0">
                                     <children>
-                                        <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                                         <Label styleClass="static-label" text="Seated: " HBox.hgrow="ALWAYS" />
                                         <Label fx:id="seated" styleClass="static-label" text="0" HBox.hgrow="ALWAYS" />
-                                        <Region prefHeight="39.0" prefWidth="25.0" />
+                                        <Region prefWidth="25.0" />
                                         <Label styleClass="static-label" text="Cancelled: " HBox.hgrow="ALWAYS" />
                                         <Label fx:id="cancelled" styleClass="static-label" text="0" HBox.hgrow="ALWAYS" />
-                                        <Region prefHeight="39.0" prefWidth="25.0" />
+                                        <Region prefWidth="25.0" />
                                         <Label styleClass="static-label" text="No Show: " />
                                         <Label fx:id="noshow" styleClass="static-label" text="0" />
                                     </children>
                                 </HBox>
                             </children>
                             <padding>
-                                <Insets bottom="25.0" left="25.0" right="25.0" top="10.0" />
+                                <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
                             </padding>
                         </VBox>
                         <Region prefHeight="88.0" prefWidth="1066.0" GridPane.rowIndex="4" />
                         <VBox alignment="CENTER" minHeight="550.0" prefHeight="550.0" prefWidth="1066.0" spacing="10.0" styleClass="Statistics-cell" GridPane.rowIndex="5">
                             <children>
-                                <Label styleClass="BoldText" text="RESERVATION LOGS">
+                                <Label styleClass="BoldText" text="COMPLETE RESERVATIONS">
                                     <font>
                                         <Font size="30.0" />
                                     </font>
@@ -293,18 +292,26 @@
                                         <TableColumn fx:id="dateRL" prefWidth="75.0" text="Date" />
                                     </columns>
                                     <VBox.margin>
-                                        <Insets bottom="25.0" left="25.0" right="25.0" />
+                                        <Insets />
                                     </VBox.margin>
                                 </TableView>
-                                <Region prefHeight="18.0" prefWidth="1066.0" />
+                        <HBox alignment="CENTER_RIGHT" prefWidth="200.0">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" styleClass="static-label" text="Complete: " />
+                              <Label fx:id="complete" alignment="CENTER_RIGHT" styleClass="static-label" text="0" />
+                           </children>
+                        </HBox>
                             </children>
                             <padding>
-                                <Insets top="10.0" />
+                                <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />
                             </padding>
                         </VBox>
                     </children>
                 </GridPane>
             </center>
+         <padding>
+            <Insets bottom="20.0" />
+         </padding>
         </BorderPane>
     </content>
 </ScrollPane>

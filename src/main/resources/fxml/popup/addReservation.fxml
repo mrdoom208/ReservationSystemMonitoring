@@ -23,7 +23,7 @@
                   <MFXTextField fx:id="Email" floatingText="Email" maxWidth="1.7976931348623157E308" prefHeight="50.0" prefWidth="90.0" styleClass="filter-search" VBox.vgrow="ALWAYS" />
                       <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="20.0" VBox.vgrow="ALWAYS">
                           <children>
-                              <MFXComboBox fx:id="statusComboBox" alignment="CENTER" disable="true" floatingText="Status" maxWidth="1.7976931348623157E308" prefHeight="50.0" prefWidth="242.0" styleClass="filter-date" text="Pending" HBox.hgrow="ALWAYS" />
+                              <MFXComboBox fx:id="statusComboBox" alignment="CENTER" disable="true" floatMode="DISABLED" floatingText="Status" maxWidth="1.7976931348623157E308" prefHeight="50.0" prefWidth="242.0" styleClass="filter-date" text="Pending" HBox.hgrow="ALWAYS" />
                           </children>
                       </HBox>
                       <HBox alignment="CENTER_RIGHT" prefHeight="50.0" prefWidth="310.0" spacing="15.0" VBox.vgrow="ALWAYS">

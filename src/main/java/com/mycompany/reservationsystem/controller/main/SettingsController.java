@@ -334,10 +334,10 @@ public class SettingsController {
         ComboBoxUtil.selectMessageByLabel(confirmReservation, AppSettings.loadMessageLabel("message.confirm"));
         ComboBoxUtil.selectMessageByLabel(completeReservation, AppSettings.loadMessageLabel("message.complete"));
 
-        ToggleButtonUtil.setupToggle(newReservationtoggle, "newReservation");
-        ToggleButtonUtil.setupToggle(confirmReservationtoggle, "confirmReservation");
-        ToggleButtonUtil.setupToggle(cancelledReservationtoggle, "cancelledReservation");
-        ToggleButtonUtil.setupToggle(completeReservationtoggle, "completeReservation");
+        ToggleButtonUtil.setupToggle(newReservationtoggle, "message.new");
+        ToggleButtonUtil.setupToggle(confirmReservationtoggle, "message.confirm");
+        ToggleButtonUtil.setupToggle(cancelledReservationtoggle, "message.cancelled");
+        ToggleButtonUtil.setupToggle(completeReservationtoggle, "message.complete");
     }
 
 
@@ -428,10 +428,10 @@ public class SettingsController {
                 AppSettings.saveMessageLabel("message.cancelled",cancelledReservation.getValue().getMessageLabel());
                 AppSettings.saveMessageLabel("message.confirm",confirmReservation.getValue().getMessageLabel());
                 AppSettings.saveMessageLabel("message.complete",completeReservation.getValue().getMessageLabel());
-                AppSettings.saveMessageEnabled("newReservation",newReservationtoggle.isSelected());
-                AppSettings.saveMessageEnabled("cancelledReservation",cancelledReservationtoggle.isSelected());
-                AppSettings.saveMessageEnabled("confirmReservation",confirmReservationtoggle.isSelected());
-                AppSettings.saveMessageEnabled("completeReservation",completeReservationtoggle.isSelected());
+                AppSettings.saveMessageEnabled("message.new",newReservationtoggle.isSelected());
+                AppSettings.saveMessageEnabled("message.cancelled",cancelledReservationtoggle.isSelected());
+                AppSettings.saveMessageEnabled("message.confirm",confirmReservationtoggle.isSelected());
+                AppSettings.saveMessageEnabled("message.complete",completeReservationtoggle.isSelected());
 
 
                 /*------------- Permission ------------*/

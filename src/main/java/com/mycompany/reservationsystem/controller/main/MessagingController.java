@@ -8,6 +8,7 @@ import com.mycompany.reservationsystem.service.PermissionService;
 import com.mycompany.reservationsystem.service.ReservationService;
 import com.mycompany.reservationsystem.dto.CustomerReportDTO;
 import com.mycompany.reservationsystem.model.Message;
+import com.mycompany.reservationsystem.transition.LabelTransition;
 import com.mycompany.reservationsystem.util.dialog.ConfirmationDialog;
 import com.mycompany.reservationsystem.util.dialog.DeleteDialog;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -177,9 +178,13 @@ public class MessagingController {
                         loadMessages();
 
                         messageresponse(true, msg.getMessageLabel() + " Message Removed Successfully");
-                    } catch (IllegalArgumentException ex) {
+
+                    }catch (IllegalArgumentException ignored){
+                        messageresponse(false, ignored.getMessage());
+                    }
+                    catch (Exception ex) {
                         // This is called if it's the default message
-                        messageresponse(false, ex.getMessage());
+                        messageresponse(false, "The message \"" + msg.getMessageLabel() + "\" has not been saved yet.");
                     }
                 });
     }
@@ -543,6 +548,7 @@ public class MessagingController {
     }
 
     public void messageresponse(boolean successfully,String details){
+        LabelTransition.play(UIresponse);
         if(!successfully){
             UIresponse.getStyleClass().removeAll("login-success", "login-message");
             UIresponse.getStyleClass().add("login-error");
@@ -566,6 +572,7 @@ public class MessagingController {
             sendmessageresponse.getStyleClass().add("login-success");
             sendmessageresponse.setText(details);
         }
+        LabelTransition.play(sendmessageresponse);
 
     }
     private void applyPermissions() {

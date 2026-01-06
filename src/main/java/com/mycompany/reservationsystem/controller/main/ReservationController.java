@@ -2,12 +2,15 @@ package com.mycompany.reservationsystem.controller.main;
 
 import com.mycompany.reservationsystem.App;
 import com.mycompany.reservationsystem.controller.popup.addReservationController;
+import com.mycompany.reservationsystem.controller.popup.editReservationController;
 import com.mycompany.reservationsystem.service.ActivityLogService;
 import com.mycompany.reservationsystem.model.*;
 import com.mycompany.reservationsystem.repository.ManageTablesRepository;
 import com.mycompany.reservationsystem.repository.ReservationRepository;
 import com.mycompany.reservationsystem.repository.ReservationTableLogsRepository;
+import com.mycompany.reservationsystem.service.MessageService;
 import com.mycompany.reservationsystem.service.PermissionService;
+import com.mycompany.reservationsystem.util.ComboBoxUtil;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -112,10 +115,12 @@ public class ReservationController {
     /* ===================== CONTROLS ===================== */
 
     @FXML
-    private MFXButton Mergebtn, newcustomer, reservationrefresh;
+    private MFXButton Mergebtn, newcustomer, reservationrefresh,sendsms,editreservation;
 
     @FXML
     private MFXComboBox reservationfilter;
+
+    @FXML MFXComboBox<Message> messagelabels;
 
     @FXML
     private MFXTextField SearchCL;
@@ -140,12 +145,13 @@ public class ReservationController {
     private Label
             CusToTable,
             pending, confirm, seated,
-            cancelled, noshow;
+            cancelled, noshow, complete;
 
     /* ===================== STATE ===================== */
 
     private Reservation selectedReservation;
     private User currentuser;
+    private Message selectedMessage;
 
 
     @Autowired
@@ -158,6 +164,8 @@ public class ReservationController {
     ActivityLogService activityLogService;
     @Autowired
     PermissionService permissionService;
+    @Autowired
+    MessageService messageService;
 
 
 
@@ -170,6 +178,7 @@ public class ReservationController {
     private final ObservableList<Reservation> reservationsData = FXCollections.observableArrayList();
     private final ObservableList<ManageTables> availableTables = FXCollections.observableArrayList();
     private final ObservableList<ReservationTableLogs> reservationlogsdata = FXCollections.observableArrayList();
+    private final ObservableList<Message> messageData = FXCollections.observableArrayList();
 
     FilteredList<ManageTables> filteredtable;
     FilteredList<Reservation> filteredReservationList = new FilteredList<>(reservationsData);
@@ -191,12 +200,38 @@ public class ReservationController {
                     LocalDate.now()
             );
             reservationsData.setAll(data);
+
+            long pendingsize = reservationsData.stream().filter(r -> "Pending".equals(r.getStatus())).count();
+            pending.setText(String.valueOf(pendingsize));
+
+            long confirmsize = reservationsData.stream().filter(r -> "Confirm".equals(r.getStatus())).count();
+            confirm.setText(String.valueOf(confirmsize));
+
+
+            long seatedsize = reservationsData.stream().filter(r -> "Seated".equals(r.getStatus())).count();
+            seated.setText(String.valueOf(seatedsize));
+
+            long cancelledsize = reservationsData.stream().filter(r -> "Cancelled".equals(r.getStatus())).count();
+            cancelled.setText(String.valueOf(cancelledsize));
+
+            long noshowsize = reservationsData.stream().filter(r -> "No Show".equals(r.getStatus())).count();
+            noshow.setText(String.valueOf(noshowsize));
         });
 
     }
 
     //////////////////////CUSTOMER RESERVATION TABLE////////////////////
     public void setupCustomerReservationTable() {
+        messagelabels.setItems(messageData);
+        ComboBoxUtil.formatMessageComboBox(messagelabels);
+
+        messagelabels.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            selectedMessage = newVal; // remember the selection
+        });
+        CustomerReservationTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            selectedReservation = newSelection;
+            editreservation.setDisable(newSelection == null);
+        });
 
         CustomerReservationTable.setItems(secondfilteredReservationList);
         String[] statuses = {"Confirm", "Pending", "Show All"};
@@ -259,44 +294,44 @@ public class ReservationController {
         });
 
         TableNoCRT.setCellFactory(col -> new TableCell<Reservation, Long>() {
+            private final Label selectLabel = new Label("Select");
+
+            {
+                selectLabel.getStyleClass().add("table-number-btn");
+                selectLabel.setCursor(Cursor.HAND);
+
+                selectLabel.setOnMouseClicked(e -> {
+                    int index = getIndex(); // get the row index
+                    Reservation row = getTableView().getItems().get(index);
+                    if (row != null) {
+                        selectedReservation = row;
+
+                        // Select the row in the table (highlights it)
+                        getTableView().getSelectionModel().clearAndSelect(index);
+                        getTableView().getFocusModel().focus(index);
+
+                        currentpax = row.getPax();
+                        hideTableList(row.getId());
+                        loadAvailableTable();
+                        System.out.println("Selected Reservation: " + row.getReference());
+                    }
+                });
+            }
+
             @Override
             protected void updateItem(Long item, boolean empty) {
                 super.updateItem(item, empty);
 
-                setText(null);
-                setGraphic(null);
-
                 if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
                     setText(null);
                     setGraphic(null);
-                    return;
-                }
-
-                Reservation row = getTableView().getItems().get(getIndex());
-
-                if (item == null) {
-                    Label btn = new Label("Select");
-                    btn.getStyleClass().add("table-number-btn"); // CSS class
-                    btn.setCursor(Cursor.HAND); // pointer cursor
-
-                    btn.setOnMouseClicked(e -> {
-                        selectedReservation = row;
-                        //scrollPosition = ReservationPane.getVvalue();
-                        currentpax = row.getPax();
-
-                        hideTableList(row.getId());
-                        loadAvailableTable();
-                        System.out.println(row.getReference());
-                    });
-
-                    setGraphic(btn);
                 } else {
-                    setText(String.valueOf(item));
-                    setGraphic(null);
+                    setText(String.valueOf(item != null ? item : ""));
+                    setGraphic(selectLabel);
                 }
-
             }
         });
+
 
         applyTimeFormat(TimeCRT);
         applyStatusStyle(StatusCRT);
@@ -332,10 +367,6 @@ public class ReservationController {
             }
             return statuses.contains(reservation.getStatus());
         });
-
-        pending.setText(String.valueOf(reservationRepository.countByStatus("Pending")));
-        confirm.setText(String.valueOf(reservationRepository.countByStatus("Confirm")));
-
 
     }
 
@@ -494,14 +525,12 @@ public class ReservationController {
             }
             return statuses.contains(reservation.getStatus());
         });
-        seated.setText(String.valueOf(reservationRepository.countByStatus("Seated")));
-        cancelled.setText(String.valueOf(reservationRepository.countByStatus("Cancelled")));
-        noshow.setText(String.valueOf(reservationRepository.countByStatus("No Show")));
     }
 
 
     /// ////////////////////////RESERVATION LOGS////////////////////////////
     private void setupReservationLogs(){
+        complete.setText(String.valueOf(reservationlogsdata.size()));
         ReservationLogs.setItems(reservationlogsdata);
         applyStatusStyle(statusRL);
         applyTimeFormat(pendingRL);
@@ -531,6 +560,17 @@ public class ReservationController {
             }
         }
         ReservationLogs.setPlaceholder(new Label("No Complete Reservation yet "));
+    }
+    public void loadmessages(){
+        List<Message> allMessages = messageService.getAllMessages(); // or getAllMessageLabels()
+        messagelabels.getSelectionModel().clearSelection();
+        messageData.setAll(allMessages);
+        javafx.application.Platform.runLater(() -> {
+            if(selectedMessage != null){
+                messagelabels.setValue(selectedMessage);
+            }
+
+        });
     }
 
     public void loadReservationLogs() {
@@ -610,6 +650,40 @@ public class ReservationController {
         //TableManager.refresh();
     }
 
+    @FXML
+    private void editCustomerReservation(){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/popup/editReservation.fxml"));
+            loader.setControllerFactory(springContext::getBean);
+            Parent root = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(App.primaryStage); // mainStage is your primary stage
+            dialogStage.initStyle(StageStyle.TRANSPARENT);
+            dialogStage.setResizable(false);
+            Scene scn = new Scene(root);
+            scn.setFill(Color.TRANSPARENT);
+            dialogStage.setScene(scn);
+
+            // Link controller with dialog stage
+            editReservationController controller = loader.getController();
+            controller.setTargetReservation(selectedReservation);
+            controller.setDialogStage(dialogStage);
+
+            dialogStage.showAndWait(); // wait until closed
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 5. Refresh UI
+        loadReservationsData();
+        adminUIController.getDashboardController().loadRecentReservations();
+        //loadReservationReports();
+        adminUIController.getDashboardController().barchart();
+
+    }
+
     private void applyPermissions() {
         if (currentuser == null) return;
 
@@ -636,11 +710,14 @@ public class ReservationController {
         hiddenTable.setVisible(false);
         hiddenTable.setManaged(false);
 
+        editreservation.setDisable(selectedReservation == null);
+
         loadReservationsData();
         loadCustomerReservationTable();
-        loadAvailableTable();
+        loadmessages();
         loadReservationLogs();
         loadSCNReservation();
+        loadAvailableTable();
         setupCustomerReservationTable();
         setupAvailableTable();
         setupSCNReservation();

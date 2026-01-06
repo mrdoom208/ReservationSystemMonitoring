@@ -499,7 +499,7 @@
 
 .edit {
     -fx-font-weight: bold;
-    -fx-font-size:0.9em;  /* was 10px */
+    -fx-font-size:0.9em;
     -fx-background-radius: 8px;
     -fx-cursor: hand;
     -fx-transition: all 0.2s ease-in-out;
@@ -773,6 +773,9 @@
  .menu-item .label .text {
      -fx-text-alignment: center;
  }
+
+
+ /* TEXTFIELD */
 .filter-search {
     -fx-font-size: 1em;
     -fx-background-color: #2C2C2C;
@@ -792,9 +795,19 @@
 .filter-search:focused .floating-text {
     -fx-text-fill: #3E7BFA;       /* matches accent color */
 }
+.filter-search:disabled {
+    -fx-background-color: #1F1F1F;   /* darker gray for disabled */
+    -fx-text-fill: #6B6B6B;          /* muted text */
+    -fx-opacity: 1;                  /* keep opacity same, we use muted colors instead */
+}
+
+.filter-search:disabled .floating-text,
+.filter-search:disabled .floating-text-container {
+    -fx-text-fill: #6B6B6B;          /* muted label */
+}
 
 /* ===========================
-   DATEPICKER — MFXDatePicker
+   DATEPICKER — MFXDatePicker AND COMBOBOX - MFXCOMBOBOX
    =========================== */
 .filter-date {
     -fx-background-color: #2C2C2C;
@@ -841,6 +854,30 @@
     -fx-background-color: transparent; /* remove default background */
     -fx-fill: #E53935;       /* change icon color */
 }
+.filter-date:disabled {
+    -fx-background-color: #1F1F1F;   /* darker gray for disabled */
+    -fx-text-fill: #6B6B6B;          /* muted text */
+    -fx-prompt-text-fill: #6B6B6B;   /* muted prompt */
+}
+
+.filter-date:disabled .floating-text,
+.filter-date:disabled .floating-text-container {
+    -fx-text-fill: #6B6B6B;          /* muted floating label */
+}
+/* Popup calendar for disabled date picker */
+.mfx-date-picker:disabled .calendar-popup {
+    -fx-background-color: #1A1A1A;   /* darker panel */
+    -fx-text-fill: #6B6B6B;          /* muted text */
+}
+
+.mfx-date-picker:disabled .date-cell {
+    -fx-background-color: transparent; /* no hover / selection effect */
+    -fx-text-fill: #6B6B6B;           /* muted date text */
+}
+
+.mfx-date-picker:disabled .mfx-icon-wrapper .mfx-font-icon {
+    -fx-fill: #6B6B6B;               /* muted icon */
+}
 
 /* ===========================
    APPLY BUTTON — MFXButton
@@ -862,6 +899,17 @@
     -fx-background-color: #CC0000
 
 }
+.filter-btn:disabled {
+    -fx-background-color: #6B6B6B;  /* muted gray */
+    -fx-text-fill: #CCCCCC;          /* muted text */
+    -fx-font-weight: normal;         /* optional: make less bold */
+}
+
+.filter-btn:disabled:hover,
+.filter-btn:disabled:armed {
+    -fx-background-color: #6B6B6B;  /* stay muted, no hover effect */
+}
+/*---------------------------------------------------------------------*/
 
 .custom-btn {
     -fx-background-color: #FFB6C9;       /* main button color */
@@ -961,13 +1009,20 @@
 .sent-text-button {
     -fx-background-color: #1E1E1E;
     -fx-text-fill: #FFFFFF;
-    -fx-border-color: #333333;
-    -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-    -fx-padding: 10px 20px;
-    -fx-font-size: 1em;
+    -fx-font-size: 0.9em;
     -fx-cursor: hand; /* pointer in JavaFX */
 }
+.edit {
+    -fx-font-weight: bold;
+    -fx-font-size:0.9em;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s ease-in-out;
+    -fx-background-color: #FFC107;
+    -fx-text-fill: #1e1e1e;
+}
+
 
 .sent-text-button:hover {
     -fx-background-color: #2C2C2C;
@@ -1086,3 +1141,4 @@
     -fx-text-alignment: center;
     -fx-text-fill: #FFFFFF;
 }
+/*-----------COMBOBOX--------------------------

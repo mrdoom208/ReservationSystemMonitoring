@@ -33,7 +33,7 @@
             <MFXTextField fx:id="lastname" floatingText="Lastname" maxWidth="1.7976931348623157E308" styleClass="filter-search" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <MFXTextField fx:id="username" floatingText="Username" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" styleClass="filter-search" GridPane.columnSpan="2" GridPane.rowIndex="2" />
             <MFXPasswordField fx:id="password" floatingText="Password" maxWidth="1.7976931348623157E308" styleClass="filter-search" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-            <MFXComboBox fx:id="position" floatingText="Position" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="filter-date" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+            <MFXComboBox fx:id="position" floatMode="DISABLED" floatingText="Position" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="filter-date" GridPane.columnSpan="2" GridPane.rowIndex="4" />
             <MFXButton fx:id="cancel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="basic-btn" text="Cancel" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
             <MFXButton fx:id="submit" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="filter-btn" text="Submit" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
          </children>

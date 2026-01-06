@@ -12,6 +12,7 @@ import com.mycompany.reservationsystem.repository.ActivityLogRepository;
 import com.mycompany.reservationsystem.repository.UserRepository;
 import java.io.IOException;
 
+import com.mycompany.reservationsystem.service.UserService;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.application.Platform;
@@ -64,6 +65,9 @@ public class LoginController {
     private ActivityLogRepository activityLogRepository;
     @Autowired
     private ActivityLogService activityLogService;
+
+    @Autowired
+    private UserService userService;
     private boolean manager = false;
     private double xOffset = 0;
     private double yOffset = 0;
@@ -93,6 +97,7 @@ public class LoginController {
     
     @FXML
     private void initialize() {
+        userService.createAdminIfMissing();
         // Set default active button
         Submit.setDefaultButton(true);
 

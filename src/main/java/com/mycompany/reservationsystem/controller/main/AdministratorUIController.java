@@ -12,6 +12,7 @@ import com.mycompany.reservationsystem.util.BackgroundViewLoader;
 import com.mycompany.reservationsystem.util.NotificationManager;
 import com.mycompany.reservationsystem.websocket.WebSocketListener;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
+import com.mycompany.reservationsystem.websocket.WebUpdateHandlerImpl;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
@@ -44,17 +46,18 @@ import static com.mycompany.reservationsystem.transition.ButtonTransition.setupB
  * @author formentera
  */
 @Component
-public class AdministratorUIController implements Initializable, WebSocketListener {
+public class AdministratorUIController implements Initializable {
 
     public User currentuser;
-    private BackgroundViewLoader viewLoader;
-    private DeviceDetectionManager deviceDetectionManager = new DeviceDetectionManager();
+    private static BackgroundViewLoader viewLoader;
+    private static DeviceDetectionManager deviceDetectionManager = new DeviceDetectionManager();
+
 
     public void setDeviceDetectionManager(DeviceDetectionManager deviceDetectionManager) {
-        this.deviceDetectionManager = deviceDetectionManager;
+        AdministratorUIController.deviceDetectionManager = deviceDetectionManager;
     }
 
-    public DeviceDetectionManager getDeviceDetectionManager() {
+    public static DeviceDetectionManager getDeviceDetectionManager() {
         return deviceDetectionManager;
     }
 
@@ -118,6 +121,9 @@ public class AdministratorUIController implements Initializable, WebSocketListen
 
     private Reservation selectedReservation;
 
+    @Autowired
+    private WebUpdateHandlerImpl webUpdateHandler;
+
     WebSocketClient wsClient;
 
     @Override
@@ -148,15 +154,9 @@ public class AdministratorUIController implements Initializable, WebSocketListen
 
 
         // Setup WebSocket in separate thread
-        WebSocketClient wsClient = new WebSocketClient("ws://localhost:8080/ws");
-        wsClient.addListener(this);
-        new Thread(() -> {
-            try {
-                wsClient.connect();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        this.wsClient = new WebSocketClient("ws://localhost:8080/ws");
+        this.wsClient.addListener(webUpdateHandler);
+        this.wsClient.connect();
 
         HboxProgress.setManaged(false);
         HboxProgress.setVisible(false);
@@ -291,7 +291,6 @@ public class AdministratorUIController implements Initializable, WebSocketListen
 
 
                 // Optionally center window
-                ;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -352,52 +351,37 @@ public class AdministratorUIController implements Initializable, WebSocketListen
     }
 
     // Controller getters - now using cached controllers from background loader
-    public DashboardController getDashboardController() {
+    public static DashboardController getDashboardController() {
         return (DashboardController) viewLoader.getCachedController("/fxml/main/Dashboard.fxml");
     }
 
-    public ReservationController getReservationController() {
+    public static ReservationController getReservationController() {
         return (ReservationController) viewLoader.getCachedController("/fxml/main/Reservation.fxml");
     }
 
-    public TableController getTableController() {
+    public static TableController getTableController() {
         return (TableController) viewLoader.getCachedController("/fxml/main/Table.fxml");
     }
-    public MessagingController getMessagingController(){
+    public static MessagingController getMessagingController(){
         return (MessagingController) viewLoader.getCachedController("/fxml/Message.fxml");
     }
 
-    public AccountController getAccountController() {
+    public static AccountController getAccountController() {
         return (AccountController) viewLoader.getCachedController("/fxml/main/Account.fxml");
     }
 
-    public ActivityLogsController getActivityLogsController() {
+    public static ActivityLogsController getActivityLogsController() {
         return (ActivityLogsController) viewLoader.getCachedController("/fxml/main/ActivityLogs.fxml");
     }
 
-    public ReportsController getReportsController() {
+    public static ReportsController getReportsController() {
         return (ReportsController) viewLoader.getCachedController("/fxml/main/Reports.fxml");
     }
-    public SettingsController getSettingsController() {
+    public static SettingsController getSettingsController() {
         return (SettingsController) viewLoader.getCachedController("/fxml/main/Settings.fxml");
     }
 
 
-    @Override
-    public void onMessage(WebUpdateDTO dto) {
-        // Only update if Dashboard controller is already loaded (not forced loading)
-        DashboardController controller = getDashboardController();
-        if (controller != null) {
-            // Update in background to avoid blocking the UI thread
-            CompletableFuture.runAsync(() -> {
-                Platform.runLater(() -> {
-                    controller.updateLabels();
-                    NotificationManager.show("New Reservation Added",
-                            dto.getMessage(), NotificationManager.NotificationType.SUCCESS);
-                });
-            });
-        }
-    }
     private void missingDetails(){
         userService.createAdminIfMissing();
         messageService.createIfMissing("New Reservation");
@@ -456,7 +440,6 @@ public class AdministratorUIController implements Initializable, WebSocketListen
                 currentStage.close();
 
                 // Optionally center window
-                ;
             } catch (IOException e) {
                 e.printStackTrace();
             }

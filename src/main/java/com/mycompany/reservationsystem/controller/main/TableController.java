@@ -502,14 +502,14 @@ public class TableController {
         TableManager.setPlaceholder(new Label("No Table set yet"));
 
     }
-    protected void loadTableManager(){
+    public void loadTableManager(){
         List<ManageTablesDTO> tables = manageTablesRepository.getManageTablesDTO();
         tableManagerData.setAll(tables);
         totaltables.setText(String.valueOf(manageTablesRepository.count()));
         totalfree.setText(String.valueOf(manageTablesRepository.countByStatus("Available")));
         int busy = 0;
-        busy += manageTablesRepository.countByStatus("Reserved");
-        busy += manageTablesRepository.countByStatus("Occupied");
+        busy += (int) manageTablesRepository.countByStatus("Reserved");
+        busy += (int) manageTablesRepository.countByStatus("Occupied");
         totalbusy.setText(String.valueOf(busy));
 
 
@@ -517,6 +517,10 @@ public class TableController {
     ///////////////////////////////////////TABLE HISTORY/////////////////////////////////////
     private void setupTableHistory(){
         TableHistory.setItems(reservationlogsdata);
+        applyTimeFormat(reservedTH);
+        applyTimeFormat(occupiedTH);
+        applyTimeFormat(completeTH);
+        
         TableColumn<?, ?>[] column = {referenceTH,customerTH,paxTH,statusTH,tablenoTH,capacityTH,reservedTH,occupiedTH,completeTH,dateTH};
         double[] widthFactors = {0.11, 0.2, 0.05, 0.1, 0.05,0.05,0.11,0.11,0.11,0.11};
         String[] namecol = {"reference","customer","pax","status","tableid","tablecapacity","tablestarttime","reservationSeatedtime","reservationCompletetime","date"};
