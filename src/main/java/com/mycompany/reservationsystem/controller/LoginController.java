@@ -6,11 +6,13 @@ package com.mycompany.reservationsystem.controller;
 import com.mycompany.reservationsystem.App;
 import com.mycompany.reservationsystem.config.AppSettings;
 import com.mycompany.reservationsystem.controller.main.AdministratorUIController;
+import com.mycompany.reservationsystem.model.ActivityLog;
 import com.mycompany.reservationsystem.service.ActivityLogService;
 import com.mycompany.reservationsystem.model.User;
 import com.mycompany.reservationsystem.repository.ActivityLogRepository;
 import com.mycompany.reservationsystem.repository.UserRepository;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import com.mycompany.reservationsystem.service.UserService;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
@@ -184,6 +186,17 @@ public class LoginController {
                 stage.show();
 
                 ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
+
+                ActivityLog log = new ActivityLog();
+                log.setUser(found.getUsername());
+                log.setPosition(String.valueOf(found.getPosition()));
+                log.setModule("Account");
+                log.setAction("Login");
+                log.setDescription("User "+found.getUsername()+" Logged in Successfully");
+                log.setTimestamp(LocalDateTime.now());
+                activityLogRepository.save(log);
+
+
 
             } catch (IOException ex) {
                 ex.printStackTrace();

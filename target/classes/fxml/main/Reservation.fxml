@@ -93,20 +93,16 @@
                                                 <Insets />
                                             </VBox.margin>
                                         </TableView>
-                                        <HBox alignment="CENTER" prefHeight="52.0" prefWidth="714.0" spacing="15.0">
+                                        <HBox alignment="CENTER_LEFT" prefHeight="52.0" prefWidth="714.0" spacing="15.0">
                                             <children>
                                     <HBox maxHeight="1.7976931348623157E308" spacing="5.0" HBox.hgrow="NEVER">
                                        <children>
                                           <MFXComboBox fx:id="messagelabels" floatMode="BORDER" floatingText="Message" maxHeight="1.7976931348623157E308" prefWidth="200.0" styleClass="filter-date" HBox.hgrow="ALWAYS" />
-                                          <MFXButton fx:id="sendsms" maxHeight="1.7976931348623157E308" styleClass="sent-text-button" text="Send SMS" />
+                                          <MFXButton fx:id="sendsms" maxHeight="1.7976931348623157E308" onAction="#sendMessage" styleClass="sent-text-button" text="Send SMS" />
                                        </children>
                                     </HBox>
                                     <MFXButton fx:id="editreservation" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" onAction="#editCustomerReservation" styleClass="edit" text="Edit Reservation" />
-                                                <Region prefHeight="52.0" prefWidth="134.0" HBox.hgrow="ALWAYS">
-                                                    <HBox.margin>
-                                                        <Insets />
-                                                    </HBox.margin>
-                                                </Region>
+                                    <Label fx:id="response" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Label" HBox.hgrow="ALWAYS" />
                                     <HBox alignment="CENTER">
                                        <children>
                                                       <Label styleClass="static-label" text="Pending: ">

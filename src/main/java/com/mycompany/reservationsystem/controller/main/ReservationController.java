@@ -1,8 +1,10 @@
 package com.mycompany.reservationsystem.controller.main;
 
 import com.mycompany.reservationsystem.App;
+import com.mycompany.reservationsystem.config.AppSettings;
 import com.mycompany.reservationsystem.controller.popup.addReservationController;
 import com.mycompany.reservationsystem.controller.popup.editReservationController;
+import com.mycompany.reservationsystem.hardware.DeviceDetectionManager;
 import com.mycompany.reservationsystem.service.ActivityLogService;
 import com.mycompany.reservationsystem.model.*;
 import com.mycompany.reservationsystem.repository.ManageTablesRepository;
@@ -10,6 +12,7 @@ import com.mycompany.reservationsystem.repository.ReservationRepository;
 import com.mycompany.reservationsystem.repository.ReservationTableLogsRepository;
 import com.mycompany.reservationsystem.service.MessageService;
 import com.mycompany.reservationsystem.service.PermissionService;
+import com.mycompany.reservationsystem.transition.LabelTransition;
 import com.mycompany.reservationsystem.util.ComboBoxUtil;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.application.Platform;
@@ -17,6 +20,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -142,7 +146,7 @@ public class ReservationController {
     /* ===================== LABELS ===================== */
 
     @FXML
-    private Label
+    private Label response,
             CusToTable,
             pending, confirm, seated,
             cancelled, noshow, complete;
@@ -152,6 +156,8 @@ public class ReservationController {
     private Reservation selectedReservation;
     private User currentuser;
     private Message selectedMessage;
+    private double v;
+    private double h;
 
 
     @Autowired
@@ -313,6 +319,7 @@ public class ReservationController {
                         currentpax = row.getPax();
                         hideTableList(row.getId());
                         loadAvailableTable();
+                        v = ReservationPane.getVvalue();
                         System.out.println("Selected Reservation: " + row.getReference());
                     }
                 });
@@ -326,12 +333,17 @@ public class ReservationController {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    setText(String.valueOf(item != null ? item : ""));
-                    setGraphic(selectLabel);
+                    Reservation row = getTableView().getItems().get(getIndex());
+                    if (row.getTable() != null) { // If table assigned, hide the button
+                        setText(String.valueOf(row.getTable().getId()));
+                        setGraphic(null);
+                    } else {
+                        setText(String.valueOf(item != null ? item : ""));
+                        setGraphic(selectLabel);
+                    }
                 }
             }
         });
-
 
         applyTimeFormat(TimeCRT);
         applyStatusStyle(StatusCRT);
@@ -648,7 +660,61 @@ public class ReservationController {
         //ReservationPane.setVvalue(scrollPosition);
         adminUIController.getDashboardController().updateLabels();
         //TableManager.refresh();
+        Platform.runLater(() -> {
+            ReservationPane.setVvalue(v);
+        });
     }
+    @FXML
+    private void sendMessage() {
+
+        response.setText(null);
+        Platform.runLater(() -> response.setGraphic(new ProgressIndicator()));
+        sendsms.setDisable(true);
+
+        String port = AppSettings.loadSerialPort();
+        DeviceDetectionManager device = AdministratorUIController.getDeviceDetectionManager();
+
+        // Define a Task for sending the SMS
+        Task<Void> sendSmsTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                device.openPort(port, 115200);
+
+                String message = messagelabels.getValue().getMessageDetails();
+                String phoneNo = selectedReservation.getCustomer().getPhone();
+
+                // If sendMessage fails, it throws an exception
+                device.sendMessage(phoneNo, message);
+
+                return null; // task succeeded if no exception
+            }
+        };
+
+// Success handler
+        sendSmsTask.setOnSucceeded(evt -> {
+            response.setGraphic(null);
+            sendsms.setDisable(false);
+            sendResponse(true, "Message sent successfully!");
+        });
+
+        // Failure handler
+        sendSmsTask.setOnFailed(evt -> {
+            response.setGraphic(null);
+            sendsms.setDisable(false);
+            sendResponse(false, "Failed to send message");
+        });
+
+        // Start the task
+        Thread thread = new Thread(sendSmsTask);
+        thread.setDaemon(true);
+        thread.start();
+
+    }
+
+
+
+
+
 
     @FXML
     private void editCustomerReservation(){
@@ -672,6 +738,7 @@ public class ReservationController {
             controller.setDialogStage(dialogStage);
 
             dialogStage.showAndWait(); // wait until closed
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -681,6 +748,21 @@ public class ReservationController {
         adminUIController.getDashboardController().loadRecentReservations();
         //loadReservationReports();
         adminUIController.getDashboardController().barchart();
+
+    }
+
+    public void sendResponse(boolean successfully,String details){
+        if(!successfully){
+            response.getStyleClass().removeAll("login-success", "login-message");
+            response.getStyleClass().add("login-error");
+            response.setText(details);
+        }
+        else{
+            response.getStyleClass().removeAll("login-error", "login-message-hidden");
+            response.getStyleClass().add("login-success");
+            response.setText(details);
+        }
+        LabelTransition.play(response);
 
     }
 
@@ -722,6 +804,11 @@ public class ReservationController {
         setupAvailableTable();
         setupSCNReservation();
         setupReservationLogs();
+        sendsms.setFocusTraversable(false);
+        editreservation.setFocusTraversable(false);
+        Mergebtn.setFocusTraversable(false);
+
+
 
 
     }

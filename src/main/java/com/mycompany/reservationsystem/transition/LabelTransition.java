@@ -21,7 +21,7 @@ public class LabelTransition {
 
         // Reset visibility and opacity
         label.setVisible(true);
-        label.setManaged(true);
+        //label.setManaged(true);
         label.setOpacity(1);
 
         // Delay before fade out
@@ -36,7 +36,7 @@ public class LabelTransition {
         currentTransition = new SequentialTransition(pause, fadeOut);
         currentTransition.setOnFinished(e -> {
             label.setVisible(false);
-            label.setManaged(false);
+            //label.setManaged(false);
             label.setOpacity(1); // reset for next message
         });
 

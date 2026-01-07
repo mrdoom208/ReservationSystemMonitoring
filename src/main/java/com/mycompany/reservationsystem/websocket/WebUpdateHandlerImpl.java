@@ -78,12 +78,12 @@ public class WebUpdateHandlerImpl implements WebSocketListener {
 
                     case "NEW_RESERVATION" -> {
                         String smsMessage =
-                                "Hello " + dto.getCustomerName() + ", your reservation has been successfully made.\n" +
+                                "Hello " + dto.getCustomerName() + ", your reservation has been successfully made.\n"+
                                         "Reference: " + dto.getReference() + "\n" +
                                         "Party Size: " + dto.getPax() + "\n" +
-                                        "You can view or manage your reservation directly here: " + dto.getLink() + "\n" +
                                         "We look forward to welcoming you!";
 
+                        System.out.println(smsMessage + dto.getLink());
                         deviceDetectionManager.sendMessage(dto.getPhone(), smsMessage);
 
                         String key = "message.new";
