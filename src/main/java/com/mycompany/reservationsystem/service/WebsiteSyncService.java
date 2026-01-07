@@ -1,9 +1,14 @@
 package com.mycompany.reservationsystem.service;
 
+import com.mycompany.reservationsystem.config.AppSettings;
+import com.mycompany.reservationsystem.model.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import static com.mysql.cj.conf.PropertyKey.logger;
 
@@ -37,5 +42,12 @@ public class WebsiteSyncService {
         } catch (Exception e) {
             System.out.println("Failed to send auto-delete months");
         }
+    }
+    public String generateLoginLink(Reservation reservation) {
+        String baseUrl = AppSettings.loadApplicationUrl(); // e.g., https://myrestaurant.com
+        String phone = URLEncoder.encode(reservation.getCustomer().getPhone(), StandardCharsets.UTF_8);
+        String reference = URLEncoder.encode(reservation.getReference(), StandardCharsets.UTF_8);
+
+        return baseUrl + "/login?phone=" + phone + "&reference=" + reference;
     }
 }

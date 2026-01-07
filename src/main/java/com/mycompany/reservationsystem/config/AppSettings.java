@@ -15,12 +15,8 @@ public final class AppSettings {
     }
 
     public static String loadApplicationTitle() {
-        return PREFS.get("ApplicationTitle", "");
+        return PREFS.get("ApplicationTitle", "ROMANTIC BABOY RESERVATION SYSTEM");
     }
-
-
-
-
 
     // -------- SERIAL --------
     public static void saveSerialPort(String portName) {
@@ -46,7 +42,7 @@ public final class AppSettings {
     }
 
     public static String loadCancelTime() {
-        return PREFS.get("cancelTime", "");
+        return PREFS.get("cancelTime", "5 minutes");
     }
 
 
@@ -90,4 +86,14 @@ public final class AppSettings {
         return PREFS.get("database.deleteTime", "");
     }
 
+    public static void saveResolution(String resolution){
+        PREFS.put("resolution", resolution != null ? resolution : "");
+    }
+    public static String loadResolution(){
+        return PREFS.get("resolution","Fullscreen");
+    }
+
+    public static String loadApplicationUrl() {
+        return PREFS.get("app.url","http://localhost:8080");
+    }
 }

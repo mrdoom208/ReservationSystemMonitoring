@@ -1,6 +1,7 @@
 package com.mycompany.reservationsystem.controller.main;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.mycompany.reservationsystem.App;
 import com.mycompany.reservationsystem.config.AppSettings;
 import com.mycompany.reservationsystem.hardware.DeviceDetectionManager;
 import com.mycompany.reservationsystem.model.Message;
@@ -72,8 +73,9 @@ public class SettingsController {
     /*--------------------- GENERAL ------------------------------------*/
     @FXML
     private TextField ApplicationTitle;
+
     @FXML
-    private MFXComboBox<String> AutoCancelTime;
+    private MFXComboBox<String> Resolution,AutoCancelTime;
 
     /* ---------------- MESSAGING ---------------- */
     @FXML private MFXComboBox<SerialPort> messageDevicePortCombo;
@@ -113,8 +115,6 @@ public class SettingsController {
         DatabaseBtn.setManaged(permissionService.hasPermission(currentUser, "VIEW_DATABASE"));
 
         startPortMonitoring();
-
-
 
         showGeneral();
 
@@ -172,12 +172,14 @@ public class SettingsController {
     }
     /*=============================== GENERAL =========================================*/
     private void setupGeneral(){
+        List<String> resolutions = Arrays.asList("1400x900","1600x900","Fullscreen");
+        Resolution.getItems().addAll(resolutions);
+
 
         List<String> options = Arrays.asList("2 minutes", "5 minutes", "10 minutes", "15 minutes", "20 minutes");
         AutoCancelTime.getItems().addAll(options);
 
-        // Optional: set default selection
-        AutoCancelTime.selectItem("5 minutes");
+            AutoCancelTime.selectItem(AppSettings.loadCancelTime());
     }
     public int getSelectedMinutes() {
         String value = AutoCancelTime.getValue(); // e.g., "10 minutes"
@@ -417,6 +419,8 @@ public class SettingsController {
 
                 /*------------------ General ------------------------*/
                 AppSettings.saveApplicationTitle(ApplicationTitle.getText());
+                AppSettings.saveResolution(Resolution.getValue());
+                AppSettings.saveCancelTime(AutoCancelTime.getValue());
                 websiteSyncService.sendAutoCancelTime(getSelectedMinutes());
 
                 /*----------------- Messaging --------------------------*/
@@ -501,6 +505,15 @@ public class SettingsController {
 
     /* ================= RESTORE ================= */
     private void restoreSettings() {
+        //GENERAL
+        ApplicationTitle.setText(AppSettings.loadApplicationTitle());
+        Resolution.selectItem(AppSettings.loadResolution());
+        AutoCancelTime.selectItem(AppSettings.loadCancelTime());
+
+
+
+
+        //MESSAGING
         String saved = AppSettings.loadSerialPort();
         if (saved != null) {
             messageDevicePortCombo.getItems().stream()
@@ -509,10 +522,7 @@ public class SettingsController {
                     .ifPresent(messageDevicePortCombo::setValue);
         }
 
-        ApplicationTitle.setText(AppSettings.loadApplicationTitle());
-        System.out.println(AppSettings.loadApplicationTitle()+"app");
 
-        System.out.println(ApplicationTitle.getText()+"app");
 
         if(AppSettings.loadCancelTime() != null & !AppSettings.loadCancelTime().isBlank()){
             AutoCancelTime.selectItem(AppSettings.loadCancelTime());}

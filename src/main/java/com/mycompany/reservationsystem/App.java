@@ -3,6 +3,7 @@ package com.mycompany.reservationsystem;
 import com.mycompany.reservationsystem.config.AppSettings;
 import com.mycompany.reservationsystem.controller.main.AdministratorUIController;
 import com.mycompany.reservationsystem.util.BackgroundViewLoader;
+import com.mycompany.reservationsystem.websocket.WebSocketClient;
 import io.github.palexdev.materialfx.MFXResourcesLoader;
 import io.github.palexdev.materialfx.theming.JavaFXThemes;
 import io.github.palexdev.materialfx.theming.MaterialFXStylesheets;
@@ -35,8 +36,10 @@ public class App extends Application {
     public static Stage primaryStage;
     private static Scene scene;
     private ConfigurableApplicationContext springContext;
-    public static BackgroundViewLoader backgroundLoader;
+    public BackgroundViewLoader backgroundLoader;
     public String ApplicationTitle;
+    public WebSocketClient wsClient;
+
 
 
 
@@ -92,13 +95,17 @@ public class App extends Application {
         stage.show();
     }
     @Override
-    public void stop() {
+    public void stop() throws Exception{
+        super.stop();
         springContext.close();
 
         if(backgroundLoader != null){
         backgroundLoader.shutdown();
         }
-
+        if (wsClient != null) {
+            wsClient.disconnect();
+        }
+        System.exit(0);
     }
 
     public static void main(String[] args) {

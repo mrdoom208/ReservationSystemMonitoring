@@ -161,6 +161,7 @@ public class LoginController {
                 controller.setUser(found);
 
                 Stage stage = new Stage();
+                App.primaryStage = stage;
                 stage.setTitle(AppSettings.loadApplicationTitle());
                 Scene scene = new Scene(root);
                 stage.setScene(scene);
@@ -174,11 +175,15 @@ public class LoginController {
                             return "-fx-font-size: " + fontSize + "px;";
                         }, scene.widthProperty(), scene.heightProperty())
                 );
-                stage.initStyle(StageStyle.UNDECORATED);
-                stage.setMaximized(true);
+                if(AppSettings.loadResolution().equals("Fullscreen")){
+                    stage.initStyle(StageStyle.UNDECORATED);
+                    stage.setMaximized(true);
+                }else{
+                    applyResolution(stage,AppSettings.loadResolution());
+                }
                 stage.show();
 
-                ((Node) event.getSource()).getScene().getWindow().hide();
+                ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
 
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -226,9 +231,38 @@ public class LoginController {
         messageLabel.setText(message);
     }
 
-    private void hideMessage() {
-        messageLabel.getStyleClass().add("login-message-hidden");
-        messageLabel.setText("");
+    private void applyResolution(Stage stage, String resolution) {
+
+        if (resolution == null || resolution.isBlank()) {
+            return;
+        }
+
+        // Handle Fullscreen
+        if (resolution.equalsIgnoreCase("Fullscreen")) {
+            stage.setFullScreen(true);
+            return;
+        }
+
+        // Expected format: WIDTHxHEIGHT (e.g. 1600x900)
+        String[] parts = resolution.toLowerCase().split("x");
+
+        if (parts.length != 2) {
+            System.err.println("Invalid resolution format: " + resolution);
+            return;
+        }
+
+        try {
+            double width = Double.parseDouble(parts[0]);
+            double height = Double.parseDouble(parts[1]);
+
+            stage.setFullScreen(false);
+            stage.setWidth(width);
+            stage.setHeight(height);
+            stage.centerOnScreen();
+
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid resolution numbers: " + resolution);
+        }
     }
 }
     

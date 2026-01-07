@@ -53,6 +53,8 @@ public class AdministratorUIController implements Initializable {
     private static DeviceDetectionManager deviceDetectionManager = new DeviceDetectionManager();
 
 
+
+
     public void setDeviceDetectionManager(DeviceDetectionManager deviceDetectionManager) {
         AdministratorUIController.deviceDetectionManager = deviceDetectionManager;
     }
@@ -426,6 +428,7 @@ public class AdministratorUIController implements Initializable {
 
                 // Replace the scene content
                 Stage loginStage = new Stage();
+                App.primaryStage = loginStage;
                 loginStage.initStyle(StageStyle.TRANSPARENT);
                 Scene scn = new Scene(loginRoot);
                 scn.setFill(Color.TRANSPARENT);
