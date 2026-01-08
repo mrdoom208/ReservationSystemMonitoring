@@ -4,11 +4,13 @@ import com.mycompany.reservationsystem.model.Customer;
 import com.mycompany.reservationsystem.model.Reservation;
 import com.mycompany.reservationsystem.repository.ReservationRepository;
 import com.mycompany.reservationsystem.util.FieldValidators;
+import com.mycompany.reservationsystem.util.PhoneFormatter;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import static com.mycompany.reservationsystem.util.FieldRestrictions.*;
+import static com.mycompany.reservationsystem.util.FieldValidators.isNonZeroNumeric;
+import static com.mycompany.reservationsystem.util.FieldValidators.validateRequired;
 
 @Component
 public class editReservationController {
@@ -45,7 +49,7 @@ public class editReservationController {
     private MFXTextField Pax;
 
     @FXML
-    private MFXTextField Phone;
+    private TextField Phone;
 
     @FXML
     private MFXButton Submit;
@@ -62,7 +66,8 @@ public class editReservationController {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    private FieldValidators fieldValidators;
+    private PhoneFormatter phoneFormatter;
+
 
     private void showError(String message) {
         messageLabel.getStyleClass().removeAll("popup-success", "popup-message-hidden");
@@ -82,17 +87,17 @@ public class editReservationController {
         statusComboBox.setDisable(true);
         applyEmailRestriction(Email);
         applyNumbersOnly(Pax);
-        applyNumbersOnly(Phone);
+        phoneFormatter = new PhoneFormatter("+63",Phone);
         applyLettersOnly(CustomerName);
 
 
         cancelButton.setOnAction(e -> dialogStage.close());
         Submit.setOnAction(event -> {
-            if (!fieldValidators.validateRequired(CustomerName)) {showError("Please Insert Customer Name"); return;}
-            if (!fieldValidators.validateRequired(Pax)) {showError("Please Insert Pax Size"); return;}
-            if (!fieldValidators.isNonZeroNumeric(Pax)) {showError("Pax must be greater than zero."); return;}
-            if (!fieldValidators.validateRequired(Phone)){ showError("Please Insert Phone No."); return;}
-            if (!fieldValidators.startsWith09(Phone)) {showError("Please Insert Valid Phone No."); return;}
+            if (!validateRequired(CustomerName)) {showError("Please Insert Customer Name"); return;}
+            if (!validateRequired(Pax)) {showError("Please Insert Pax Size"); return;}
+            if (!isNonZeroNumeric(Pax)) {showError("Pax must be greater than zero."); return;}
+            if (!validateRequired(Phone)){ showError("Please Insert Phone No."); return;}
+            if (!phoneFormatter.isValid()) {showError("Please Insert Valid Phone No."); return;}
             if (Email.getText() != null && !Email.getText().trim().isEmpty()) {
                 // Email has text, so validate format
                 if (!isValidEmail(Email)) {
@@ -103,7 +108,7 @@ public class editReservationController {
             showSuccess("Reservation Changed Successfully");
             targetReservation.getCustomer().setName(CustomerName.getText());
             targetReservation.setPax(Integer.parseInt(Pax.getText()));
-            targetReservation.getCustomer().setPhone(Phone.getText());
+            targetReservation.getCustomer().setPhone(phoneFormatter.getCleanPhone());
             targetReservation.getCustomer().setEmail(Email.getText());
             reservationRepository.save(targetReservation);
             // close dialog after adding
