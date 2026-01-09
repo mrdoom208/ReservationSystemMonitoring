@@ -128,6 +128,10 @@ public class AdministratorUIController implements Initializable {
 
     WebSocketClient wsClient;
 
+    public WebSocketClient getWsClient() {
+        return wsClient;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Initialize background loader

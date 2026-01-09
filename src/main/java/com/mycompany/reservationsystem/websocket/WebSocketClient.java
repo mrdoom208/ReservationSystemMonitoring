@@ -40,9 +40,9 @@ public class WebSocketClient {
                 stompClient.connect(url, new StompSessionHandlerAdapter() {
                     @Override
                     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-                        stompSession = session;
                         System.out.println("WebSocket connected!");
 
+                        stompSession = session;
                         session.subscribe("/topic/forms", new StompFrameHandler() {
                             @Override
                             public Type getPayloadType(StompHeaders headers) {
@@ -86,6 +86,17 @@ public class WebSocketClient {
             e.printStackTrace();
         }
     }
+    public void send(Object payload) {
+        String destination ="/app/forms";
+        System.out.println("SENDSENSEND ");
+        if (stompSession != null && stompSession.isConnected()) {
+            System.out.println(stompSession);
+            stompSession.send(destination, payload);
+        } else {
+            System.err.println("WebSocket not connected, cannot send message");
+        }
+    }
+
     public String generateLoginLink(WebUpdateDTO reservation) {
         String baseUrl = AppSettings.loadApplicationUrl(); // e.g., https://myrestaurant.com
         String phone = URLEncoder.encode(reservation.getPhone(), StandardCharsets.UTF_8);

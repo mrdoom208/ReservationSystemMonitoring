@@ -4,6 +4,7 @@ import com.mycompany.reservationsystem.App;
 import com.mycompany.reservationsystem.config.AppSettings;
 import com.mycompany.reservationsystem.controller.popup.addReservationController;
 import com.mycompany.reservationsystem.controller.popup.editReservationController;
+import com.mycompany.reservationsystem.dto.WebUpdateDTO;
 import com.mycompany.reservationsystem.hardware.DeviceDetectionManager;
 import com.mycompany.reservationsystem.service.ActivityLogService;
 import com.mycompany.reservationsystem.model.*;
@@ -14,6 +15,7 @@ import com.mycompany.reservationsystem.service.MessageService;
 import com.mycompany.reservationsystem.service.PermissionService;
 import com.mycompany.reservationsystem.transition.LabelTransition;
 import com.mycompany.reservationsystem.util.ComboBoxUtil;
+import com.mycompany.reservationsystem.websocket.WebSocketClient;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -160,6 +162,7 @@ public class ReservationController {
     private double h;
 
 
+    WebSocketClient  webSocketClient;
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
@@ -671,6 +674,13 @@ public class ReservationController {
         Platform.runLater(() -> response.setGraphic(new ProgressIndicator()));
         sendsms.setDisable(true);
 
+            WebUpdateDTO dto = new WebUpdateDTO();
+            dto.setCode("TABLE_READY");
+            dto.setMessage("Open Confirmation Modal");
+            dto.setPhone(selectedReservation.getCustomer().getPhone());
+            dto.setReference(selectedReservation.getReference());
+
+
         String port = AppSettings.loadSerialPort();
         DeviceDetectionManager device = AdministratorUIController.getDeviceDetectionManager();
 
@@ -678,6 +688,9 @@ public class ReservationController {
         Task<Void> sendSmsTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
+                webSocketClient.send(dto);
+                System.out.println("DTO SEND");
+
                 device.openPort(port, 115200);
 
                 String message = messagelabels.getValue().getMessageDetails();
@@ -791,7 +804,7 @@ public class ReservationController {
         reservpane.minHeightProperty().bind(reservpane.widthProperty().multiply(1.456));
         hiddenTable.setVisible(false);
         hiddenTable.setManaged(false);
-
+        webSocketClient = adminUIController.getWsClient();
         editreservation.setDisable(selectedReservation == null);
 
         loadReservationsData();
