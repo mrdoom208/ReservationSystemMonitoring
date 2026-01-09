@@ -13,10 +13,13 @@ import com.mycompany.reservationsystem.repository.ReservationRepository;
 import com.mycompany.reservationsystem.repository.ReservationTableLogsRepository;
 import com.mycompany.reservationsystem.service.MessageService;
 import com.mycompany.reservationsystem.service.PermissionService;
+import com.mycompany.reservationsystem.service.SmsService;
 import com.mycompany.reservationsystem.transition.LabelTransition;
 import com.mycompany.reservationsystem.util.ComboBoxUtil;
+import com.mycompany.reservationsystem.util.NotificationManager;
 import com.mycompany.reservationsystem.websocket.WebSocketClient;
 import io.github.palexdev.materialfx.controls.*;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -38,6 +41,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -126,7 +130,6 @@ public class ReservationController {
     @FXML
     private MFXComboBox reservationfilter;
 
-    @FXML MFXComboBox<Message> messagelabels;
 
     @FXML
     private MFXTextField SearchCL;
@@ -175,6 +178,8 @@ public class ReservationController {
     PermissionService permissionService;
     @Autowired
     MessageService messageService;
+    @Autowired
+    SmsService smsService;
 
 
 
@@ -231,12 +236,7 @@ public class ReservationController {
 
     //////////////////////CUSTOMER RESERVATION TABLE////////////////////
     public void setupCustomerReservationTable() {
-        messagelabels.setItems(messageData);
-        ComboBoxUtil.formatMessageComboBox(messagelabels);
 
-        messagelabels.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            selectedMessage = newVal; // remember the selection
-        });
         CustomerReservationTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             selectedReservation = newSelection;
             editreservation.setDisable(newSelection == null);
@@ -576,17 +576,7 @@ public class ReservationController {
         }
         ReservationLogs.setPlaceholder(new Label("No Complete Reservation yet "));
     }
-    public void loadmessages(){
-        List<Message> allMessages = messageService.getAllMessages(); // or getAllMessageLabels()
-        messagelabels.getSelectionModel().clearSelection();
-        messageData.setAll(allMessages);
-        javafx.application.Platform.runLater(() -> {
-            if(selectedMessage != null){
-                messagelabels.setValue(selectedMessage);
-            }
 
-        });
-    }
 
     public void loadReservationLogs() {
         Platform.runLater(() -> {
@@ -689,15 +679,21 @@ public class ReservationController {
             @Override
             protected Void call() throws Exception {
                 webSocketClient.send(dto);
-                System.out.println("DTO SEND");
 
-                device.openPort(port, 115200);
+                String phoneNo = selectedReservation.getCustomer().getPhone();
+                String Details ="Hello "+selectedReservation.getCustomer().getName()+", your table is ready.\n" +
+                        "Please proceed to the reception for seating. Thank you.\n";
+
+                smsService.sendSms(phoneNo,Details);
+
+
+                /*device.openPort(port, 115200);
 
                 String message = messagelabels.getValue().getMessageDetails();
                 String phoneNo = selectedReservation.getCustomer().getPhone();
 
                 // If sendMessage fails, it throws an exception
-                device.sendMessage(phoneNo, message);
+                device.sendMessage(phoneNo, message);*/
 
                 return null; // task succeeded if no exception
             }
@@ -708,6 +704,27 @@ public class ReservationController {
             response.setGraphic(null);
             sendsms.setDisable(false);
             sendResponse(true, "Message sent successfully!");
+
+            Reservation currentReservation = selectedReservation;
+
+            PauseTransition delay = new PauseTransition(Duration.minutes(AppSettings.loadCancelTimeMinutes()));
+            delay.setOnFinished(e -> {
+                // Check if the reservation status is still the same
+                if (currentReservation.getStatus().equals("PENDING")) {
+                    currentReservation.setStatus("CANCELLED");
+                    currentReservation.setReservationCancelledtime(LocalTime.now());
+                    // Save this status to DB if needed
+                    reservationRepository.save(currentReservation);
+
+                    String Details = "Reservation from " + currentReservation.getCustomer().getName()
+                            + " | Ref: " + currentReservation.getReference()
+                            + " has been cancelled";
+
+                    // Optionally, notify the user
+                    NotificationManager.show("Reservation Cancelled",Details, NotificationManager.NotificationType.ERROR );
+                }
+            });
+            delay.play();
         });
 
         // Failure handler
@@ -809,7 +826,6 @@ public class ReservationController {
 
         loadReservationsData();
         loadCustomerReservationTable();
-        loadmessages();
         loadReservationLogs();
         loadSCNReservation();
         loadAvailableTable();

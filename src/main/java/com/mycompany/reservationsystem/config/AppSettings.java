@@ -44,6 +44,18 @@ public final class AppSettings {
     public static String loadCancelTime() {
         return PREFS.get("cancelTime", "5 minutes");
     }
+    public static int loadCancelTimeMinutes() {
+        String value = loadCancelTime(); // e.g., "5 minutes"
+
+        // Extract the first number from the string
+        try {
+            String numberOnly = value.replaceAll("\\D+", ""); // remove non-digits
+            return Integer.parseInt(numberOnly);
+        } catch (NumberFormatException e) {
+            // fallback to default 5 if parsing fails
+            return 5;
+        }
+    }
 
 
     public static String loadController() {

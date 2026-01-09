@@ -8,6 +8,7 @@ import com.mycompany.reservationsystem.controller.main.TableController;
 import com.mycompany.reservationsystem.dto.WebUpdateDTO;
 import com.mycompany.reservationsystem.hardware.DeviceDetectionManager;
 import com.mycompany.reservationsystem.service.MessageService;
+import com.mycompany.reservationsystem.service.SmsService;
 import com.mycompany.reservationsystem.util.NotificationManager;
 import javafx.application.Platform;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class WebUpdateHandlerImpl implements WebSocketListener {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private SmsService smsService;
 
     @Override
     public void onMessage(WebUpdateDTO dto) {
@@ -60,6 +64,11 @@ public class WebUpdateHandlerImpl implements WebSocketListener {
                         dto.getMessage(),
                         NotificationManager.NotificationType.CHANGE
                 );
+                case "CONFIRM_RESERVATION" -> NotificationManager.show(
+                        "Reservation Confirmed",
+                        dto.getMessage(),
+                        NotificationManager.NotificationType.CONFIRM
+                );
             }
 
             dashboardController.loadRecentReservations();
@@ -70,9 +79,8 @@ public class WebUpdateHandlerImpl implements WebSocketListener {
 
         /* ================= SERIAL THREAD ================= */
         new Thread(() -> {
-
             try {
-                deviceDetectionManager.openPort(port, 115200);
+                //deviceDetectionManager.openPort(port, 115200);
 
                 switch (dto.getCode()) {
 
@@ -102,16 +110,24 @@ public class WebUpdateHandlerImpl implements WebSocketListener {
                                     .ifPresent(msg -> sendSafe(dto.getPhone(), msg.getMessageDetails()));
                         }
                     }
+                    case "CONFIRM_RESERVATION" -> {
+                        String key = "message.confirm";
+                        if (AppSettings.loadMessageEnabled(key)) {
+                            messageService
+                                    .findByLabel(AppSettings.loadMessageLabel(key))
+                                    .ifPresent(msg -> sendSafe(dto.getPhone(), msg.getMessageDetails()));
+                        }
+                    }
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                try {
-                    Thread.sleep(2000);
+                /*try {
+
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
-                }
+                }*/
                 deviceDetectionManager.closePort();
             }
 
@@ -120,10 +136,12 @@ public class WebUpdateHandlerImpl implements WebSocketListener {
 
     /* ================= SAFE SEND ================= */
     private void sendSafe(String phone, String message) {
-        try {
+        smsService.sendSms(phone,message);
+
+        /*try {
             deviceDetectionManager.sendMessage(phone, message);
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }

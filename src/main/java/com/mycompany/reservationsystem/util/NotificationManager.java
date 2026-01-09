@@ -22,7 +22,10 @@ public class NotificationManager {
         ERROR,
         CHANGE,
         INFO,
-        WARNING
+        WARNING,
+        CONFIRM,
+        NO_SHOW
+
     }
 
     // Show notification
@@ -61,6 +64,16 @@ public class NotificationManager {
                 root.getStyleClass().add("warning-border");
                 iconCircle.getStyleClass().add("warning-icon");
                 icon.setText("⚠");
+            }
+            case CONFIRM -> {
+                root.getStyleClass().add("confirm-border");
+                iconCircle.getStyleClass().add("confirm-icon");
+                icon.setText("✔");
+            }
+            case NO_SHOW -> {
+                root.getStyleClass().add("noshow-border");
+                iconCircle.getStyleClass().add("noshow-icon");
+                icon.setText("⛔");
             }
         }
         icon.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");

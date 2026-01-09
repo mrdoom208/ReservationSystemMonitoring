@@ -823,7 +823,6 @@
 .filter-search {
     -fx-font-size: 1em;
     -fx-background-color: #2C2C2C;
-    -fx-background-radius: 8;
     -fx-padding: 6 10 6 10;
     -mfx-main: #E53935;           /* Accent color (floating line + focus) */
     -fx-text-fill: #E0E0E0;       /* typed text */
@@ -1012,6 +1011,36 @@
     -fx-border-width: 0 0 0 5;
     -fx-border-color: #E74C3C;
 }
+/* LEFT COLOR STRIP — CHANGE */
+.change-border {
+    -fx-border-width: 0 0 0 5;
+    -fx-border-color: #3B82F6;
+}
+
+/* LEFT COLOR STRIP — INFO */
+.info-border {
+    -fx-border-width: 0 0 0 5;
+    -fx-border-color: #38BDF8;
+}
+
+/* LEFT COLOR STRIP — WARNING */
+.warning-border {
+    -fx-border-width: 0 0 0 5;
+    -fx-border-color: #F59E0B;
+}
+
+/* LEFT COLOR STRIP — CONFIRM */
+.confirm-border {
+    -fx-border-width: 0 0 0 5;
+    -fx-border-color: #22C55E;
+}
+
+/* LEFT COLOR STRIP — NO SHOW */
+.noshow-border {
+    -fx-border-width: 0 0 0 5;
+    -fx-border-color: #DC2626;
+}
+
 
 /* ICON CIRCLE */
 .icon-circle {
@@ -1035,6 +1064,32 @@
 .error-icon {
     -fx-background-color: #E74C3C;
 }
+/* CHANGE ICON COLOR */
+.change-icon {
+    -fx-background-color: #3B82F6;
+}
+
+/* INFO ICON COLOR */
+.info-icon {
+    -fx-background-color: #38BDF8;
+}
+
+/* WARNING ICON COLOR */
+.warning-icon {
+    -fx-background-color: #F59E0B;
+}
+
+/* CONFIRM ICON COLOR */
+.confirm-icon {
+    -fx-background-color: #22C55E;
+}
+
+/* NO SHOW ICON COLOR */
+.noshow-icon {
+    -fx-background-color: #DC2626;
+}
+
+
 
 /* TITLE TEXT */
 .notification-title {
