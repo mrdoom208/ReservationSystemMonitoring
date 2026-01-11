@@ -184,7 +184,6 @@ public class LoginController {
                     applyResolution(stage,AppSettings.loadResolution());
                 }
                 stage.show();
-
                 ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
 
                 ActivityLog log = new ActivityLog();

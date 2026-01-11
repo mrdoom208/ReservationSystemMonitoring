@@ -11,6 +11,7 @@ public class ActivityLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "username")
     private String user;        // username of the person performing the action
 
     private String position;    // new field: role/position of the user

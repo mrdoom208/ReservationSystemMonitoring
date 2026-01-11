@@ -159,7 +159,6 @@ public class ReservationController {
     /* ===================== STATE ===================== */
 
     private Reservation selectedReservation;
-    private User currentuser;
     private Message selectedMessage;
     private double v;
     private double h;
@@ -183,7 +182,6 @@ public class ReservationController {
 
 
 
-    @Autowired
     public ReservationController(AdministratorUIController adminUIController) {
         this.adminUIController = adminUIController;
     }
@@ -240,6 +238,7 @@ public class ReservationController {
         CustomerReservationTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             selectedReservation = newSelection;
             editreservation.setDisable(newSelection == null);
+            sendsms.setDisable(newSelection==null);
         });
 
         CustomerReservationTable.setItems(secondfilteredReservationList);
@@ -424,7 +423,7 @@ public class ReservationController {
         AvailableTable.setItems(filteredtable);
         applyStatusStyle(StatusAT);
 
-        filteredtable.setPredicate(table -> table.getCapacity() > currentpax);
+        filteredtable.setPredicate(table -> table.getCapacity() >= currentpax);
         AvailableTable.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSelection, newSelection) -> {
                     selectedTable = newSelection;
@@ -636,11 +635,8 @@ public class ReservationController {
 
             reservationRepository.save(cr);
 
-        }else{
-            System.out.println(selectedTable);
-            System.out.println(cr);
-
         }
+        User currentuser = adminUIController.getCurrentUser();
 
         activityLogService.logAction(currentuser.getUsername(),String.valueOf(currentuser.getPosition()),"Table","Update Status",String.format("Changed table %d status from %s to Reserved for %s", cr.getTable().getId(),currentStatus,cr.getReference()));
 
@@ -659,7 +655,7 @@ public class ReservationController {
     }
     @FXML
     private void sendMessage() {
-
+        webSocketClient = adminUIController.getWsClient();
         response.setText(null);
         Platform.runLater(() -> response.setGraphic(new ProgressIndicator()));
         sendsms.setDisable(true);
@@ -678,13 +674,19 @@ public class ReservationController {
         Task<Void> sendSmsTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                webSocketClient.send(dto);
-
-                String phoneNo = selectedReservation.getCustomer().getPhone();
-                String Details ="Hello "+selectedReservation.getCustomer().getName()+", your table is ready.\n" +
-                        "Please proceed to the reception for seating. Thank you.\n";
-
-                smsService.sendSms(phoneNo,Details);
+                try {
+                    webSocketClient.send(dto);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    String phoneNo = selectedReservation.getCustomer().getPhone();
+                    String Details = "Hello " + selectedReservation.getCustomer().getName() + ", your table is ready.\n"
+                            + "Please proceed to the reception for seating. Thank you.\n";
+                    smsService.sendSms(phoneNo, Details);
+                } catch (Exception e) {
+                    throw new Exception("SMS send failed", e);
+                }
 
 
                 /*device.openPort(port, 115200);
@@ -731,7 +733,9 @@ public class ReservationController {
         sendSmsTask.setOnFailed(evt -> {
             response.setGraphic(null);
             sendsms.setDisable(false);
+            Throwable exception = sendSmsTask.getException();
             sendResponse(false, "Failed to send message");
+
         });
 
         // Start the task
@@ -797,6 +801,7 @@ public class ReservationController {
     }
 
     private void applyPermissions() {
+        User currentuser = adminUIController.getCurrentUser();
         if (currentuser == null) return;
 
         // Map each button to its required permission code
@@ -816,18 +821,16 @@ public class ReservationController {
 
     @FXML
     private void initialize(){
-        currentuser = adminUIController.getCurrentUser();
-        applyPermissions();
         reservpane.minHeightProperty().bind(reservpane.widthProperty().multiply(1.456));
         hiddenTable.setVisible(false);
         hiddenTable.setManaged(false);
-        webSocketClient = adminUIController.getWsClient();
+        sendsms.setDisable(selectedReservation == null);
         editreservation.setDisable(selectedReservation == null);
 
-        loadReservationsData();
-        loadCustomerReservationTable();
-        loadReservationLogs();
-        loadSCNReservation();
+        //loadReservationsData();
+        //loadCustomerReservationTable();
+        //loadReservationLogs();
+        //loadSCNReservation();
         loadAvailableTable();
         setupCustomerReservationTable();
         setupAvailableTable();
@@ -836,8 +839,7 @@ public class ReservationController {
         sendsms.setFocusTraversable(false);
         editreservation.setFocusTraversable(false);
         Mergebtn.setFocusTraversable(false);
-
-
+        applyPermissions();
 
 
     }

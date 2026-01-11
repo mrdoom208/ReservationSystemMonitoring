@@ -3,6 +3,7 @@ package com.mycompany.reservationsystem.service;
 import com.mycompany.reservationsystem.config.AppSettings;
 import com.mycompany.reservationsystem.model.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,7 +17,9 @@ import static com.mysql.cj.conf.PropertyKey.logger;
 public class WebsiteSyncService {
 
     private final RestTemplate restTemplate;
-    private String WebsiteUrl = "http://localhost:8080";
+
+    @Value("${website.url}")
+    private String WebsiteUrl;
     private String websiteSettings = WebsiteUrl+"/settings/auto-cancel";
 
     @Autowired

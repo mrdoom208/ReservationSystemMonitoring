@@ -11,6 +11,7 @@ import jakarta.persistence.*;
  * @author formentera
  */
 @Entity
+@Table(name = "users")
 public class User {
     
     @Id

@@ -199,13 +199,12 @@
                         </HBox>
                         <VBox minHeight="500.0" prefWidth="1100.0" spacing="10.0" styleClass="Statistics-cell" GridPane.rowIndex="3">
                             <children>
-                              <Region prefHeight="149.0" prefWidth="1092.0" />
                                 <HBox alignment="CENTER" prefHeight="60.0" prefWidth="1100.0">
                                     <children>
                                         <Label styleClass="BoldText" text="SEATED, CANCELLED, NO SHOW RESERVATIONS" textAlignment="CENTER" />
                                     </children>
                                 </HBox>
-                                <TableView fx:id="SCNReservations" prefHeight="367.0" prefWidth="1050.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
+                                <TableView fx:id="SCNReservations" prefWidth="1050.0" styleClass="DefaultTable" VBox.vgrow="ALWAYS">
                                     <columns>
                                         <TableColumn fx:id="refSCNR" prefWidth="75.0" text="Reference" />
                                         <TableColumn fx:id="customerSCNR" prefWidth="75.0" text="Customer" />

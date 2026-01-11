@@ -46,11 +46,13 @@ public class WebSocketClient {
                         session.subscribe("/topic/forms", new StompFrameHandler() {
                             @Override
                             public Type getPayloadType(StompHeaders headers) {
+                                System.out.println("Websocket is ready!222");
                                 return WebUpdateDTO.class;
                             }
 
                             @Override
                             public void handleFrame(StompHeaders headers, Object payload) {
+                                System.out.println("Websocket is ready!123");
                                 WebUpdateDTO reservation = (WebUpdateDTO) payload;
                                 reservation.setLink(generateLoginLink(reservation));
 
@@ -59,7 +61,9 @@ public class WebSocketClient {
                                     Platform.runLater(() -> l.onMessage(reservation));
                                 }
                             }
+
                         });
+                        System.out.println("Websocket is ready!");
                     }
 
                     @Override

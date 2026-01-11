@@ -53,11 +53,10 @@ import static com.mycompany.reservationsystem.util.TableCellFactoryUtil.*;
 public class TableController {
 
     // ====================== Constructor-injected dependencies ======================
-    @Autowired
     private AdministratorUIController adminUIController;
 
     // ====================== Other Dependencies ======================
-    private User currentuser;
+    public User currentuser;
 
     @Autowired
     private ConfigurableApplicationContext springContext;
@@ -139,9 +138,15 @@ public class TableController {
 
     private LocalDate applyDate;
 
+    public TableController(AdministratorUIController adminUIController) {
+        this.adminUIController = adminUIController;
+    }
+
 
     //////////////////////TABLE MANAGER////////////////////////////
     public void setupTableManager() {
+        User currentuser = adminUIController.getCurrentUser();
+        AddTablebtn.setDisable(!permissionService.hasPermission(currentuser,"ADD_TABLE"));
         AddTablebtn.setOnAction(e -> showAddTableDialog());
         tablesfilteredData = new FilteredList<>(tableManagerData, p -> true);
         TableManager.setItems(tablesfilteredData);
@@ -586,14 +591,14 @@ public class TableController {
 
 
     public void initialize(){
+
          applyDate = LocalDate.now();
-         currentuser = adminUIController.getCurrentUser();
-         AddTablebtn.setDisable(!permissionService.hasPermission(currentuser,"ADD_TABLE"));
          tablepane.minHeightProperty().bind(tablepane.widthProperty().multiply(0.95));
          loadTableManager();
          loadTableHistory();
          setupTableManager();
          setupTableHistory();
+
 
     }
 

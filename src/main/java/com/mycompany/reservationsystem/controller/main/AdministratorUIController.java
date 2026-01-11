@@ -27,6 +27,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -52,7 +53,8 @@ public class AdministratorUIController implements Initializable {
     private static BackgroundViewLoader viewLoader;
     private static DeviceDetectionManager deviceDetectionManager = new DeviceDetectionManager();
 
-
+    @Value("${server.url}")
+    private String Domain;
 
 
     public void setDeviceDetectionManager(DeviceDetectionManager deviceDetectionManager) {
@@ -160,7 +162,7 @@ public class AdministratorUIController implements Initializable {
 
 
         // Setup WebSocket in separate thread
-        this.wsClient = new WebSocketClient("ws://localhost:8080/ws");
+        this.wsClient = new WebSocketClient(Domain);
         this.wsClient.addListener(webUpdateHandler);
         this.wsClient.connect();
 
